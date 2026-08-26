@@ -1,0 +1,404 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  ArrowLeft,
+  Minus,
+  Plus,
+  Trash2,
+  Store,
+  TicketPercent,
+  MapPin,
+  Navigation,
+  Edit3
+} from 'lucide-react';
+import { useCart } from '@/context/CartContext';
+import { useLocation } from '@/context/LocationContext';
+import { StepProgressBar } from './StepProgressBar';
+
+export default function CheckoutPageContent() {
+  const router = useRouter();
+  const { cart, increment, decrement, removeItem, clearCart } = useCart();
+  const { selectedLocation, openLocationDrawer } = useLocation();
+
+  // Form state
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [deliveryOption, setDeliveryOption] = useState<'gps' | 'custom'>('gps');
+  const [houseDetail, setHouseDetail] = useState('');
+  const [customAddress, setCustomAddress] = useState('');
+  const [additionalNote, setAdditionalNote] = useState('');
+  const [makeDefault, setMakeDefault] = useState(false);
+  const [coupon, setCoupon] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(cart.map(i => i.id)));
+
+  const allSelected = cart.length > 0 && selectedIds.size === cart.length;
+
+  const toggleSelectAll = () => {
+    if (allSelected) setSelectedIds(new Set());
+    else setSelectedIds(new Set(cart.map(i => i.id)));
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectedItems = cart.filter(item => selectedIds.has(item.id));
+  const productTotal = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const deliveryCharge = 0;
+  const discount = 0;
+  const totalPayable = productTotal + deliveryCharge - discount;
+
+  // Group by store
+  const storeGroups = cart.reduce<Record<string, typeof cart>>((acc, item) => {
+    const store = item.storeName || 'Default Store';
+    if (!acc[store]) acc[store] = [];
+    acc[store].push(item);
+    return acc;
+  }, {});
+
+  const handlePlaceOrder = () => {
+    if (!fullName || !phone) return;
+    if (deliveryOption === 'custom' && !customAddress.trim()) return;
+    clearCart();
+    router.push('/checkout-flow/success');
+  };
+
+  const isFormValid =
+    fullName.trim() !== '' &&
+    phone.trim() !== '' &&
+    (deliveryOption === 'gps' || customAddress.trim() !== '') &&
+    selectedItems.length > 0;
+
+  return (
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
+      {/* Back + Title */}
+      <div className="flex items-center gap-3 mb-2">
+        <button onClick={() => router.back()} className="text-slate-600 hover:text-emerald-600 transition">
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Checkout</h1>
+      </div>
+
+      {/* Step Bar */}
+      <StepProgressBar currentStep={3} />
+
+      <div className="flex flex-col lg:flex-row gap-6 mt-4">
+        {/* LEFT COLUMN */}
+        <div className="flex-1 space-y-6">
+          {/* ──── SHIPPING FORM ──── */}
+          <div className="bg-white rounded-xl border border-slate-100 shadow-xs p-5 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Full Name */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={e => setFullName(e.target.value)}
+                  placeholder="Enter your full name"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
+                />
+              </div>
+
+              {/* Phone Number */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">
+                  Phone Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="Enter your phone number"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
+                />
+              </div>
+            </div>
+
+            {/* ──── DELIVERY LOCATION (GPS AUTO-DETECT VS MANUAL CUSTOM) ──── */}
+            <div className="space-y-3 pt-2">
+              <label className="text-xs font-bold text-slate-700 block">
+                Delivery Location <span className="text-red-500">*</span>
+              </label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Option 1: Current GPS / Selected Header Location */}
+                <div
+                  onClick={() => setDeliveryOption('gps')}
+                  className={`p-3.5 rounded-xl border-2 transition cursor-pointer flex flex-col justify-between ${
+                    deliveryOption === 'gps'
+                      ? 'border-emerald-500 bg-emerald-50/40 shadow-xs'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                        <MapPin className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="font-extrabold text-xs text-slate-900 block">
+                          Current GPS Location
+                        </span>
+                        <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+                          {selectedLocation.title}
+                        </span>
+                      </div>
+                    </div>
+                    <input
+                      type="radio"
+                      name="deliveryOption"
+                      checked={deliveryOption === 'gps'}
+                      onChange={() => setDeliveryOption('gps')}
+                      className="accent-emerald-600 w-4 h-4 mt-1"
+                    />
+                  </div>
+
+                  <p className="text-xs text-slate-600 mt-2.5 line-clamp-2 leading-relaxed">
+                    {selectedLocation.address}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openLocationDrawer();
+                    }}
+                    className="mt-3 text-[11px] font-extrabold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                  >
+                    <Navigation className="w-3 h-3" /> Change via Map / GPS
+                  </button>
+                </div>
+
+                {/* Option 2: Custom Manual Address */}
+                <div
+                  onClick={() => setDeliveryOption('custom')}
+                  className={`p-3.5 rounded-xl border-2 transition cursor-pointer flex flex-col justify-between ${
+                    deliveryOption === 'custom'
+                      ? 'border-emerald-500 bg-emerald-50/40 shadow-xs'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+                        <Edit3 className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="font-extrabold text-xs text-slate-900 block">
+                          Order to another location
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-medium">
+                          Enter address manually
+                        </span>
+                      </div>
+                    </div>
+                    <input
+                      type="radio"
+                      name="deliveryOption"
+                      checked={deliveryOption === 'custom'}
+                      onChange={() => setDeliveryOption('custom')}
+                      className="accent-emerald-600 w-4 h-4 mt-1"
+                    />
+                  </div>
+
+                  <p className="text-xs text-slate-500 mt-2.5 leading-relaxed">
+                    Enter full street address, house no, or landmark manually for custom delivery.
+                  </p>
+                </div>
+              </div>
+
+              {/* Extra input field depending on selection */}
+              {deliveryOption === 'custom' ? (
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-xs font-bold text-slate-700">
+                    Manual Address Details <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={customAddress}
+                    onChange={e => setCustomAddress(e.target.value)}
+                    placeholder="Building / House No / Floor / Street / Area details"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-xs font-bold text-slate-700">
+                    House / Flat No / Landmark (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={houseDetail}
+                    onChange={e => setHouseDetail(e.target.value)}
+                    placeholder="e.g. Flat 4B, House 12, Near Central Mosque"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Additional Instruction */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700">Additional Instruction</label>
+              <input
+                type="text"
+                value={additionalNote}
+                onChange={e => setAdditionalNote(e.target.value)}
+                placeholder="Enter additional instruction for the address (optional)"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
+              />
+            </div>
+
+            {/* Make Default */}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={makeDefault}
+                onChange={e => setMakeDefault(e.target.checked)}
+                className="w-4 h-4 accent-emerald-600 rounded"
+              />
+              <span className="text-xs font-medium text-emerald-600">Make it default address</span>
+            </label>
+          </div>
+
+          {/* ──── PRODUCT LIST ──── */}
+          <div className="flex items-center gap-3 px-4 py-3 bg-white rounded-xl border border-slate-100 shadow-xs">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={toggleSelectAll}
+              className="w-4 h-4 accent-emerald-600 rounded"
+            />
+            <span className="text-xs font-bold text-slate-700">
+              Select All ({selectedIds.size}/{cart.length})
+            </span>
+          </div>
+
+          {Object.entries(storeGroups).map(([storeName, items]) => (
+            <div key={storeName} className="bg-white rounded-xl border border-slate-100 shadow-xs p-5 space-y-3">
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <Store className="w-4 h-4 text-emerald-600" />
+                <span className="font-extrabold text-sm text-slate-900">{storeName}</span>
+              </div>
+
+              {items.map(item => (
+                <div key={item.id} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(item.id)}
+                      onChange={() => toggleSelect(item.id)}
+                      className="w-4 h-4 accent-emerald-600 rounded"
+                    />
+                    <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover bg-slate-100" />
+                    <div>
+                      <h4 className="font-bold text-xs sm:text-sm text-slate-800">{item.name}</h4>
+                      <p className="text-[11px] text-slate-400">৳{item.price} x {item.quantity}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <span className="font-black text-xs sm:text-sm text-slate-900">৳{item.price * item.quantity}</span>
+                    <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+                      <button onClick={() => decrement(item.id)} className="w-5 h-5 rounded bg-white text-slate-700 flex items-center justify-center text-xs font-bold">
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="text-xs font-extrabold px-1.5">{item.quantity}</span>
+                      <button onClick={() => increment(item.id)} className="w-5 h-5 rounded bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <button onClick={() => removeItem(item.id)} className="text-slate-400 hover:text-rose-500 transition">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* RIGHT COLUMN: SUMMARY */}
+        <div className="w-full lg:w-[360px] flex-shrink-0">
+          <div className="sticky top-4 space-y-4">
+            {/* Voucher / Coupon */}
+            <div className="bg-white rounded-xl border border-slate-100 shadow-xs p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <TicketPercent className="w-4.5 h-4.5 text-emerald-600" />
+                <span className="font-bold text-sm text-slate-800">Apply a Voucher / Coupon</span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={coupon}
+                  onChange={e => setCoupon(e.target.value)}
+                  placeholder="Enter coupon code"
+                  className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm placeholder-slate-400 focus:outline-none focus:border-emerald-400 transition"
+                />
+                <button className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition">
+                  Apply
+                </button>
+              </div>
+            </div>
+
+            {/* Summary Card */}
+            <div className="bg-white rounded-xl border border-slate-100 shadow-xs p-5 space-y-4">
+              <h3 className="font-black text-base text-slate-900">Summary</h3>
+
+              <div className="space-y-2.5 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Product Price</span>
+                  <span className="font-bold text-slate-800">৳{productTotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Standard Delivery</span>
+                  <span className="font-bold text-slate-800">৳{deliveryCharge}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Discount</span>
+                  <span className="font-bold text-slate-800">৳{discount}</span>
+                </div>
+              </div>
+
+              <hr className="border-slate-100" />
+
+              <div className="flex justify-between text-sm">
+                <span className="font-black text-slate-900">Total Payable</span>
+                <span className="font-black text-emerald-700 text-lg">৳{totalPayable.toLocaleString()}</span>
+              </div>
+
+              {/* Payment Method */}
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-slate-700">Payment Method</span>
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 border-emerald-500 bg-emerald-50">
+                  <div className="w-4 h-4 rounded-full border-2 border-emerald-500 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  </div>
+                  <span className="text-xs font-bold text-emerald-700">Cash on Delivery</span>
+                </div>
+              </div>
+
+              <button
+                onClick={handlePlaceOrder}
+                disabled={!isFormValid}
+                className="w-full py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-black text-sm shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                Place Order
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

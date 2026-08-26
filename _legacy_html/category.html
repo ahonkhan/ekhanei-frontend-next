@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Category Details — ShymMarket Express</title>
+  <meta name="description"
+    content="Explore service category products, special offers, top brands, and local stores on ShymMarket Express.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome Pro 6.5.1 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              900: '#064e3b',
+              950: '#022c22',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col pb-20 md:pb-0">
+
+  <!-- ========================================== -->
+  <!-- HEADER & NAVBAR                            -->
+  <!-- ========================================== -->
+  <header
+    class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-all duration-300">
+
+    <!-- Top Delivery Location Strip -->
+    <div class="bg-slate-900 text-white text-xs py-1.5 px-4 sm:px-6">
+      <div class="max-w-[1440px] mx-auto flex items-center justify-between">
+
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-location-dot text-emerald-400 text-xs"></i>
+          <span class="text-slate-300 hidden sm:inline">Delivering to:</span>
+          <button id="location-picker-btn"
+            class="font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition">
+            <span id="current-location-text" class="truncate max-w-[200px] sm:max-w-[320px]">Rangpur Sadar,
+              Rangpur</span>
+            <i class="fa-solid fa-chevron-down text-[10px] ml-0.5"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-4 text-[11px] text-slate-300">
+          <span
+            class="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">
+            <i class="fa-solid fa-bolt text-[10px] text-amber-400"></i>
+            <span>20 Min Express</span>
+          </span>
+          <a href="#" class="hover:text-white hidden md:inline transition">Help & Support</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 py-2.5 sm:py-3">
+      <div class="flex items-center justify-between gap-3 sm:gap-6">
+
+        <!-- Back Button & Brand Logo -->
+        <div class="flex items-center gap-3">
+          <a href="index.html"
+            class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs shadow-sm touch-active"
+            aria-label="Back to home">
+            <i class="fa-solid fa-arrow-left text-sm"></i>
+          </a>
+
+          <a href="index.html" class="flex items-center gap-2 group">
+            <div
+              class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center text-lg sm:text-xl font-extrabold shadow-md group-hover:scale-105 transition">
+              <i class="fa-solid fa-store"></i>
+            </div>
+            <div class="hidden sm:block">
+              <span class="font-extrabold text-lg sm:text-xl text-slate-900 tracking-tight block leading-none">Shym<span
+                  class="text-emerald-600">Market</span></span>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mt-0.5">Category
+                Store</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-xl relative">
+          <div class="relative">
+            <i
+              class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"></i>
+            <input type="text" id="global-search-input" placeholder="Search items in this category..."
+              class="w-full pl-9 sm:pl-10 pr-10 py-2 sm:py-2.5 bg-slate-100/90 focus:bg-white text-xs sm:text-sm rounded-2xl border border-slate-200/80 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition shadow-inner">
+          </div>
+        </div>
+
+        <!-- Cart Button -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button id="cart-header-btn"
+            class="open-cart-trigger relative flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-white px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-md transition touch-active">
+            <div class="relative">
+              <i class="fa-solid fa-basket-shopping text-sm sm:text-base"></i>
+              <span
+                class="cart-badge-count hidden absolute -top-2 -right-2 bg-emerald-500 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.2 rounded-full border border-white min-w-[18px] text-center">0</span>
+            </div>
+            <span class="font-bold text-xs hidden md:inline">Cart</span>
+            <span class="cart-total-header text-xs font-extrabold text-emerald-400 ml-1">৳0</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- CATEGORY PAGE MAIN CONTAINER               -->
+  <!-- ========================================== -->
+  <main class="max-w-[1440px] mx-auto px-4 sm:px-6 space-y-6 sm:space-y-10 pt-4 sm:pt-6 pb-6">
+
+    <!-- Category Title Header -->
+    <div class="flex items-center justify-between pb-3 border-b border-slate-200/80">
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-7 rounded-full bg-emerald-500"></div>
+        <div>
+          <h1 id="category-page-title" class="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+            Fresh Fish
+          </h1>
+          <p id="category-page-subtitle" class="text-xs text-slate-500 font-medium mt-0.5">Explore deals, top brands,
+            popular items, and local stores</p>
+        </div>
+      </div>
+
+      <a href="index.html"
+        class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 transition">
+        <span>Back to Home</span>
+        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+      </a>
+    </div>
+
+    <!-- 1. CATEGORY HERO SLIDER (Images Only, No Overlay Text) -->
+    <section
+      class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border border-slate-200/60 aspect-[21/9] sm:aspect-[24/8] bg-slate-900">
+      <div id="category-hero-slider" class="w-full h-full relative">
+        <!-- Rendered via category.js -->
+      </div>
+    </section>
+
+    <!-- 2. SUB-CATEGORIES FILTER RAIL -->
+    <section class="space-y-2">
+      <div id="category-subcategories-rail" class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+        <!-- Rendered via category.js -->
+      </div>
+    </section>
+
+    <!-- 3. আজকের বিশেষ অফার (TODAY'S SPECIAL OFFERS) -->
+    <section class="space-y-4">
+      <div class="flex items-center gap-2.5">
+        <div class="w-1.5 h-6 bg-orange-500 rounded-full"></div>
+        <h2 class="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">আজকের বিশেষ অফার</h2>
+      </div>
+      <div id="category-special-offers-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-1">
+        <!-- Rendered via category.js -->
+      </div>
+    </section>
+
+    <!-- 4. TOP BRANDS -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">Top Brands</h2>
+      </div>
+      <div id="category-brands-rail" class="flex gap-3 overflow-x-auto no-scrollbar py-1">
+        <!-- Rendered via category.js -->
+      </div>
+    </section>
+
+    <!-- 5. POPULAR PRODUCTS (SLIDER) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">Popular Products</h2>
+        <div class="flex items-center gap-1.5">
+          <button data-scroll-target="category-popular-products-rail" data-scroll-dir="-320"
+            class="rail-scroll-btn w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button data-scroll-target="category-popular-products-rail" data-scroll-dir="320"
+            class="rail-scroll-btn w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="category-popular-products-rail"
+        class="flex gap-1 sm:gap-1 overflow-x-auto no-scrollbar snap-x-rail py-1">
+        <!-- Rendered via category.js -->
+      </div>
+    </section>
+
+    <!-- 6. POPULAR STORES -->
+    <section class="space-y-4">
+      <h2 class="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">Popular Stores</h2>
+      <div id="category-stores-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1 sm:gap-1">
+        <!-- Rendered via category.js -->
+      </div>
+    </section>
+
+    <!-- 7. ALL PRODUCTS (LOAD ON SCROLL) -->
+    <section class="space-y-4 pt-2">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">All Products</h2>
+        <span id="all-products-count" class="text-xs font-semibold text-slate-400">Showing items</span>
+      </div>
+
+      <!-- Grid of Pink Tinted "Shop Under ৳..." Cards -->
+      <div id="category-all-products-grid"
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-4">
+        <!-- Rendered via category.js -->
+      </div>
+
+      <!-- Infinite Scroll Loading Spinner -->
+      <div id="scroll-loading-indicator" class="py-8 text-center hidden">
+        <div
+          class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-md">
+          <i class="fa-solid fa-circle-notch fa-spin text-emerald-600"></i>
+          <span>Loading more items...</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- FOOTER (Desktop Only)                      -->
+  <!-- ========================================== -->
+  <footer
+    class="hidden md:block mt-16 bg-slate-950 text-slate-400 text-xs border-t border-slate-800/80 relative overflow-hidden">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10 relative z-10">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
+        <p>© 2026 ShymMarket Hyperlocal Express Inc. All rights reserved.</p>
+        <p class="text-[10px] text-slate-400">Rangpur Sadar, Bangladesh 🇧🇩</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- MOBILE STICKY CART BAR                      -->
+  <!-- ========================================== -->
+  <div id="mobile-sticky-cart-bar" class="md:hidden fixed bottom-16 left-3 right-3 z-45 hidden">
+    <button
+      class="open-cart-trigger w-full bg-slate-950 text-white p-3 rounded-2xl shadow-2xl border border-emerald-500/50 flex items-center justify-between backdrop-blur-md touch-active">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-8 h-8 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-extrabold text-xs">
+          <i class="fa-solid fa-basket-shopping"></i>
+        </div>
+        <div class="text-left">
+          <span class="cart-bar-items block text-xs font-bold text-white">0 items</span>
+          <span class="text-[10px] text-emerald-400 font-medium">Extra delivery discounts applied</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="cart-bar-total text-sm font-extrabold text-emerald-400">৳0</span>
+        <div class="bg-emerald-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-xl flex items-center gap-1">
+          <span>View Cart</span>
+          <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </div>
+      </div>
+    </button>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION                    -->
+  <!-- ========================================== -->
+  <nav
+    class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-2 py-1.5 flex items-center justify-around shadow-lg">
+    <a href="index.html"
+      class="bottom-nav-item flex flex-col items-center gap-0.5 text-slate-400 text-[10px] py-1 touch-active">
+      <i class="fa-solid fa-house text-base"></i>
+      <span>Home</span>
+    </a>
+
+    <a href="index.html#service-categories-section"
+      class="bottom-nav-item flex flex-col items-center gap-0.5 text-emerald-600 font-bold text-[10px] py-1 touch-active">
+      <i class="fa-solid fa-border-all text-base"></i>
+      <span>Categories</span>
+    </a>
+
+    <button
+      class="open-cart-trigger bottom-nav-item relative flex flex-col items-center gap-0.5 text-slate-400 text-[10px] py-1 touch-active">
+      <div class="relative">
+        <i class="fa-solid fa-basket-shopping text-base"></i>
+        <span
+          class="cart-badge-count hidden absolute -top-1.5 -right-2 bg-emerald-600 text-white text-[9px] font-extrabold px-1 rounded-full min-w-[14px] text-center">0</span>
+      </div>
+      <span>Cart</span>
+    </button>
+  </nav>
+
+  <!-- JavaScript Dependencies -->
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/interactions.js"></script>
+  <script src="assets/js/category.js"></script>
+</body>
+
+</html>
