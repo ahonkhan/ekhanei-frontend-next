@@ -440,10 +440,57 @@ export const STORES: Store[] = [
     deliveryTime: "25–35 min",
     distance: "1.2 km",
     offer: "20% OFF",
-    coverImage: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-    logoImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=150&q=80",
+    coverImage: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
+    logoImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80",
     isPopular: true,
-    tags: ["Kacchi", "Traditional", "Biryani"]
+    verified: true,
+    tags: ["Kacchi Biryani", "Traditional", "Charcoal Grill", "Borhani"],
+    bio: "Authentic Bangladeshi Kacchi Biryani & Special Charcoal Grill prepared fresh daily with pure ghee, mustard oil & secret aromatic spices. Top rated culinary experience in Rangpur! 🍲🔥",
+    address: "Plot #14, Station Road, Rangpur Sadar, Rangpur",
+    phone: "+880 1712-345678",
+    email: "contact@sultansdine.com.bd",
+    openingHours: "Open Daily • 10:30 AM – 11:30 PM",
+    joinedDate: "Member since Jan 2021",
+    totalOrders: "15,400+ Delivered",
+    followersCount: "24.5k",
+    minOrder: 150,
+    deliveryFee: 30,
+    storeCategories: [
+      { id: "all", name: "All Items" },
+      { id: "kacchi", name: "Kacchi & Biryani" },
+      { id: "grill", name: "Grill & Kabab" },
+      { id: "combo", name: "Family Combos" },
+      { id: "drinks", name: "Beverages & Drinks" }
+    ],
+    gallery: [
+      "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=600&q=80"
+    ],
+    reviews: [
+      {
+        id: "r1",
+        userName: "Rafiqul Islam",
+        userAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
+        rating: 5,
+        date: "2 days ago",
+        comment: "Kacchi Biryani was super delicious! The mutton piece was so tender and juicy. Fast delivery in 20 minutes."
+      },
+      {
+        id: "r2",
+        userName: "Tanvir Ahmed",
+        userAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80",
+        rating: 5,
+        date: "1 week ago",
+        comment: "Best Borhani and Grill Chicken in Rangpur Sadar! Packaging was top notch and heat sealed."
+      }
+    ],
+    socialLinks: {
+      facebook: "https://facebook.com/sultansdine",
+      instagram: "https://instagram.com/sultansdine",
+      whatsapp: "https://wa.me/8801712345678"
+    }
   },
   {
     id: "s2",
@@ -454,10 +501,31 @@ export const STORES: Store[] = [
     deliveryTime: "15–25 min",
     distance: "0.8 km",
     offer: "Fresh River Catch",
-    coverImage: "https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=600&q=80",
-    logoImage: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=150&q=80",
+    coverImage: "https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=1200&q=80",
+    logoImage: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=300&q=80",
     isPopular: true,
-    tags: ["Hilsha", "Prawns", "Rui", "Katla"]
+    verified: true,
+    tags: ["Hilsha", "Prawns", "Rui", "Katla", "Sea Fish"],
+    bio: "100% Chemical & Formalin free daily morning catch directly from Padma & Meghna rivers. Expert fish cutting & doorstep cleaning included! 🐟⚓",
+    address: "Shop 42, Central Fish Market, Rangpur",
+    phone: "+880 1812-987654",
+    email: "orders@padmafisheries.com",
+    openingHours: "Open Daily • 06:00 AM – 09:00 PM",
+    joinedDate: "Member since Mar 2022",
+    totalOrders: "9,800+ Delivered",
+    followersCount: "18.2k",
+    minOrder: 300,
+    deliveryFee: 25,
+    storeCategories: [
+      { id: "all", name: "All Fish" },
+      { id: "river", name: "River Fish (নদীর মাছ)" },
+      { id: "prawn", name: "Chingri & Prawns" },
+      { id: "sea", name: "Sea Fish" }
+    ],
+    gallery: [
+      "https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80"
+    ]
   },
   {
     id: "s3",
@@ -468,10 +536,24 @@ export const STORES: Store[] = [
     deliveryTime: "20–30 min",
     distance: "1.5 km",
     offer: "Up to 50% OFF",
-    coverImage: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=600&q=80",
-    logoImage: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=150&q=80",
+    coverImage: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=1200&q=80",
+    logoImage: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=300&q=80",
     isPopular: true,
-    tags: ["Beauty", "Dresses", "Men", "Women"]
+    verified: true,
+    tags: ["Men's Wear", "Women's Collection", "Beauty", "Accessories"],
+    bio: "Trendy streetwear, ethnic panjabi & saree collections, premium fragrances & modern apparel for all seasons. Express instant try-on at doorstep! 👗👔✨",
+    address: "Level 2, City Center Mall, Park Road, Rangpur",
+    phone: "+880 1912-112233",
+    openingHours: "Open Daily • 10:00 AM – 09:30 PM",
+    followersCount: "32.1k",
+    minOrder: 500,
+    deliveryFee: 40,
+    storeCategories: [
+      { id: "all", name: "All Fashion" },
+      { id: "men", name: "Men's Collection" },
+      { id: "women", name: "Women's Fashion" },
+      { id: "beauty", name: "Cosmetics & Care" }
+    ]
   },
   {
     id: "s4",
@@ -482,10 +564,24 @@ export const STORES: Store[] = [
     deliveryTime: "10–20 min",
     distance: "0.5 km",
     offer: "24/7 Open",
-    coverImage: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80",
-    logoImage: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=150&q=80",
+    coverImage: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=1200&q=80",
+    logoImage: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=300&q=80",
     isPopular: true,
-    tags: ["Medicine", "Baby Care", "Wellness"]
+    verified: true,
+    tags: ["Prescription Meds", "Baby Care", "Healthcare", "First Aid"],
+    bio: "24 Hours emergency medicine & healthcare delivery. 100% authentic medicine from certified pharmaceutical companies with temperature-controlled logistics. 💊🩺",
+    address: "Hospital Road, Gate No 2, Rangpur Sadar",
+    phone: "+880 1612-445566",
+    openingHours: "24/7 Open (Always Available)",
+    followersCount: "45.8k",
+    minOrder: 50,
+    deliveryFee: 15,
+    storeCategories: [
+      { id: "all", name: "All Medicines" },
+      { id: "otc", name: "OTC Medicines" },
+      { id: "baby", name: "Baby Care" },
+      { id: "firstaid", name: "Wellness & First Aid" }
+    ]
   },
   {
     id: "s5",
@@ -496,10 +592,24 @@ export const STORES: Store[] = [
     deliveryTime: "20–30 min",
     distance: "1.1 km",
     offer: "Flat ৳500 Cashback",
-    coverImage: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80",
-    logoImage: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=150&q=80",
+    coverImage: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+    logoImage: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=300&q=80",
     isPopular: true,
-    tags: ["Headphones", "Smartwatch", "Gadgets"]
+    verified: true,
+    tags: ["Smartphones", "Earbuds", "Smartwatches", "Power Banks"],
+    bio: "Official warranty gadget store! Premium sound gear, smartwatches, fast chargers, mobile accessories and authentic tech gadgets. 🎧📱⚡",
+    address: "Shop 105, Zilla Parishad Market, Rangpur",
+    phone: "+880 1711-998877",
+    openingHours: "Open Sat-Thu • 10:00 AM – 09:00 PM",
+    followersCount: "19.4k",
+    minOrder: 200,
+    deliveryFee: 30,
+    storeCategories: [
+      { id: "all", name: "All Gadgets" },
+      { id: "audio", name: "Headphones & TWS" },
+      { id: "watches", name: "Smartwatches" },
+      { id: "cables", name: "Chargers & Cables" }
+    ]
   },
   {
     id: "s6",
@@ -510,10 +620,24 @@ export const STORES: Store[] = [
     deliveryTime: "15–25 min",
     distance: "1.0 km",
     offer: "Free Delivery",
-    coverImage: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80",
-    logoImage: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=150&q=80",
+    coverImage: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
+    logoImage: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=300&q=80",
     isPopular: true,
-    tags: ["Rice", "Oil", "Lentils", "Spices"]
+    verified: true,
+    tags: ["Rice", "Oil", "Lentils", "Spices", "Snacks"],
+    bio: "Your neighborhood super store! Daily fresh groceries, packaged food, household cleaning essentials & kitchen staples delivered to your doorstep in 20 minutes. 🛒🌾",
+    address: "College Road, Near Carmichael College, Rangpur",
+    phone: "+880 1512-334455",
+    openingHours: "Open Daily • 07:00 AM – 11:00 PM",
+    followersCount: "28.9k",
+    minOrder: 100,
+    deliveryFee: 0,
+    storeCategories: [
+      { id: "all", name: "All Grocery" },
+      { id: "staples", name: "Rice & Lentils" },
+      { id: "oil", name: "Oil & Spices" },
+      { id: "snacks", name: "Snacks & Drinks" }
+    ]
   }
 ];
 
@@ -878,7 +1002,26 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 410,
     storeName: "Kazi Farms Kitchen",
-    discountBadge: "Ready 5-Min",
-    isPopular: true
   }
 ];
+
+// Helper Functions for Stores
+export const getStoreById = (id: string): Store => {
+  const store = STORES.find(s => s.id === id);
+  return store || STORES[0];
+};
+
+export const getProductsByStore = (store: Store): Product[] => {
+  const storeNameKey = store.name.toLowerCase().split(' ')[0];
+  const directMatches = PRODUCTS.filter(p => p.storeName?.toLowerCase().includes(storeNameKey));
+  if (directMatches.length > 0) return directMatches;
+
+  // Fallback to category products if specific store items are fewer
+  const categoryKey = store.category.toLowerCase();
+  const categoryMatches = PRODUCTS.filter(p => 
+    p.categoryName?.toLowerCase().includes(categoryKey) || 
+    p.categoryId?.toLowerCase().includes(categoryKey.split(' ')[0])
+  );
+
+  return categoryMatches.length > 0 ? categoryMatches : PRODUCTS.slice(0, 8);
+};

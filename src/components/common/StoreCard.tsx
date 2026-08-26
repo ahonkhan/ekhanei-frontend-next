@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Store } from '@/types';
 import { Tag, Clock, Star, MapPin } from 'lucide-react';
 
@@ -13,8 +14,9 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) =
   const widthClass = isGrid ? 'w-full' : 'snap-start flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[340px]';
 
   return (
-    <div
-      className={`${widthClass} rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md overflow-hidden flex flex-col cursor-pointer transition-all duration-300 group touch-active select-none`}
+    <Link
+      href={`/store/${store.id}`}
+      className={`${widthClass} rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md overflow-hidden flex flex-col cursor-pointer transition-all duration-300 group touch-active select-none block`}
     >
       {/* Cover Image Box */}
       <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
@@ -74,6 +76,6 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) =
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

@@ -36,6 +36,22 @@ export interface Product {
   flashStock?: number;
 }
 
+export interface StoreCategoryTab {
+  id: string;
+  name: string;
+  count?: number;
+}
+
+export interface StoreReview {
+  id: string;
+  userName: string;
+  userAvatar: string;
+  rating: number;
+  date: string;
+  comment: string;
+  likesCount?: number;
+}
+
 export interface Store {
   id: string;
   name: string;
@@ -50,6 +66,25 @@ export interface Store {
   isPopular?: boolean;
   isNew?: boolean;
   tags?: string[];
+  bio?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  openingHours?: string;
+  joinedDate?: string;
+  totalOrders?: string;
+  followersCount?: string;
+  verified?: boolean;
+  minOrder?: number;
+  deliveryFee?: number;
+  storeCategories?: StoreCategoryTab[];
+  gallery?: string[];
+  reviews?: StoreReview[];
+  socialLinks?: {
+    facebook?: string;
+    instagram?: string;
+    whatsapp?: string;
+  };
 }
 
 export interface SpecialOffer {

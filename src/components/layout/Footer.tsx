@@ -53,7 +53,7 @@ export const Footer: React.FC = () => {
                 <img
                   src="/logo.png"
                   alt="Logo"
-                  className="h-10 sm:h-12 w-auto object-contain brightness-0 invert"
+                  className="h-10 sm:h-12 w-auto object-contain"
                 />
               </Link>
               
