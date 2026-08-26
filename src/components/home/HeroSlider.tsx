@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, MapPin } from 'lucide-react';
+import { useLocation } from '@/context/LocationContext';
 
 export const HeroSlider: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { selectedLocation } = useLocation();
 
   return (
     <section className="w-full relative overflow-hidden select-none bg-[#c2185b]">
@@ -14,6 +16,25 @@ export const HeroSlider: React.FC = () => {
           alt="Bangladesh's Favorite Online Fashion Mall"
           className="w-full h-full object-cover object-center"
         />
+
+        {/* Location pill overlay on small devices (top-left over banner, non-clickable display) */}
+        <div className="absolute z-10 top-3 left-3 sm:top-4 sm:left-4 md:hidden">
+          <div
+            className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-black/25 border border-white/40 backdrop-blur-md text-left shadow-md cursor-default select-none max-w-[240px] xs:max-w-[280px]"
+          >
+            <div className="w-6 h-6 rounded-full bg-white/25 text-white flex items-center justify-center text-xs shrink-0 font-black">
+              <MapPin className="w-3.5 h-3.5 text-white" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="block text-[9px] font-bold text-white/80 uppercase tracking-wider leading-none">
+                DELIVER TO
+              </span>
+              <span className="text-xs font-extrabold text-white truncate block mt-0.5">
+                {selectedLocation.title} — {selectedLocation.address}
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Search Bar overlay centered at the bottom of the banner image */}
         <div className="absolute z-10 bottom-3 sm:bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-[85%] sm:w-[88%] max-w-sm sm:max-w-xl">

@@ -23,7 +23,7 @@ export const Header: React.FC = () => {
   const isHomePage = pathname === '/';
 
   const { totalItemsCount, setIsCartOpen } = useCart();
-  const { selectedLocation, openLocationDrawer } = useLocation();
+  const { selectedLocation } = useLocation();
 
   return (
     <>
@@ -51,7 +51,7 @@ export const Header: React.FC = () => {
                 />
               </Link>
 
-              {/* Static Location Pill Display (Non-clickable) */}
+              {/* Static Location Display (Non-clickable) */}
               <div
                 className="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-transparent via-white/15 to-white/35 border border-white/40 backdrop-blur-md text-left shadow-xs cursor-default select-none"
               >
@@ -66,7 +66,6 @@ export const Header: React.FC = () => {
                     {selectedLocation.title} — {selectedLocation.address}
                   </span>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-white/80 shrink-0 ml-0.5" />
               </div>
             </div>
 
@@ -134,10 +133,7 @@ export const Header: React.FC = () => {
           <div className="px-4 py-2.5 space-y-2">
             {/* Top Row */}
             <div className="flex items-center justify-between">
-              <button
-                onClick={openLocationDrawer}
-                className="flex items-center gap-2 text-left group cursor-pointer"
-              >
+              <div className="flex items-center gap-2 text-left select-none">
                 <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">
                   <MapPin className="w-4 h-4" />
                 </div>
@@ -145,14 +141,11 @@ export const Header: React.FC = () => {
                   <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">
                     Deliver to
                   </span>
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs font-bold text-slate-900 line-clamp-1 max-w-[200px]">
-                      {selectedLocation.title} — {selectedLocation.address}
-                    </span>
-                    <ChevronDown className="w-3 h-3 text-slate-400" />
-                  </div>
+                  <span className="text-xs font-bold text-slate-900 line-clamp-1 max-w-[200px] block">
+                    {selectedLocation.title} — {selectedLocation.address}
+                  </span>
                 </div>
-              </button>
+              </div>
 
               <div className="flex items-center gap-2">
                 <button className="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-xs relative">
