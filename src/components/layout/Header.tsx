@@ -1,125 +1,164 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useLocation } from '@/context/LocationContext';
-import { 
-  Menu, 
-  MapPin, 
-  Search, 
-  ShoppingBag, 
-  Heart, 
-  Smartphone, 
-  ChevronDown, 
-  User, 
-  Bell, 
-  Truck 
-} from 'lucide-react';
+import { SearchInput } from '@/components/common/SearchInput';
+import { CategoryMenuDrawer } from '@/components/layout/CategoryMenuDrawer';
+import { Menu, Heart, ShoppingCart, ChevronDown, MapPin } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { totalItemsCount, setIsCartOpen } = useCart();
-  const { selectedLocation } = useLocation();
+  const { selectedLocation, openLocationDrawer } = useLocation();
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+  const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 shadow-md">
-      {/* Main Solid Pink/Magenta Header Bar */}
-      <div className="bg-[#d81b60] text-white py-3 px-2 sm:px-3 md:px-5">
-        <div className="w-full max-w-full mx-auto flex items-center justify-between gap-2.5 sm:gap-6 h-[58px]">
-          
-          {/* Left: Hamburger Menu + Govaly Brand Logo */}
-          <div className="flex items-center gap-3 sm:gap-5 flex-shrink-0">
-            <button
-              type="button"
-              className="p-1.5 sm:p-2 hover:bg-white/10 rounded-xl transition text-white cursor-pointer"
-              title="Open Menu"
-            >
-              <Menu className="w-6 h-6 sm:w-6.5 sm:h-6.5" />
-            </button>
+    <>
+      {/* Mobile App Download Banner (Positioned ABOVE Header) */}
+      <div className="lg:hidden flex items-center justify-between bg-white px-3.5 py-2 border-b border-slate-100 shadow-2xs shrink-0 w-full z-[1001] relative">
+        <div className="flex items-center gap-3">
+          <img
+            src="/app-icon.png"
+            alt="App Icon"
+            className="w-10 h-10 rounded-xl object-contain shrink-0 shadow-2xs"
+          />
+          <div>
+            <h4 className="font-extrabold text-xs text-slate-900 leading-snug">App Download</h4>
+            <p className="text-[10px] font-medium text-slate-500 leading-tight">Get exciting deals in app</p>
+          </div>
+        </div>
 
-            <Link href="/" className="flex items-center gap-2.5 group">
+        <a
+          href="https://play.google.com/store/apps/details?id=com.ekhanei.customer.app&pcampaignid=web_share"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="py-1.5 px-4 rounded-full bg-[#d81b60] hover:bg-[#c2185b] active:bg-[#a8144b] text-white font-extrabold text-xs shadow-xs transition active:scale-95 cursor-pointer inline-flex items-center justify-center"
+        >
+          Open App
+        </a>
+      </div>
+
+      <header className="w-full transition-all ease-in-out duration-500 sticky top-0 left-0 right-0 z-[1000] overflow-visible h-[50px] md:h-18 text-white bg-[#d81b60] backdrop-blur-md shadow-md">
+        <div className="h-13 md:h-full w-full flex justify-between items-center pr-4 sm:pr-7 pl-3.5 max-w-[1680px] mx-auto">
+
+          {/* Left: Hamburger Menu & Logo */}
+          <div className="w-fit flex items-center gap-3 sm:gap-4 shrink-0">
+            <Menu
+              onClick={() => setIsMenuDrawerOpen(true)}
+              className="w-6 h-6 cursor-pointer text-white hover:opacity-80 transition"
+            />
+            <Link href="/">
               <img
+                alt="Logo"
+                width="130"
+                height="33"
+                className="w-22.5 h-5.75 md:w-32.5 md:h-8.25 object-contain brightness-0 invert"
                 src="/logo.png"
-                alt="Govaly Logo"
-                className="h-8 sm:h-10 md:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
             </Link>
 
-            {/* Static Location Display (Non-clickable) */}
+            {/* Location Pill (Desktop Header) */}
             <div
-              className="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-transparent via-white/15 to-white/35 border border-white/40 backdrop-blur-md text-left shadow-xs cursor-default select-none"
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-transparent via-white/15 to-white/35 border border-white/40 backdrop-blur-md text-left shadow-xs cursor-default select-none shrink-0 max-w-[180px]"
             >
-              <div className="w-6 h-6 rounded-full bg-white/25 text-white flex items-center justify-center text-xs shrink-0 font-black">
-                <MapPin className="w-3.5 h-3.5 text-white" />
+              <div className="w-5 h-5 rounded-full bg-white/25 text-white flex items-center justify-center text-xs shrink-0 font-black">
+                <MapPin className="w-3 h-3 text-white" />
               </div>
-              <div>
-                <span className="block text-[9px] font-bold text-white/80 uppercase tracking-wider leading-none">
-                  Deliver to
-                </span>
-                <span className="text-xs font-extrabold text-white truncate block mt-0.5 max-w-[130px] sm:max-w-[160px]">
-                  {selectedLocation.title} — {selectedLocation.address}
-                </span>
-              </div>
+              <span className="text-xs font-extrabold text-white truncate block max-w-[130px]">
+                {selectedLocation.title} — {selectedLocation.address}
+              </span>
             </div>
           </div>
 
-          {/* Right Action Icons & User Account */}
-          <div className="flex items-center gap-4 sm:gap-6 text-white select-none">
-            
-            {/* App Download Link */}
-            <div className="hidden lg:flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition">
-              <Smartphone className="w-6 h-6 text-white shrink-0" />
-              <div className="text-left leading-none font-bold text-[11px]">
-                <span className="block">Download the</span>
-                <span className="block font-black text-xs mt-0.5">Govaly App</span>
-              </div>
+          {!isHomePage ? (
+            <div className="w-full max-w-173.5 flex-1 flex ml-3 md:mx-7 lg:px-0">
+              <SearchInput />
             </div>
+          ) : (
+            <div className="flex-1" />
+          )}
 
-            <div className="hidden lg:block w-[1px] h-6 bg-white/30" />
+          {/* Right: Actions */}
+          <div className="min-w-fit hidden gap-3 md:flex justify-between items-center">
 
-            {/* Track Order Link */}
-            <Link href="/track-order" className="flex flex-col items-center gap-0.5 cursor-pointer hover:opacity-90 transition">
-              <Truck className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
-              <span className="text-[10px] sm:text-[11px] font-bold">Track</span>
+            {/* Download App Tooltip */}
+            <a
+              href="https://play.google.com/store/apps/details?id=com.ekhanei.customer.app&pcampaignid=web_share"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden lg:flex items-center hover:opacity-85 transition cursor-pointer"
+            >
+              <svg width="35" height="35" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15.7493 2.33398H12.2493C9.49949 2.33398 8.12456 2.33398 7.27028 3.18825C6.41602 4.04253 6.41602 5.41746 6.41602 8.16732V19.834C6.41602 22.5838 6.41602 23.9587 7.27028 24.8131C8.12456 25.6673 9.49949 25.6673 12.2493 25.6673H15.7493C18.4992 25.6673 19.8741 25.6673 20.7284 24.8131C21.5827 23.9587 21.5827 22.5838 21.5827 19.834V8.16732C21.5827 5.41746 21.5827 4.04253 20.7284 3.18825C19.8741 2.33398 18.4992 2.33398 15.7493 2.33398Z" stroke="white" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M16.3327 2.33398H11.666L12.2493 3.50065H15.7493L16.3327 2.33398Z" stroke="white" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <p className="text-xs font-semibold leading-tight mr-2 ml-1 text-white">
+                Download the <br />EkhaneiApp
+              </p>
+            </a>
+
+            <div className="hidden lg:block h-9 border-l border-white/40" />
+
+            {/* Wishlist Button */}
+            <Link href="/profile">
+              <button
+                type="button"
+                className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-4 py-2 flex flex-col items-center justify-center cursor-pointer gap-0"
+              >
+                <div className="relative">
+                  <Heart className="w-5 h-5" />
+                </div>
+                <span className="text-[11px]">Wishlist</span>
+              </button>
             </Link>
 
-            {/* Cart Drawer Trigger Button */}
+            {/* Cart Button */}
             <button
-              onClick={() => setIsCartOpen(true)}
               type="button"
-              className="flex flex-col items-center gap-0.5 cursor-pointer hover:opacity-90 transition relative"
+              onClick={() => setIsCartOpen(true)}
+              className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-4 py-2 flex flex-col items-center justify-center cursor-pointer gap-0 relative"
             >
               <div className="relative">
-                <ShoppingBag className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+                <ShoppingCart className="w-5 h-5" />
                 {totalItemsCount > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-white text-[#d81b60] text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md">
+                  <span className="absolute flex items-center justify-center -top-2.5 -right-3 h-4.5 w-4.5 rounded-full bg-white text-[#d81b60] text-[11px] font-bold shadow-xs">
                     {totalItemsCount}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] sm:text-[11px] font-bold">Cart</span>
+              <span className="text-[11px]">Cart</span>
             </button>
 
-            <div className="w-[1px] h-5 sm:h-6 bg-white/30" />
+            <div className="h-9 border-l border-white/40" />
 
-            {/* User Account Profile Link */}
-            <Link href="/profile" className="flex items-center gap-2 sm:gap-2.5 cursor-pointer hover:opacity-90 transition">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white/80 flex items-center justify-center font-black text-xs bg-white/20 uppercase">
-                A
-              </div>
-              <div className="hidden xs:block text-left leading-none text-[11px] font-semibold">
-                <span className="block text-white/80 text-[10px]">Hi, Customer</span>
-                <div className="flex items-center gap-1 mt-0.5 font-extrabold text-white">
-                  <span>Account</span>
-                  <ChevronDown className="w-3 h-3 text-white" />
+            {/* Account Profile Trigger */}
+            <Link href="/profile">
+              <button
+                type="button"
+                className="flex h-full min-w-[140px] items-center gap-2.5 rounded-sm px-1 text-left text-white outline-none hover:opacity-90 transition"
+              >
+                <div className="flex size-9 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-white/20 text-xs font-semibold text-white">
+                  <span>A</span>
                 </div>
-              </div>
+                <span className="flex min-w-0 flex-col text-xs font-medium leading-tight text-white">
+                  <span className="truncate font-medium">Hi, Customer</span>
+                  <span className="flex items-center gap-1 text-[11px]">Account <ChevronDown className="w-3.5 h-3.5" /></span>
+                </span>
+              </button>
             </Link>
 
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <CategoryMenuDrawer
+        isOpen={isMenuDrawerOpen}
+        onClose={() => setIsMenuDrawerOpen(false)}
+      />
+    </>
   );
 };

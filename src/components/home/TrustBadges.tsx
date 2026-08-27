@@ -4,56 +4,152 @@ import React from 'react';
 
 export const TrustBadges: React.FC = () => {
   return (
-    <section className="w-full py-0">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-        {/* Badge 1: Cash On Delivery */}
-        <div className="bg-white rounded-xl py-2 px-3 sm:py-2.5 sm:px-4 shadow-2xs border border-slate-100/90 flex items-center justify-center gap-2 sm:gap-2.5 group hover:border-[#d81b60]/30 hover:shadow-xs transition-all duration-300">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#d81b60]/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#d81b60]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-              <rect x="2" y="6" width="20" height="12" rx="2" />
-              <circle cx="12" cy="12" r="3" />
-              <path strokeLinecap="round" d="M6 12h.01M18 12h.01" />
-            </svg>
+    <section className="w-full">
+      {/* Desktop Grid (hidden on mobile) */}
+      <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Cash On Delivery */}
+        <div className="text-card-foreground flex flex-col gap-6 rounded-sm py-6 shadow-sm shadow-primary/10 flex-1 h-[66px] hover:shadow-lg transition-all duration-200 bg-white border border-slate-100">
+          <div className="px-6 h-full">
+            <div className="flex justify-center items-center gap-1 w-full h-full">
+              <div className="rounded-lg">
+                <img
+                  alt="Cash On Delivery"
+                  loading="lazy"
+                  width="43"
+                  height="42"
+                  src="https://govaly.com.bd/assets/delivery/image-1.png"
+                />
+              </div>
+              <span className="text-gray-800 font-medium text-[16.6px]">Cash On Delivery</span>
+            </div>
           </div>
-          <span className="text-xs sm:text-sm font-semibold text-slate-800 tracking-tight whitespace-nowrap">
-            Cash On Delivery
-          </span>
         </div>
 
-        {/* Badge 2: Instant Return */}
-        <div className="bg-white rounded-xl py-2 px-3 sm:py-2.5 sm:px-4 shadow-2xs border border-slate-100/90 flex items-center justify-center gap-2 sm:gap-2.5 group hover:border-[#d81b60]/30 hover:shadow-xs transition-all duration-300">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#d81b60]/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#d81b60]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
+        {/* Card 2: Instant Return */}
+        <div className="text-card-foreground flex flex-col gap-6 rounded-sm py-6 shadow-sm shadow-primary/10 flex-1 h-[66px] hover:shadow-lg transition-all duration-200 bg-white border border-slate-100">
+          <div className="px-6 h-full">
+            <div className="flex justify-center items-center gap-1 w-full h-full">
+              <div className="rounded-lg">
+                <img
+                  alt="Instant Return"
+                  loading="lazy"
+                  width="43"
+                  height="42"
+                  src="https://govaly.com.bd/assets/delivery/image-2.png"
+                />
+              </div>
+              <span className="text-gray-800 font-medium text-[16.6px]">Instant Return</span>
+            </div>
           </div>
-          <span className="text-xs sm:text-sm font-semibold text-slate-800 tracking-tight whitespace-nowrap">
-            Instant Return
-          </span>
         </div>
 
-        {/* Badge 3: Delivery Within 48hrs */}
-        <div className="bg-white rounded-xl py-2 px-3 sm:py-2.5 sm:px-4 shadow-2xs border border-slate-100/90 flex items-center justify-center gap-2 sm:gap-2.5 group hover:border-[#d81b60]/30 hover:shadow-xs transition-all duration-300">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#d81b60]/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#d81b60]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+        {/* Card 3: Delivery Within 48hrs */}
+        <div className="text-card-foreground flex flex-col gap-6 rounded-sm py-6 shadow-sm shadow-primary/10 flex-1 h-[66px] hover:shadow-lg transition-all duration-200 bg-white border border-slate-100">
+          <div className="px-6 h-full">
+            <div className="flex justify-center items-center gap-1 w-full h-full">
+              <div className="rounded-lg">
+                <img
+                  alt="Delivery Within"
+                  loading="lazy"
+                  width="43"
+                  height="42"
+                  src="https://govaly.com.bd/assets/delivery/image-3.png"
+                />
+              </div>
+              <span className="text-gray-800 font-medium text-[16.6px]">
+                Delivery Within <span className="text-[#d81b60]">48hrs</span>
+              </span>
+            </div>
           </div>
-          <span className="text-xs sm:text-sm font-semibold text-slate-800 tracking-tight whitespace-nowrap">
-            Delivery Within <span className="text-[#d81b60] font-bold">48hrs</span>
-          </span>
         </div>
 
-        {/* Badge 4: Best Price Deal */}
-        <div className="bg-white rounded-xl py-2 px-3 sm:py-2.5 sm:px-4 shadow-2xs border border-slate-100/90 flex items-center justify-center gap-2 sm:gap-2.5 group hover:border-[#d81b60]/30 hover:shadow-xs transition-all duration-300">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#d81b60]/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#d81b60]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
+        {/* Card 4: Best Price Deal */}
+        <div className="text-card-foreground flex flex-col gap-6 rounded-sm py-6 shadow-sm shadow-primary/10 flex-1 h-[66px] hover:shadow-lg transition-all duration-200 bg-white border border-slate-100">
+          <div className="px-6 h-full">
+            <div className="flex justify-center items-center gap-1 w-full h-full">
+              <div className="rounded-lg">
+                <img
+                  alt="Best Price Deal"
+                  loading="lazy"
+                  width="43"
+                  height="42"
+                  src="https://govaly.com.bd/assets/delivery/image-4.png"
+                />
+              </div>
+              <span className="text-gray-800 font-medium text-[16.6px]">Best Price Deal</span>
+            </div>
           </div>
-          <span className="text-xs sm:text-sm font-semibold text-slate-800 tracking-tight whitespace-nowrap">
-            Best Price Deal
-          </span>
+        </div>
+      </div>
+
+      {/* Mobile Flex Row (hidden on md+) */}
+      <div className="md:hidden flex gap-1">
+        {/* Mobile Card 1 */}
+        <div className="text-card-foreground flex flex-col gap-6 shadow-sm flex-1 h-[50px] hover:shadow-lg !border-none rounded p-0.5 bg-white">
+          <div className="p-1 h-full flex flex-col items-center justify-center">
+            <img
+              alt="Cash On Delivery"
+              loading="lazy"
+              width="25"
+              height="26"
+              className="w-[25px] h-[26px]"
+              src="https://govaly.com.bd/assets/delivery/image-1.png"
+            />
+            <span className="text-gray-800 font-medium text-[8px] leading-tight text-center whitespace-nowrap">
+              Cash On Delivery
+            </span>
+          </div>
+        </div>
+
+        {/* Mobile Card 2 */}
+        <div className="text-card-foreground flex flex-col gap-6 shadow-sm flex-1 h-[50px] hover:shadow-lg !border-none rounded p-0.5 bg-white">
+          <div className="p-1 h-full flex flex-col items-center justify-center">
+            <img
+              alt="Instant Return Policy"
+              loading="lazy"
+              width="25"
+              height="26"
+              className="w-[25px] h-[26px]"
+              src="https://govaly.com.bd/assets/delivery/image-2.png"
+            />
+            <span className="text-gray-800 font-medium text-[8px] leading-tight text-center">
+              Instant Return
+            </span>
+          </div>
+        </div>
+
+        {/* Mobile Card 3 */}
+        <div className="text-card-foreground flex flex-col gap-6 shadow-sm flex-1 h-[50px] hover:shadow-lg !border-none rounded p-0.5 bg-white">
+          <div className="p-1 h-full flex flex-col items-center justify-center">
+            <img
+              alt="Delivery Within 48hrs"
+              loading="lazy"
+              width="25"
+              height="26"
+              className="w-[25px] h-[26px]"
+              src="https://govaly.com.bd/assets/delivery/image-3.png"
+            />
+            <span className="text-gray-800 font-medium text-[8px] leading-tight text-center">
+              Delivery Within <span className="text-[#d81b60]">48 hrs</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Mobile Card 4 */}
+        <div className="text-card-foreground flex flex-col gap-6 shadow-sm flex-1 h-[50px] hover:shadow-lg !border-none rounded p-0.5 bg-white">
+          <div className="p-1 h-full flex flex-col items-center justify-center">
+            <img
+              alt="Best Price Deal"
+              loading="lazy"
+              width="25"
+              height="26"
+              className="w-[25px] h-[26px]"
+              src="https://govaly.com.bd/assets/delivery/image-4.png"
+            />
+            <span className="text-gray-800 font-medium text-[8px] whitespace-nowrap leading-tight text-center">
+              Best Price Deal
+            </span>
+          </div>
         </div>
       </div>
     </section>

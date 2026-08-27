@@ -19,6 +19,38 @@ export function generateStaticParams() {
     });
   });
 
+  const extraSubCategories = [
+    'men-footwear',
+    'men-bottomwear',
+    'women-fashion-wear',
+    'women-bottom-wear',
+    'men-topwear',
+    'women-footwear',
+    'men-fashion-accessories',
+    'women-fashion-accessories',
+    'health-beauty',
+    'kids-kurti',
+    'kids-girls-clothing',
+    'kids-boys-clothing',
+    'kids-accessories',
+    'kids-footwear',
+    'baby-clothing-set',
+    'baby-shoes',
+    'baby-accessories',
+    'baby-winter-wear',
+    'men',
+    'women',
+    'all',
+    'popular',
+  ];
+
+  extraSubCategories.forEach(sub => {
+    params.push({
+      slug: 'category',
+      subSlug: sub,
+    });
+  });
+
   return params;
 }
 

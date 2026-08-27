@@ -383,9 +383,9 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. STORE CATEGORY & PROFILE NAVIGATION TABS (STICKY BAR ONLY) */}
+      {/* 2. STORE CATEGORY & PROFILE NAVIGATION TABS (STICKY BAR RIGHT UNDER HEADER) */}
       {/* ========================================================================= */}
-      <div className="sticky top-[82px] z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+      <div className="sticky top-[50px] lg:top-[72px] z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
         <div className="max-w-6xl mx-auto px-4">
           <div
             ref={tabsContainerRef}

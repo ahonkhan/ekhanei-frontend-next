@@ -11,7 +11,7 @@ interface PinkProductCardProps {
 }
 
 export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSlider = false }) => {
-  const widthClass = isSlider ? 'snap-start flex-shrink-0 w-[160px] sm:w-[200px]' : 'w-full';
+  const widthClass = isSlider ? 'snap-start flex-shrink-0 w-[calc(50%-0.25rem)] min-w-[calc(50%-0.25rem)] sm:w-[200px] sm:min-w-[200px]' : 'w-full';
 
   // Sample card gallery images for hover sliding
   const cardImages = [
@@ -59,7 +59,7 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
         <div className="relative overflow-hidden w-full aspect-square bg-slate-100">
           <img
             src={cardImages[activeImgIdx]}
-            alt="Govaly Product"
+            alt="EkhaneiProduct"
             loading="eager"
             className="object-cover object-center group-hover:scale-105 transition-transform duration-300 will-change-transform w-full h-full"
             style={{ objectFit: 'cover', objectPosition: 'center center' }}
@@ -67,7 +67,7 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
 
 
 
-          {/* Bottom Center Dot Pagination (Govaly Glassmorphism pill style) */}
+          {/* Bottom Center Dot Pagination (EkhaneiGlassmorphism pill style) */}
           <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-1 py-0.5 rounded-full z-10 !border-none backdrop-blur-xl bg-white/30">
             {cardImages.map((_, idx) => (
               <button
@@ -79,11 +79,10 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
                   setActiveImgIdx(idx);
                 }}
                 aria-label={`Go to image ${idx + 1}`}
-                className={`w-[5px] h-[5px] md:w-1.5 md:h-1.5 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer ${
-                  activeImgIdx === idx
+                className={`w-[5px] h-[5px] md:w-1.5 md:h-1.5 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer ${activeImgIdx === idx
                     ? 'bg-[#d81b60] border-[#d81b60] shadow scale-105'
                     : 'bg-[#C3C3C3]/70 hover:bg-black/40'
-                }`}
+                  }`}
                 style={{
                   boxShadow:
                     activeImgIdx === idx

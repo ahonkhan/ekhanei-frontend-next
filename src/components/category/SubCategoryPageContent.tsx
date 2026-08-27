@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 import { CATEGORIES, CATEGORY_DETAILS_DATA, PRODUCTS } from '@/data/mockData';
 import { Product } from '@/types';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
@@ -19,9 +23,6 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
   const [displayedCount, setDisplayedCount] = useState(12);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const topRatedScrollRef = useRef<HTMLDivElement>(null);
-  const topSoldScrollRef = useRef<HTMLDivElement>(null);
 
   // Filter products for this subcategory
   let subProducts = PRODUCTS.filter(p => p.categoryId === slug);
@@ -64,12 +65,6 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isLoadingMore, displayedCount, subProducts.length]);
 
-  const scrollContainer = (ref: React.RefObject<HTMLDivElement | null>, offset: number) => {
-    if (ref.current) {
-      ref.current.scrollBy({ left: offset, behavior: 'smooth' });
-    }
-  };
-
   return (
     <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-8 sm:space-y-12 pt-4 sm:pt-6 pb-12">
       {/* TOP PROMO HERO BANNER WITH OVERLAPPING CENTERED FLOATING TITLE CARD */}
@@ -83,7 +78,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
           />
         </section>
 
-        {/* Floating White Title Box Overlapping Bottom Edge of Banner — REDUCED RADIUS & FULL WIDTH */}
+        {/* Floating White Title Box Overlapping Bottom Edge of Banner */}
         <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 z-10 px-4 sm:px-6">
           <div className="bg-white/95 backdrop-blur-md px-5 py-3.5 sm:px-8 sm:py-4 rounded-lg sm:rounded-xl shadow-lg border border-slate-100/90 w-full text-left">
             <h1 className="text-base sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none text-left">
@@ -93,7 +88,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
         </div>
       </div>
 
-      {/* 2. TOP RATED SECTION */}
+      {/* 2. TOP RATED SECTION WITH SWIPER */}
       <section className="space-y-4 pt-4 sm:pt-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -106,31 +101,43 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
           <div className="flex items-center gap-1.5">
             <button
-              onClick={() => scrollContainer(topRatedScrollRef, -320)}
-              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs"
+              className="tr-prev w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
-              onClick={() => scrollContainer(topRatedScrollRef, 320)}
-              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs"
+              className="tr-next w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <div
-          ref={topRatedScrollRef}
-          className="flex gap-1 sm:gap-1 overflow-x-auto no-scrollbar snap-x py-1"
+        <Swiper
+          modules={[Navigation]}
+          navigation={{
+            prevEl: '.tr-prev',
+            nextEl: '.tr-next',
+          }}
+          spaceBetween={8}
+          slidesPerView={2}
+          breakpoints={{
+            640: { slidesPerView: 3, spaceBetween: 12 },
+            768: { slidesPerView: 4, spaceBetween: 12 },
+            1024: { slidesPerView: 5, spaceBetween: 16 },
+            1280: { slidesPerView: 6, spaceBetween: 16 },
+          }}
+          className="w-full py-1"
         >
           {topRatedProducts.map((product, idx) => (
-            <PinkProductCard key={`tr-${product.id}-${idx}`} product={product} isSlider={true} />
+            <SwiperSlide key={`tr-${product.id}-${idx}`}>
+              <PinkProductCard product={product} isSlider={false} />
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       </section>
 
-      {/* 3. TOP SOLD SECTION */}
+      {/* 3. TOP SOLD SECTION WITH SWIPER */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -143,28 +150,40 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
           <div className="flex items-center gap-1.5">
             <button
-              onClick={() => scrollContainer(topSoldScrollRef, -320)}
-              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs"
+              className="ts-prev w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
-              onClick={() => scrollContainer(topSoldScrollRef, 320)}
-              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs"
+              className="ts-next w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        <div
-          ref={topSoldScrollRef}
-          className="flex gap-1 sm:gap-1 overflow-x-auto no-scrollbar snap-x py-1"
+        <Swiper
+          modules={[Navigation]}
+          navigation={{
+            prevEl: '.ts-prev',
+            nextEl: '.ts-next',
+          }}
+          spaceBetween={8}
+          slidesPerView={2}
+          breakpoints={{
+            640: { slidesPerView: 3, spaceBetween: 12 },
+            768: { slidesPerView: 4, spaceBetween: 12 },
+            1024: { slidesPerView: 5, spaceBetween: 16 },
+            1280: { slidesPerView: 6, spaceBetween: 16 },
+          }}
+          className="w-full py-1"
         >
           {topSoldProducts.map((product, idx) => (
-            <PinkProductCard key={`ts-${product.id}-${idx}`} product={product} isSlider={true} />
+            <SwiperSlide key={`ts-${product.id}-${idx}`}>
+              <PinkProductCard product={product} isSlider={false} />
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       </section>
 
       {/* 4. FOR YOU SECTION (LOAD ON SCROLL) */}

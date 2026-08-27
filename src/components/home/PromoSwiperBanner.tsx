@@ -1,65 +1,36 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PromoBanner {
   id: string;
-  title: string;
-  subtitle: string;
-  badge: string;
   image: string;
-  bgGradient: string;
-  btnText: string;
-  btnBg: string;
+  link: string;
 }
 
 const PROMO_BANNERS: PromoBanner[] = [
   {
     id: 'promo-1',
-    title: 'STEP INTO COMFORT & STYLE',
-    subtitle: 'Style Starts From Below — Premium Footwear & Fashion Deals',
-    badge: 'NEW ARRIVALS',
-    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=1200&q=80',
-    bgGradient: 'from-pink-600 via-rose-500 to-slate-900',
-    btnText: 'Shop Footwear',
-    btnBg: 'bg-white text-pink-600 hover:bg-slate-100'
+    image: 'https://d62ipmwrm4ymk.cloudfront.net/home_hero_banner/8ef18da1-57f4-4e3b-a11a-a7962913dde3.jpeg',
+    link: '/category/men-footwear'
   },
   {
     id: 'promo-2',
-    title: 'FRESH RIVER FISH & SEAFOOD',
-    subtitle: '100% Pure River Catch Delivered Daily in 20 Mins',
-    badge: 'DAILY FRESH',
-    image: 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=1200&q=80',
-    bgGradient: 'from-cyan-600 via-teal-500 to-slate-900',
-    btnText: 'Order Fresh Fish',
-    btnBg: 'bg-white text-cyan-700 hover:bg-slate-100'
+    image: 'https://d62ipmwrm4ymk.cloudfront.net/home_hero_banner/9cbf903f-c171-44c2-834a-4cfcaa0c6ce7.jpg',
+    link: '/category/men-bottomwear'
   },
   {
     id: 'promo-3',
-    title: 'TRENDY FASHION & LIFESTYLE',
-    subtitle: 'Flat 50% Cashback on All Premium Fashion Apparel',
-    badge: 'BIG DISCOUNT',
-    image: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=1200&q=80',
-    bgGradient: 'from-indigo-600 via-purple-500 to-slate-900',
-    btnText: 'Explore Fashion',
-    btnBg: 'bg-white text-indigo-700 hover:bg-slate-100'
-  },
-  {
-    id: 'promo-4',
-    title: 'GADGETS & ELECTRONICS FEST',
-    subtitle: 'Smart Watches, Wireless Earbuds & Gadgets at Wholesale Price',
-    badge: 'BEST OFFERS',
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80',
-    bgGradient: 'from-emerald-600 via-teal-600 to-slate-900',
-    btnText: 'Shop Gadgets',
-    btnBg: 'bg-white text-emerald-700 hover:bg-slate-100'
+    image: 'https://d62ipmwrm4ymk.cloudfront.net/home_hero_banner/724388c5-aec6-40cf-9ce9-ea3382f3d5d0.jpeg',
+    link: '/category/women'
   }
 ];
 
-const GAP = 16;
-const LARGE = `calc(74% - ${GAP / 2}px)`;
-const SMALL = `calc(26% - ${GAP / 2}px)`;
+const GAP = 12;
+const LARGE = `calc(80% - ${GAP / 2}px)`;
+const SMALL = `calc(20% - ${GAP / 2}px)`;
 const ZERO = '0px';
 const EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
 const DURATION = 850;
@@ -74,7 +45,7 @@ export const PromoSwiperBanner: React.FC = () => {
 
   const len = PROMO_BANNERS.length;
 
-  // Always render 4 slides: [prev, current, next, next+1]
+  // Render 4 slots for continuous sliding loop: [prev, current, next, next+1]
   const slides = [
     PROMO_BANNERS[(currentIndex - 1 + len) % len],
     PROMO_BANNERS[currentIndex],
@@ -86,11 +57,6 @@ export const PromoSwiperBanner: React.FC = () => {
     ? 'none'
     : `width ${DURATION}ms ${EASING}, margin-right ${DURATION}ms ${EASING}`;
 
-  /**
-   * IDLE:  [0%, 74%, 26%, 0%] → current(LARGE) + next(SMALL)
-   * NEXT:  [0%,  0%, 74%, 26%] → current exits, next expands, next+1 enters
-   * PREV:  [74%, 26%, 0%, 0%] → prev enters, current shrinks, next exits
-   */
   const getSlotStyles = (): React.CSSProperties[] => {
     if (phase === 'idle') {
       return [
@@ -108,7 +74,6 @@ export const PromoSwiperBanner: React.FC = () => {
         { width: SMALL, marginRight: '0px', opacity: 1 },
       ];
     }
-    // prev
     return [
       { width: LARGE, marginRight: `${GAP}px`, opacity: 1 },
       { width: SMALL, marginRight: '0px', opacity: 1 },
@@ -139,7 +104,6 @@ export const PromoSwiperBanner: React.FC = () => {
     }, DURATION);
   }, [phase, len]);
 
-  // Re-enable CSS transitions after instant snap
   useEffect(() => {
     if (skipTransition) {
       const raf = requestAnimationFrame(() => {
@@ -158,7 +122,6 @@ export const PromoSwiperBanner: React.FC = () => {
     return () => clearInterval(timer);
   }, [currentIndex, isHovered, phase, nextSlide]);
 
-  // Touch gestures
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -177,49 +140,67 @@ export const PromoSwiperBanner: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="relative w-full pt-1 pb-2 select-none overflow-hidden group"
+      className="relative w-full pt-0 mt-0 select-none overflow-hidden group"
     >
-      {/* Navigation Arrows */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/85 hover:bg-white text-slate-800 hover:text-emerald-600 flex items-center justify-center transition-all duration-300 shadow-xl backdrop-blur-md border border-white/80 opacity-0 group-hover:opacity-100 cursor-pointer"
-        aria-label="Previous Slide"
-      >
-        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/85 hover:bg-white text-slate-800 hover:text-emerald-600 flex items-center justify-center transition-all duration-300 shadow-xl backdrop-blur-md border border-white/80 opacity-0 group-hover:opacity-100 cursor-pointer"
-        aria-label="Next Slide"
-      >
-        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-      </button>
-
       {/* Slider Viewport */}
       <div className="relative w-full overflow-hidden">
-        {/* Aspect-ratio container sets uniform height for all slots */}
-        <div className="flex items-stretch aspect-[2.2/1] sm:aspect-[2.5/1] md:aspect-[2.7/1]">
-          {slides.map((banner, i) => (
-            <div
-              key={`slot-${i}`}
-              className="overflow-hidden rounded-2xl sm:rounded-3xl"
-              style={{
-                ...slotStyles[i],
-                transition,
-                flexShrink: 0,
-                minWidth: 0,
-              }}
-            >
-              {/* Banner Card — fills the slot entirely */}
-              <div className="relative w-full h-full overflow-hidden group/card">
+        <div className="flex items-stretch h-44 sm:h-72 md:h-[420px] lg:h-[450px]">
+          {slides.map((banner, i) => {
+            const isNextPreview = i === 2 && phase === 'idle';
+            const isMainSlide = i === 1;
+
+            const cardContent = (
+              <div className="w-full h-full relative">
                 <img
                   src={banner.image}
-                  alt={banner.title}
-                  className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-700"
+                  alt="EkhaneiHome hero banner"
+                  className="absolute inset-0 w-full h-full object-cover rounded-2xl sm:rounded-3xl group-hover/card:scale-102 transition-transform duration-500"
                 />
+
+                {/* Active Slide Dark Hover Overlay */}
+                {isMainSlide && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 rounded-2xl sm:rounded-3xl" />
+                )}
+
+                {/* Next Preview Slide Floating Chevron Right Button (Only visible on hover over 20% right preview card) */}
+                {isNextPreview && (
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 z-10">
+                    <div className="bg-white/90 rounded-full p-2.5 sm:p-3.5 shadow-xl backdrop-blur-md">
+                      <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-slate-900" />
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+
+            return (
+              <div
+                key={`slot-${i}`}
+                onClick={(e) => {
+                  if (!isMainSlide) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    nextSlide();
+                  }
+                }}
+                className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/60 cursor-pointer group/card shrink-0"
+                style={{
+                  ...slotStyles[i],
+                  transition,
+                  flexShrink: 0,
+                  minWidth: 0,
+                }}
+              >
+                {isMainSlide ? (
+                  <Link href={banner.link} className="block w-full h-full">
+                    {cardContent}
+                  </Link>
+                ) : (
+                  cardContent
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -646,6 +646,95 @@ export const STORES: Store[] = [
 // ============================================================================
 export const PRODUCTS: Product[] = [
   // --------------------------------------------------------------------------
+  // PHILIPS AIR FRYERS & GADGETS
+  // --------------------------------------------------------------------------
+  {
+    id: "philips-1",
+    name: "Philips Air Fryer NA120/00 4.2 Litre - Airfryer with Rapid Air Technology",
+    categoryId: "gadget-electronics",
+    categoryName: "Gadget & Electronics",
+    price: 7550,
+    oldPrice: 8900,
+    unit: "pc",
+    image: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=400&q=80",
+    rating: 4.9,
+    reviewsCount: 142,
+    storeName: "Philips Official Store",
+    discountBadge: "15% OFF",
+    isPopular: true
+  },
+  {
+    id: "philips-2",
+    name: "PHILIPS HD9200/91 Essential Air Fryer (Slate Grey, 4.1L)",
+    categoryId: "gadget-electronics",
+    categoryName: "Gadget & Electronics",
+    price: 9900,
+    oldPrice: 11500,
+    unit: "pc",
+    image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=400&q=80",
+    rating: 4.8,
+    reviewsCount: 98,
+    storeName: "Philips Official Store",
+    discountBadge: "৳1600 OFF",
+    isPopular: true
+  },
+  {
+    id: "philips-3",
+    name: "PHILIPS Airfryer HD9252 Rapid Air Technology With 4.1L And 1400w",
+    categoryId: "gadget-electronics",
+    categoryName: "Gadget & Electronics",
+    price: 12500,
+    oldPrice: 14000,
+    unit: "pc",
+    image: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=400&q=80",
+    rating: 4.9,
+    reviewsCount: 115,
+    storeName: "Philips Official Store",
+    discountBadge: "৳1500 OFF"
+  },
+  {
+    id: "philips-4",
+    name: "Philips Air Fryer HD9255/90 Digital 5000 Series Connected Smart – 4.1Ltr, Wi-Fi Enabled, 13-in-1",
+    categoryId: "gadget-electronics",
+    categoryName: "Gadget & Electronics",
+    price: 12590,
+    oldPrice: 14900,
+    unit: "pc",
+    image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=400&q=80",
+    rating: 4.9,
+    reviewsCount: 87,
+    storeName: "Philips Official Store",
+    discountBadge: "15% OFF"
+  },
+  {
+    id: "philips-5",
+    name: "Philips HD9285 7.2 Ltr Air fryer With 2000w",
+    categoryId: "gadget-electronics",
+    categoryName: "Gadget & Electronics",
+    price: 19390,
+    oldPrice: 22000,
+    unit: "pc",
+    image: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=400&q=80",
+    rating: 5.0,
+    reviewsCount: 64,
+    storeName: "Philips Official Store",
+    discountBadge: "12% OFF"
+  },
+  {
+    id: "manmode-1",
+    name: "Manmode Printed Drop Shoulder Shirt",
+    categoryId: "fashion",
+    categoryName: "Fashion",
+    price: 1390,
+    oldPrice: 1749,
+    unit: "pc",
+    image: "https://d62ipmwrm4ymk.cloudfront.net/medium/product/20251009/walkaroo-blue-strap-sandals-for-mens_1_cbe3.jpg",
+    rating: 4.8,
+    reviewsCount: 42,
+    storeName: "Manmode Store",
+    discountBadge: "21% OFF"
+  },
+  // --------------------------------------------------------------------------
   // FRESH FISH
   // --------------------------------------------------------------------------
   {

@@ -52,6 +52,11 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
   const [isSaved, setIsSaved] = useState(false);
   const [selectedSize, setSelectedSize] = useState('37');
 
+  const handleBuyNow = () => {
+    addItem(product);
+    router.push('/checkout-flow/checkout');
+  };
+
   // Image Viewer Modal state
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [viewerActiveIdx, setViewerActiveIdx] = useState(0);
@@ -115,7 +120,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
       size: '38',
       date: '23-11-2025',
       rating: 5,
-      comment: 'Govaly theke juta kine ami sotijji khushi. Delivery ta somoymoto eseche, ar packaging eto sundor chil je khultei valo legeche. Got the delivery in time. Thank you Govaly!',
+      comment: 'Ekhaneitheke juta kine ami sotijji khushi. Delivery ta somoymoto eseche, ar packaging eto sundor chil je khultei valo legeche. Got the delivery in time. Thank you Govaly!',
     },
     {
       id: 'r3',
@@ -141,21 +146,19 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
       <div className="flex items-center gap-6 border-b border-slate-200">
         <button
           onClick={() => setActiveTab('description')}
-          className={`pb-2 font-extrabold text-sm sm:text-base transition relative ${
-            activeTab === 'description'
+          className={`pb-2 font-extrabold text-sm sm:text-base transition relative ${activeTab === 'description'
               ? 'text-slate-900 border-b-2 border-[#d81b60]'
               : 'text-slate-400 hover:text-slate-700'
-          }`}
+            }`}
         >
           Description
         </button>
         <button
           onClick={() => setActiveTab('reviews')}
-          className={`pb-2 font-extrabold text-sm sm:text-base transition relative flex items-center gap-1.5 ${
-            activeTab === 'reviews'
+          className={`pb-2 font-extrabold text-sm sm:text-base transition relative flex items-center gap-1.5 ${activeTab === 'reviews'
               ? 'text-slate-900 border-b-2 border-[#d81b60]'
               : 'text-slate-400 hover:text-slate-700'
-          }`}
+            }`}
         >
           <span>Product Reviews</span>
           <span className="text-[10px] font-black bg-pink-100 text-[#d81b60] px-1.5 py-0.5 rounded-full">
@@ -212,7 +215,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
   return (
     <main className="max-w-[1680px] mx-auto px-0 sm:px-5 pt-0 sm:pt-4 pb-24 sm:pb-16 select-none">
-      
+
       {/* 2-COLUMN MAIN LAYOUT */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 items-start">
 
@@ -223,7 +226,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
           {/* Image & Thumbnails Container Row */}
           <div className="flex flex-col sm:flex-row gap-3 items-start">
-            
+
             {/* Desktop Vertical Thumbnail Selector Column (MAX 4 PHOTOS WITH OVERLAY ON 4TH) */}
             <div className="hidden sm:flex flex-col gap-2.5 shrink-0">
               {galleryImages.slice(0, 4).map((img, idx) => {
@@ -238,14 +241,13 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                       setIsImageViewerOpen(true);
                       setViewerActiveIdx(idx);
                     }}
-                    className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden border-2 transition shrink-0 group ${
-                      selectedImgIdx === idx
+                    className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden border-2 transition shrink-0 group ${selectedImgIdx === idx
                         ? 'border-[#d81b60] ring-2 ring-[#d81b60]/20 scale-102 shadow-sm'
                         : 'border-slate-200 opacity-80 hover:opacity-100'
-                    }`}
+                      }`}
                   >
                     <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
-                    
+
                     {/* 4th Thumbnail Overlay showing +N remaining */}
                     {isFourthAndMore && (
                       <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center text-white font-black text-base sm:text-lg">
@@ -265,7 +267,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
               }}
               className="flex-1 w-full relative aspect-square max-h-[460px] rounded-none sm:rounded-3xl overflow-hidden bg-slate-100 border-0 sm:border border-slate-200/80 shadow-none sm:shadow-md group cursor-pointer"
             >
-              
+
               {/* Top Left Floating Back Arrow Button (MOBILE ONLY) */}
               <button
                 onClick={(e) => {
@@ -302,21 +304,21 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                 ))}
               </Swiper>
 
-              {/* Bottom Overlay Elements Container (MOBILE ONLY) */}
-              <div className="sm:hidden absolute bottom-3 left-3 right-3 z-30 flex items-center justify-between gap-2 pointer-events-none">
-                
-                {/* Bottom Left Badge Pill */}
-                <div className="pointer-events-auto bg-black/50 backdrop-blur-md text-white px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold border border-white/20 shadow-md flex items-center gap-1.5">
+              {/* Bottom Overlay Elements Container (MOBILE ONLY - Compact 1 line fit) */}
+              <div className="sm:hidden absolute bottom-2 left-2 right-2 z-30 flex items-center justify-between gap-1 flex-nowrap pointer-events-none">
+
+                {/* Bottom Left Rating & Sales Badge Pill */}
+                <div className="pointer-events-auto shrink-0 bg-black/60 backdrop-blur-md text-white px-2 py-0.5 rounded-full text-[10px] font-bold border border-white/20 shadow-md flex items-center gap-1">
                   <span className="text-amber-400 font-extrabold flex items-center gap-0.5">
-                    5.00 <Star className="w-3 h-3 fill-amber-400 text-amber-400 inline" />
+                    5.00 <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400 inline" />
                   </span>
                   <span className="text-white/40">|</span>
                   <span>113 sold</span>
                 </div>
 
-                {/* Bottom Center Dot Pagination & Heart Icon */}
-                <div className="pointer-events-auto flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/20">
+                {/* Bottom Center Dot Pagination (Compact dots, Heart button removed) */}
+                <div className="pointer-events-auto flex items-center shrink-0">
+                  <div className="flex items-center gap-1 bg-black/50 backdrop-blur-md px-2 py-1 rounded-full border border-white/20">
                     {galleryImages.map((_, idx) => (
                       <button
                         key={idx}
@@ -324,26 +326,11 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                           e.stopPropagation();
                           setSelectedImgIdx(idx);
                         }}
-                        className={`h-2 rounded-full transition-all ${
-                          selectedImgIdx === idx ? 'w-5 bg-[#d81b60]' : 'w-2 bg-white/60'
-                        }`}
+                        className={`h-1.5 rounded-full transition-all ${selectedImgIdx === idx ? 'w-3.5 bg-[#d81b60]' : 'w-1.5 bg-white/60'
+                          }`}
                       />
                     ))}
                   </div>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsSaved(!isSaved);
-                    }}
-                    className={`p-2 rounded-full backdrop-blur-md shadow-md border transition ${
-                      isSaved
-                        ? 'bg-[#d81b60] text-white border-[#d81b60]'
-                        : 'bg-white/80 text-slate-700 hover:bg-white border-white/40'
-                    }`}
-                  >
-                    <Heart className={`w-4 h-4 ${isSaved ? 'fill-white text-white' : 'text-slate-800'}`} />
-                  </button>
                 </div>
 
                 {/* Bottom Right View Similar Button */}
@@ -352,9 +339,9 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                     e.stopPropagation();
                     scrollToSimilar();
                   }}
-                  className="pointer-events-auto bg-white/90 hover:bg-white text-slate-800 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-extrabold shadow-md backdrop-blur-md transition flex items-center gap-1 border border-slate-200"
+                  className="pointer-events-auto shrink-0 bg-white/90 hover:bg-white text-slate-900 px-2 py-0.5 rounded-full text-[10px] font-extrabold shadow-md backdrop-blur-md transition flex items-center gap-1 border border-slate-200"
                 >
-                  <Utensils className="w-3.5 h-3.5 text-[#d81b60]" />
+                  <Utensils className="w-3 h-3 text-[#d81b60]" />
                   <span>View Similar</span>
                 </button>
               </div>
@@ -421,11 +408,10 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                 <button
                   key={sz}
                   onClick={() => setSelectedSize(sz)}
-                  className={`w-10 h-8 rounded-xl text-xs font-bold transition flex items-center justify-center shrink-0 border ${
-                    selectedSize === sz
+                  className={`w-10 h-8 rounded-xl text-xs font-bold transition flex items-center justify-center shrink-0 border ${selectedSize === sz
                       ? 'border-[#d81b60] bg-pink-50 text-[#d81b60] ring-2 ring-[#d81b60]/20 font-extrabold'
                       : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                  }`}
+                    }`}
                 >
                   {sz}
                 </button>
@@ -458,34 +444,22 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             </div>
           </div>
 
-          {/* 5. Desktop Only Action Buttons Row */}
-          <div className="hidden md:flex items-center gap-3 pt-2">
-            <button
-              onClick={() => setIsQuickCheckoutOpen(true)}
-              className="py-3 px-6 rounded-2xl bg-[#ff9800] hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-98"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Buy Now</span>
-            </button>
-
+          {/* 5. Action Buttons Row (Visible on Mobile & Desktop) */}
+          <div className="flex items-center gap-2 sm:gap-3 pt-2 w-full">
             <button
               onClick={() => addItem(product)}
-              className="py-3 px-6 rounded-2xl bg-[#d81b60] hover:bg-[#c2185b] text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 active:scale-98"
+              className="flex-1 py-3 px-4 sm:px-6 rounded-2xl bg-[#d81b60] hover:bg-[#c2185b] active:bg-[#a8144b] text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer active:scale-98"
             >
               <ShoppingCart className="w-4 h-4" />
               <span>Add to Cart</span>
             </button>
 
             <button
-              onClick={() => setIsSaved(!isSaved)}
-              className={`p-3 rounded-2xl border transition shadow-xs ${
-                isSaved
-                  ? 'bg-[#d81b60] text-white border-[#d81b60]'
-                  : 'bg-pink-50 text-[#d81b60] border-pink-200 hover:bg-pink-100'
-              }`}
-              title="Wishlist"
+              onClick={handleBuyNow}
+              className="flex-1 py-3 px-4 sm:px-6 rounded-2xl bg-[#ff9800] hover:bg-amber-600 active:bg-amber-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer active:scale-98"
             >
-              <Heart className={`w-4 h-4 ${isSaved ? 'fill-white text-white' : 'text-[#d81b60]'}`} />
+              <ShoppingBag className="w-4 h-4" />
+              <span>Buy Now</span>
             </button>
           </div>
 
@@ -618,7 +592,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
       {isImageViewerOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
           <div className="relative w-full max-w-4xl h-[560px] sm:h-[640px] bg-[#fff5f7] sm:bg-white rounded-3xl overflow-hidden shadow-2xl border border-pink-100/80 flex flex-col shrink-0">
-            
+
             {/* Modal Header Row */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-pink-100 bg-[#fff5f7] shrink-0 h-14">
               <div className="flex items-center gap-3">
@@ -669,7 +643,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
             {/* Modal Body Main Image Display Area (FIXED HEIGHT CONTAINER) */}
             <div className="relative flex-1 bg-[#fff5f7] p-4 sm:p-6 flex items-center justify-center overflow-hidden h-[360px] sm:h-[450px]">
-              
+
               {/* Previous Image Arrow Button */}
               <button
                 onClick={() => setViewerActiveIdx((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)}
@@ -708,11 +682,10 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                 <button
                   key={idx}
                   onClick={() => setViewerActiveIdx(idx)}
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 transition shrink-0 ${
-                    viewerActiveIdx === idx
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 transition shrink-0 ${viewerActiveIdx === idx
                       ? 'border-2 border-[#d81b60] ring-2 ring-[#d81b60]/20 scale-105 shadow-sm'
                       : 'border-transparent opacity-60 hover:opacity-100'
-                  }`}
+                    }`}
                 >
                   <img src={img} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
                 </button>
@@ -726,8 +699,8 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
       {/* =================================================================== */}
       {/* MOBILE ONLY: BOTTOM FIXED STICKY ACTION BAR */}
       {/* =================================================================== */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 p-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-2.5">
-        
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200 p-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-2.5">
+
         {/* Left 1: Cart Icon Button with Count Badge */}
         <button
           onClick={() => setIsCartOpen(true)}
@@ -750,20 +723,20 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
           <span className="text-[10px] font-extrabold">Chat</span>
         </button>
 
-        {/* Orange Buy Now Button */}
-        <button
-          onClick={() => setIsQuickCheckoutOpen(true)}
-          className="flex-1 bg-[#ff9800] hover:bg-amber-600 active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center"
-        >
-          Buy Now
-        </button>
-
         {/* Brand Pink Add to Cart Button */}
         <button
           onClick={() => addItem(product)}
-          className="flex-1 bg-[#d81b60] hover:bg-[#c2185b] active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center"
+          className="flex-1 bg-[#d81b60] hover:bg-[#c2185b] active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
         >
           Add to Cart
+        </button>
+
+        {/* Orange Buy Now Button */}
+        <button
+          onClick={handleBuyNow}
+          className="flex-1 bg-[#ff9800] hover:bg-amber-600 active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
+        >
+          Buy Now
         </button>
 
       </div>
