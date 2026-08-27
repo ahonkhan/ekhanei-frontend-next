@@ -30,7 +30,7 @@ export const HeroSlider: React.FC = () => {
             <MapPin className="w-3 h-3 text-white" />
           </div>
           <span className="text-[11px] font-extrabold text-white truncate block max-w-[130px]">
-            {selectedLocation.title} — {selectedLocation.address}
+            {selectedLocation.title} 
           </span>
         </div>
 
