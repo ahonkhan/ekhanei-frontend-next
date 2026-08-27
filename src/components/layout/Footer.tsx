@@ -15,7 +15,7 @@ export const Footer: React.FC = () => {
         {/* Ambient Background Glow */}
         <div className="absolute -left-32 -top-32 w-96 h-96 rounded-full bg-emerald-500/5 blur-3xl pointer-events-none" />
 
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10 sm:space-y-12 relative z-10">
+        <div className="max-w-[1680px] mx-auto px-2 sm:px-5 lg:px-8 py-10 sm:py-14 space-y-10 sm:space-y-12 relative z-10">
           
           {/* Top App Download Strip (Google Play Store Only) */}
           <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl backdrop-blur-md">

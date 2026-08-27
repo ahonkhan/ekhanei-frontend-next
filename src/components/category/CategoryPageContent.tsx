@@ -114,7 +114,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
       </section>
 
       {/* MAIN CONTAINER */}
-      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 space-y-10 sm:space-y-14">
+      <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-10 sm:space-y-14">
 
         {/* 2. SUB-CATEGORIES (2 SEPARATE INDEPENDENT SLIDERS) */}
         <section className="space-y-3">

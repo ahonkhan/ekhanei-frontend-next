@@ -71,7 +71,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
   };
 
   return (
-    <main className="max-w-[1440px] mx-auto px-4 sm:px-6 space-y-8 sm:space-y-12 pt-4 sm:pt-6 pb-12">
+    <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-8 sm:space-y-12 pt-4 sm:pt-6 pb-12">
       {/* TOP PROMO HERO BANNER WITH OVERLAPPING CENTERED FLOATING TITLE CARD */}
       <div className="relative mb-10 sm:mb-14">
         <section className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-6 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] relative rounded-none overflow-hidden border-b border-slate-200/80 shadow-xs aspect-[21/8] sm:aspect-[24/7] group cursor-pointer touch-active">
@@ -181,7 +181,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 md:gap-2.5">
           {subProducts.slice(0, displayedCount).map((product, idx) => (
             <PinkProductCard key={`fy-${product.id}-${idx}`} product={product} isSlider={false} />
           ))}

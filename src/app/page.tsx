@@ -12,7 +12,7 @@ export default function HomePage() {
       <HeroSlider />
 
       {/* INNER HOME CONTENT WRAPPER */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 space-y-4 sm:space-y-5">
+      <div className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-4 sm:space-y-5">
         {/* SERVICE CATEGORIES */}
         <ServiceCategories />
 

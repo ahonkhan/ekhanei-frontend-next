@@ -1,11 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { PRODUCTS } from '@/data/mockData';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { QuickCheckoutModal } from '@/components/product/QuickCheckoutModal';
 import { useCart } from '@/context/CartContext';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Navigation, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 import {
   Star,
   ShoppingCart,
@@ -21,8 +27,15 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  Zap,
-  Store as StoreIcon
+  Heart,
+  MessageCircle,
+  Store as StoreIcon,
+  Sparkles,
+  Utensils,
+  ZoomIn,
+  RotateCw,
+  Maximize2,
+  X
 } from 'lucide-react';
 
 interface ProductDetailsContentProps {
@@ -30,22 +43,35 @@ interface ProductDetailsContentProps {
 }
 
 export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ productId }) => {
-  const { addItem, increment, decrement, getItem } = useCart();
+  const router = useRouter();
+  const { addItem, increment, decrement, getItem, totalItemsCount, setIsCartOpen } = useCart();
   const product = PRODUCTS.find(p => p.id === productId) || PRODUCTS[0];
   const cartItem = getItem(product.id);
 
   const [isQuickCheckoutOpen, setIsQuickCheckoutOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [selectedSize, setSelectedSize] = useState('37');
 
-  // Gallery Thumbnails
+  // Image Viewer Modal state
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [viewerActiveIdx, setViewerActiveIdx] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [rotationAngle, setRotationAngle] = useState(0);
+
+  // Sizes List
+  const sizes = ['37', '38', '39', '40', '41', '42', '43', '44'];
+
+  // Gallery Images List (5 items to demonstrate max 4 photos + '+N' overflow)
   const galleryImages = [
     product.image,
-    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80',
   ];
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
-  const selectedImg = galleryImages[selectedImgIdx] || product.image;
 
-  // Active Tab State: 'description' | 'reviews'
+  // Tabs state for desktop view: 'description' | 'reviews'
   const [activeTab, setActiveTab] = useState<'description' | 'reviews'>('description');
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
@@ -57,287 +83,360 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
       ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
       : 28;
 
-  // Mock Reviews List
+  // Keyboard navigation for Image Viewer Modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isImageViewerOpen) return;
+      if (e.key === 'ArrowLeft') {
+        setViewerActiveIdx((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+      } else if (e.key === 'ArrowRight') {
+        setViewerActiveIdx((prev) => (prev + 1) % galleryImages.length);
+      } else if (e.key === 'Escape') {
+        setIsImageViewerOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isImageViewerOpen, galleryImages.length]);
+
+  // Reviews List
   const mockReviews = [
     {
       id: 'r1',
-      name: 'Azad hossain',
-      date: '12-04-2026',
+      name: 'Saimon Hosen Rashed',
+      size: '43',
+      date: '06-02-2026',
       rating: 5,
-      comment: 'hate paoar por ami really surprised hoyechi. Quality khub e bhaio.. Design ta simple but amr onk valo legeche..',
+      comment: 'Sneakers dam hishabe mane onk bhalo chilo. Discount e order korsilam tai delivery man daray thaka obosthay product khule check kore nisi. And I was satisfied.',
     },
     {
       id: 'r2',
-      name: 'Deeba Farhana',
-      date: '16-04-2026',
+      name: 'Eshita wahid',
+      size: '38',
+      date: '23-11-2025',
       rating: 5,
-      comment: 'onk sundor shari ta ..overall Govaly er service amr kache valoi legeche ..',
+      comment: 'Govaly theke juta kine ami sotijji khushi. Delivery ta somoymoto eseche, ar packaging eto sundor chil je khultei valo legeche. Got the delivery in time. Thank you Govaly!',
     },
     {
       id: 'r3',
-      name: 'Md.Habibur Rahman HaBiB',
-      date: '23-04-2026',
+      name: 'Azad hossain',
+      size: '41',
+      date: '12-04-2026',
       rating: 5,
-      comment: 'Overall experience positive, recommend kora jai jodi budget er moddhe kichu khujen.',
-    },
-    {
-      id: 'r4',
-      name: 'Emon',
-      date: '09-05-2026',
-      rating: 5,
-      comment: 'Sharir quality valo, Customer support and packaging were also excellent..',
+      comment: 'Hate paoar por ami really surprised hoyechi. Quality khub e bhaio.. Design ta simple but amr onk valo legeche..',
     },
   ];
 
-  // Helper renderer for Description & Reviews Tabs
-  const renderDescriptionAndReviews = () => (
-    <div className="space-y-4 pt-2">
+  const scrollToSimilar = () => {
+    const el = document.getElementById('similar-products');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Helper component to render Description & Reviews Tabs (Used on desktop left column)
+  const renderDescriptionAndReviewsTab = () => (
+    <div className="space-y-3 pt-2">
+      {/* Tab Navigation */}
       <div className="flex items-center gap-6 border-b border-slate-200">
         <button
           onClick={() => setActiveTab('description')}
-          className={`pb-3 font-extrabold text-sm sm:text-base transition relative ${activeTab === 'description'
-              ? 'text-slate-900 border-b-2 border-emerald-600'
+          className={`pb-2 font-extrabold text-sm sm:text-base transition relative ${
+            activeTab === 'description'
+              ? 'text-slate-900 border-b-2 border-[#d81b60]'
               : 'text-slate-400 hover:text-slate-700'
-            }`}
+          }`}
         >
           Description
         </button>
         <button
           onClick={() => setActiveTab('reviews')}
-          className={`pb-3 font-extrabold text-sm sm:text-base transition relative flex items-center gap-1.5 ${activeTab === 'reviews'
-              ? 'text-slate-900 border-b-2 border-emerald-600'
+          className={`pb-2 font-extrabold text-sm sm:text-base transition relative flex items-center gap-1.5 ${
+            activeTab === 'reviews'
+              ? 'text-slate-900 border-b-2 border-[#d81b60]'
               : 'text-slate-400 hover:text-slate-700'
-            }`}
+          }`}
         >
           <span>Product Reviews</span>
-          <span className="text-[10px] font-black bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">
+          <span className="text-[10px] font-black bg-pink-100 text-[#d81b60] px-1.5 py-0.5 rounded-full">
             9+
           </span>
         </button>
       </div>
 
-      {/* Tab 1: Description Box */}
+      {/* Tab Content: Description */}
       {activeTab === 'description' && (
-        <div className="bg-emerald-50/30 border border-emerald-100/80 p-5 rounded-3xl space-y-4 text-xs sm:text-sm text-slate-700 leading-relaxed shadow-xs">
-          <p className="font-medium">
-            This exquisite Kanchipuram saree radiates timeless royalty, featuring intricate gold zari work that shimmers with every movement. Its rich texture and opulent sheen make it a quintessential masterpiece for those who desire a look of profound elegance and heritage.
+        <div className="bg-white border border-[#d81b60]/40 rounded-2xl p-4 space-y-2.5 text-xs sm:text-sm text-slate-700 leading-relaxed shadow-xs">
+          <ul className="space-y-1 font-semibold text-slate-800">
+            <li className="flex items-center gap-1.5">• Made from durable material</li>
+            <li className="flex items-center gap-1.5">• Lightweight for all-day wear</li>
+            <li className="flex items-center gap-1.5">• Stylish, smart design</li>
+          </ul>
+
+          <p className="text-slate-600 leading-relaxed">
+            Introducing the <em className="font-bold text-slate-800">Panda Comfortable School Shoes</em> – the perfect combination of comfort, style, and durability for students. Designed with lightweight artificial leather, these shoes are perfect for all-day wear, ensuring your feet stay comfortable throughout the school day. With a smart, standard design, they pair easily with school uniforms or casual outfits.
           </p>
-
-          <div className="space-y-2 pt-1">
-            <h4 className="font-extrabold text-slate-900 text-sm">Product Specifications:</h4>
-            <ul className="space-y-1.5 text-slate-600 font-medium pl-1">
-              <li>
-                <span className="font-bold text-slate-900">• Length:</span> The saree measures <strong className="text-slate-900">12 haat</strong> in length and <strong className="text-slate-900">46 inches</strong> in width, ensuring a perfect and comfortable drape.
-              </li>
-              <li>
-                <span className="font-bold text-slate-900">• Blouse:</span> This ensemble includes a <strong className="text-slate-900">matching blouse piece</strong>. The cohesive design enhances the regal aesthetic, providing a complete look.
-              </li>
-              <li>
-                <span className="font-bold text-slate-900">• Tassel:</span> The <em className="italic">pallu (anchel)</em> is adorned with attractive tassels, adding a modern and stylish touch to this traditional attire.
-              </li>
-              {isDescExpanded && (
-                <>
-                  <li>
-                    <span className="font-bold text-slate-900">• Fabric:</span> Premium Silk Blend with authentic Zari weaving.
-                  </li>
-                  <li>
-                    <span className="font-bold text-slate-900">• Care Instructions:</span> Dry Clean Only to preserve shine and fabric strength.
-                  </li>
-                </>
-              )}
-            </ul>
-          </div>
-
-          <div className="pt-2 text-center">
-            <button
-              onClick={() => setIsDescExpanded(!isDescExpanded)}
-              className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition"
-            >
-              <span>{isDescExpanded ? 'Show Less' : 'See More'}</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isDescExpanded ? 'rotate-180' : ''}`} />
-            </button>
-          </div>
         </div>
       )}
 
-      {/* Tab 2: Reviews List */}
+      {/* Tab Content: Product Reviews */}
       {activeTab === 'reviews' && (
-        <div className="space-y-4">
-          <h3 className="font-extrabold text-slate-900 text-base">
-            Product Reviews (9)
-          </h3>
-
-          <div className="space-y-3">
-            {mockReviews.map(rev => (
-              <div
-                key={rev.id}
-                className="bg-white border border-slate-200/80 p-4 rounded-2xl space-y-1.5 shadow-xs"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-extrabold text-xs text-slate-900">{rev.name}</h4>
-                    <span className="text-[10px] text-slate-400 font-medium">{rev.date}</span>
-                  </div>
-                  <div className="flex items-center gap-0.5 text-amber-400">
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
+        <div className="space-y-3 pt-1">
+          {mockReviews.map((rev) => (
+            <div
+              key={rev.id}
+              className="bg-white border border-slate-200 p-3.5 rounded-2xl space-y-1.5 shadow-xs"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-extrabold text-xs text-slate-900">{rev.name}</h4>
+                  <span className="text-[10px] text-slate-400 font-semibold">
+                    Size: {rev.size} &nbsp; {rev.date}
+                  </span>
                 </div>
-                <p className="text-xs text-slate-600 font-medium leading-normal pt-1">
-                  {rev.comment}
-                </p>
+                <div className="flex items-center gap-0.5 bg-[#d81b60] text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                  {[...Array(rev.rating)].map((_, i) => (
+                    <Star key={i} className="w-2.5 h-2.5 fill-white text-white" />
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
-
-          <button className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition">
-            View More Reviews
-          </button>
+              <p className="text-xs text-slate-700 font-medium leading-relaxed">
+                {rev.comment}
+              </p>
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 
   return (
-    <main className="max-w-[1440px] mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 pt-4 sm:pt-6 pb-16">
-      {/* Top Breadcrumb Navigation */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-200/80">
-        <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-          <Link href="/" className="hover:text-emerald-600 transition">
-            Home
-          </Link>
-          <span>/</span>
-          <Link href={`/${product.categoryId || 'fashion'}`} className="hover:text-emerald-600 transition">
-            {product.categoryName || 'Fashion'}
-          </Link>
-          <span>/</span>
-          <span className="text-emerald-600 font-extrabold truncate max-w-[200px] sm:max-w-none">
-            {product.name}
-          </span>
-        </div>
-
-        <Link
-          href={`/${product.categoryId || 'fashion'}`}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 font-bold text-xs shadow-xs transition touch-active"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back</span>
-        </Link>
-      </div>
-
+    <main className="max-w-[1680px] mx-auto px-0 sm:px-5 pt-0 sm:pt-4 pb-24 sm:pb-16 select-none">
+      
       {/* 2-COLUMN MAIN LAYOUT */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 items-start">
 
         {/* =================================================================== */}
-        {/* LEFT COLUMN: GALLERY SHOWCASE (PLUS DESKTOP DESCRIPTION & REVIEWS) */}
+        {/* LEFT COLUMN: HERO PRODUCT IMAGE SHOWCASE (COMPACT WIDTH ON DESKTOP) */}
         {/* =================================================================== */}
-        <div className="lg:col-span-6 space-y-8">
+        <div className="lg:col-span-5 space-y-4">
 
-          {/* Gallery Showcase (Thumbnails below on mobile, vertical stack on left on sm/desktop) */}
-          <div className="flex flex-col-reverse sm:flex-row gap-4 items-start">
-            {/* Thumbnails Stack (Horizontal on mobile below main image, Vertical on desktop) */}
-            <div className="flex flex-row sm:flex-col gap-3 shrink-0 overflow-x-auto w-full sm:w-auto no-scrollbar py-1">
-              {galleryImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImgIdx(idx)}
-                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 transition shrink-0 ${selectedImgIdx === idx
-                      ? 'border-emerald-600 ring-2 ring-emerald-500/20 scale-102 shadow-md'
-                      : 'border-slate-200 hover:border-slate-300 opacity-80'
+          {/* Image & Thumbnails Container Row */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start">
+            
+            {/* Desktop Vertical Thumbnail Selector Column (MAX 4 PHOTOS WITH OVERLAY ON 4TH) */}
+            <div className="hidden sm:flex flex-col gap-2.5 shrink-0">
+              {galleryImages.slice(0, 4).map((img, idx) => {
+                const isFourthAndMore = idx === 3 && galleryImages.length > 4;
+                const remainingCount = galleryImages.length - 3; // e.g. 5 - 3 = +2 (or +1)
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setSelectedImgIdx(idx);
+                      setIsImageViewerOpen(true);
+                      setViewerActiveIdx(idx);
+                    }}
+                    className={`relative w-16 h-16 sm:w-18 sm:h-18 rounded-2xl overflow-hidden border-2 transition shrink-0 group ${
+                      selectedImgIdx === idx
+                        ? 'border-[#d81b60] ring-2 ring-[#d81b60]/20 scale-102 shadow-sm'
+                        : 'border-slate-200 opacity-80 hover:opacity-100'
                     }`}
+                  >
+                    <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                    
+                    {/* 4th Thumbnail Overlay showing +N remaining */}
+                    {isFourthAndMore && (
+                      <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center text-white font-black text-base sm:text-lg">
+                        +{remainingCount}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Main Image Box (Edge-to-Edge feel on mobile, Square 1:1 ratio container on desktop) */}
+            <div
+              onClick={() => {
+                setIsImageViewerOpen(true);
+                setViewerActiveIdx(selectedImgIdx);
+              }}
+              className="flex-1 w-full relative aspect-square max-h-[460px] rounded-none sm:rounded-3xl overflow-hidden bg-slate-100 border-0 sm:border border-slate-200/80 shadow-none sm:shadow-md group cursor-pointer"
+            >
+              
+              {/* Top Left Floating Back Arrow Button (MOBILE ONLY) */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.back();
+                }}
+                className="sm:hidden absolute top-3 left-3 z-30 p-2.5 rounded-full bg-white/80 hover:bg-white text-slate-800 shadow-md backdrop-blur-md transition active:scale-95"
+                title="Go Back"
+              >
+                <ArrowLeft className="w-5 h-5 text-slate-900" />
+              </button>
+
+              {/* Swiper Slider Component (Auto Slide Every 3 Seconds) */}
+              <Swiper
+                modules={[Pagination, Navigation, Autoplay]}
+                slidesPerView={1}
+                spaceBetween={0}
+                loop={true}
+                autoplay={{
+                  delay: 3000,
+                  disableOnInteraction: false,
+                }}
+                onSlideChange={(swiper) => setSelectedImgIdx(swiper.realIndex)}
+                className="w-full h-full"
+              >
+                {galleryImages.map((img, idx) => (
+                  <SwiperSlide key={idx} className="w-full h-full">
+                    <img
+                      src={img}
+                      alt={`${product.name} slide ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+
+              {/* Bottom Overlay Elements Container (MOBILE ONLY) */}
+              <div className="sm:hidden absolute bottom-3 left-3 right-3 z-30 flex items-center justify-between gap-2 pointer-events-none">
+                
+                {/* Bottom Left Badge Pill */}
+                <div className="pointer-events-auto bg-black/50 backdrop-blur-md text-white px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold border border-white/20 shadow-md flex items-center gap-1.5">
+                  <span className="text-amber-400 font-extrabold flex items-center gap-0.5">
+                    5.00 <Star className="w-3 h-3 fill-amber-400 text-amber-400 inline" />
+                  </span>
+                  <span className="text-white/40">|</span>
+                  <span>113 sold</span>
+                </div>
+
+                {/* Bottom Center Dot Pagination & Heart Icon */}
+                <div className="pointer-events-auto flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/20">
+                    {galleryImages.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedImgIdx(idx);
+                        }}
+                        className={`h-2 rounded-full transition-all ${
+                          selectedImgIdx === idx ? 'w-5 bg-[#d81b60]' : 'w-2 bg-white/60'
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsSaved(!isSaved);
+                    }}
+                    className={`p-2 rounded-full backdrop-blur-md shadow-md border transition ${
+                      isSaved
+                        ? 'bg-[#d81b60] text-white border-[#d81b60]'
+                        : 'bg-white/80 text-slate-700 hover:bg-white border-white/40'
+                    }`}
+                  >
+                    <Heart className={`w-4 h-4 ${isSaved ? 'fill-white text-white' : 'text-slate-800'}`} />
+                  </button>
+                </div>
+
+                {/* Bottom Right View Similar Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    scrollToSimilar();
+                  }}
+                  className="pointer-events-auto bg-white/90 hover:bg-white text-slate-800 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-extrabold shadow-md backdrop-blur-md transition flex items-center gap-1 border border-slate-200"
                 >
-                  <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                  <Utensils className="w-3.5 h-3.5 text-[#d81b60]" />
+                  <span>View Similar</span>
                 </button>
-              ))}
-            </div>
-
-            {/* Main Display Image Container with Left & Right Arrow Controls */}
-            <div className="flex-1 w-full aspect-[3/4] sm:aspect-[4/5] max-h-[560px] rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-md relative group">
-              <img
-                src={selectedImg}
-                alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-102 transition duration-500"
-              />
-
-              {product.discountBadge && (
-                <span className="absolute top-4 left-4 bg-emerald-600 text-white text-xs font-black px-3 py-1 rounded-xl shadow-md z-10">
-                  {product.discountBadge}
-                </span>
-              )}
-
-              {/* Left Arrow Button */}
-              <button
-                onClick={() => setSelectedImgIdx((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-emerald-600 hover:text-white text-slate-800 shadow-md backdrop-blur-xs flex items-center justify-center transition-all duration-300 z-20 touch-active opacity-90 hover:opacity-100"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              {/* Right Arrow Button */}
-              <button
-                onClick={() => setSelectedImgIdx((prev) => (prev + 1) % galleryImages.length)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-emerald-600 hover:text-white text-slate-800 shadow-md backdrop-blur-xs flex items-center justify-center transition-all duration-300 z-20 touch-active opacity-90 hover:opacity-100"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+              </div>
             </div>
           </div>
 
-          {/* Desktop Only: Description & Reviews (Renders in left column on desktop) */}
+          {/* Desktop Only: Description & Reviews Tabs (Renders under main image on desktop) */}
           <div className="hidden lg:block">
-            {renderDescriptionAndReviews()}
+            {renderDescriptionAndReviewsTab()}
           </div>
+
         </div>
 
         {/* =================================================================== */}
-        {/* RIGHT COLUMN: PURCHASE PANEL, RATING HISTOGRAM & MOBILE DESCRIPTION */}
+        {/* RIGHT COLUMN: COMPACT DETAILS, SIZES, ACTIONS & RATING HISTOGRAM */}
         {/* =================================================================== */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-7 space-y-3 px-4 sm:px-0">
 
-          {/* Main Title & Share Button */}
-          <div className="space-y-2">
-            <div className="flex items-start justify-between gap-4">
-              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-snug">
+          {/* 1. Title & Share Row */}
+          <div className="space-y-1">
+            <div className="flex items-start justify-between gap-2">
+              <h1 className="text-base sm:text-2xl font-extrabold text-slate-900 leading-tight tracking-tight">
                 {product.name}
               </h1>
-              <button className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition shrink-0">
+              <button className="p-1.5 rounded-full hover:bg-slate-100 text-slate-700 transition shrink-0" title="Share">
                 <Share2 className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Rating, Sold & Stock Line */}
-            <div className="flex items-center gap-3 text-xs text-slate-500 font-bold flex-wrap">
-              <div className="flex items-center gap-1 text-amber-500">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            {/* Star Rating + Meta Sub Row */}
+            <div className="flex items-center gap-2 text-xs text-slate-500 font-semibold flex-wrap">
+              <div className="flex items-center gap-0.5 text-[#d81b60]">
+                {[...Array(4)].map((_, i) => (
+                  <Star key={i} className="w-3.5 h-3.5 fill-[#d81b60] text-[#d81b60]" />
                 ))}
-                <span className="text-slate-800 ml-1">5 Reviews</span>
+                <Star className="w-3.5 h-3.5 text-slate-300" />
+                <span className="text-slate-700 ml-1 font-bold">5 Reviews</span>
               </div>
               <span className="text-slate-300">|</span>
-              <span>Sold 12</span>
+              <span>Sold 113</span>
               <span className="text-slate-300">|</span>
-              <span>Stock 50</span>
+              <span>Stock 18</span>
             </div>
           </div>
 
-          {/* Price Strip */}
-          <div className="flex items-center gap-3 pt-1">
-            <span className="font-black text-3xl sm:text-4xl text-emerald-600 tracking-tight">
+          {/* 2. Price Strip */}
+          <div className="flex items-baseline gap-2.5 pt-0.5">
+            <span className="font-black text-2xl sm:text-3xl text-[#d81b60] tracking-tight">
               ৳{product.price}
             </span>
-            <span className="line-through text-slate-400 text-base font-bold">
+            <span className="line-through text-slate-400 text-sm sm:text-base font-bold">
               ৳{product.oldPrice || Math.round(product.price * 1.38)}
             </span>
-            <span className="text-emerald-600 text-xs sm:text-sm font-black bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+            <span className="text-[#d81b60] text-xs font-black bg-pink-50 px-2 py-0.5 rounded-md border border-pink-200">
               ({discountPercent}% OFF)
             </span>
           </div>
 
-          {/* Quantity Selector */}
-          <div className="flex items-center gap-4 pt-2">
-            <span className="font-bold text-xs sm:text-sm text-slate-800">Quantity</span>
-            <div className="flex items-center gap-3 bg-slate-100 rounded-xl p-1 border border-slate-200/80">
+          {/* 3. Select Size Section */}
+          <div className="space-y-1.5 pt-2 border-t border-slate-100">
+            <label className="text-xs font-extrabold text-slate-900 block">Select Size</label>
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              {sizes.map((sz) => (
+                <button
+                  key={sz}
+                  onClick={() => setSelectedSize(sz)}
+                  className={`w-10 h-8 rounded-xl text-xs font-bold transition flex items-center justify-center shrink-0 border ${
+                    selectedSize === sz
+                      ? 'border-[#d81b60] bg-pink-50 text-[#d81b60] ring-2 ring-[#d81b60]/20 font-extrabold'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                  }`}
+                >
+                  {sz}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 4. Quantity Selector */}
+          <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
+            <span className="font-extrabold text-xs text-slate-900">Quantity</span>
+            <div className="flex items-center gap-2.5 bg-slate-100 rounded-xl p-1 border border-slate-200/80">
               <button
                 onClick={() => decrement(product.id)}
                 className="w-7 h-7 rounded-lg bg-white hover:bg-slate-200 flex items-center justify-center text-slate-800 font-extrabold transition shadow-xs text-xs"
@@ -359,150 +458,316 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             </div>
           </div>
 
-          {/* Action Buttons Row (FIRST Add to Cart, SECOND Buy Now, THIRD Wishlist) */}
-          <div className="flex items-center gap-3 pt-2">
+          {/* 5. Desktop Only Action Buttons Row */}
+          <div className="hidden md:flex items-center gap-3 pt-2">
+            <button
+              onClick={() => setIsQuickCheckoutOpen(true)}
+              className="py-3 px-6 rounded-2xl bg-[#ff9800] hover:bg-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span>Buy Now</span>
+            </button>
+
             <button
               onClick={() => addItem(product)}
-              className="flex-1 py-3.5 px-4 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 touch-active"
+              className="py-3 px-6 rounded-2xl bg-[#d81b60] hover:bg-[#c2185b] text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 active:scale-98"
             >
-              <ShoppingCart className="w-4.5 h-4.5" />
+              <ShoppingCart className="w-4 h-4" />
               <span>Add to Cart</span>
             </button>
 
             <button
-              onClick={() => setIsQuickCheckoutOpen(true)}
-              className="flex-1 py-3.5 px-4 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 touch-active cursor-pointer"
+              onClick={() => setIsSaved(!isSaved)}
+              className={`p-3 rounded-2xl border transition shadow-xs ${
+                isSaved
+                  ? 'bg-[#d81b60] text-white border-[#d81b60]'
+                  : 'bg-pink-50 text-[#d81b60] border-pink-200 hover:bg-pink-100'
+              }`}
+              title="Wishlist"
             >
-              <ShoppingBag className="w-4.5 h-4.5" />
-              <span>Buy Now</span>
+              <Heart className={`w-4 h-4 ${isSaved ? 'fill-white text-white' : 'text-[#d81b60]'}`} />
             </button>
           </div>
 
-          {/* Delivery & Service Guarantees Box + Store Info */}
-          <div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-semibold text-slate-700">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <RotateCcw className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Return : 3 Days</span>
+          {/* 6. Delivery Guarantees & Shop Card Box */}
+          <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-pink-50/20 border border-pink-100 text-xs font-semibold text-slate-700 pt-2">
+            <div className="space-y-1.5 text-[11px] sm:text-xs">
+              <div className="flex items-center gap-1.5">
+                <RotateCcw className="w-3.5 h-3.5 text-[#d81b60]" />
+                <span><strong>Return :</strong> 3 Days</span>
               </div>
-              <div className="flex items-center gap-2">
-                <ArrowLeftRight className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Exchange : 3 Days</span>
+              <div className="flex items-center gap-1.5">
+                <ArrowLeftRight className="w-3.5 h-3.5 text-[#d81b60]" />
+                <span><strong>Exchange :</strong> 3 Days</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Truck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Delivery Time : 2 Days</span>
+              <div className="flex items-center gap-1.5">
+                <Truck className="w-3.5 h-3.5 text-[#d81b60]" />
+                <span><strong>Delivery Time :</strong> 2 Days</span>
               </div>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Payment : COD Available</span>
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#d81b60]" />
+                <span><strong>Payment :</strong> COD Available</span>
               </div>
             </div>
 
-            {/* Shop Avatar Card Box */}
-            <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-xs flex items-center gap-2.5 text-left shrink-0">
-              <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-xs flex items-center justify-center uppercase">
-                TF
+            {/* Shop Badge Box */}
+            <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs flex items-center gap-2 shrink-0">
+              <div className="w-7 h-7 rounded-full bg-pink-100 text-[#d81b60] font-black text-xs flex items-center justify-center">
+                <StoreIcon className="w-3.5 h-3.5" />
               </div>
               <div>
-                <span className="block text-[9px] text-slate-400 font-bold uppercase">Shop</span>
-                <span className="block text-xs font-extrabold text-slate-900 leading-tight">
-                  Tawhid Fashion<br />House
+                <span className="block text-[8px] text-[#d81b60] font-bold uppercase tracking-wider">Shop</span>
+                <span className="block text-[11px] font-extrabold text-slate-900 leading-tight">
+                  Chittagong Shoes
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Rating & Reviews Breakdown (Histogram) */}
-          <div className="bg-white p-5 rounded-3xl border border-slate-200/80 space-y-3 shadow-xs">
-            <h3 className="font-extrabold text-sm text-slate-900">Rating & Reviews</h3>
+          {/* 7. Rating & Reviews Breakdown (Histogram Chart) */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 space-y-2 shadow-xs">
+            <h3 className="font-extrabold text-xs sm:text-sm text-slate-900">Rating & Reviews</h3>
 
-            <div className="flex items-center justify-between gap-6">
+            <div className="flex items-center justify-between gap-4">
               {/* Big Score */}
-              <div className="text-center">
-                <div className="text-3xl font-black text-slate-900 flex items-center gap-1">
-                  <span>4.9</span>
-                  <Star className="w-6 h-6 fill-emerald-500 text-emerald-500" />
+              <div className="text-center pr-4 border-r border-slate-200">
+                <div className="text-3xl sm:text-4xl font-black text-slate-900 flex items-center justify-center gap-1">
+                  <span>4.8</span>
+                  <Star className="w-6 h-6 fill-[#d81b60] text-[#d81b60]" />
                 </div>
-                <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                <span className="text-[10px] font-bold text-slate-400 block mt-0.5">
                   By Verified Buyers
                 </span>
               </div>
 
-              {/* Progress Bars */}
-              <div className="flex-1 space-y-1.5 text-[11px] font-bold text-slate-500">
+              {/* Progress Bars Breakdown */}
+              <div className="flex-1 space-y-1 text-[11px] font-bold text-slate-600">
                 <div className="flex items-center gap-2">
-                  <span>5 ⭐</span>
+                  <span>5 ★</span>
                   <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[85%] bg-emerald-500 rounded-full" />
+                    <div className="h-full w-[80%] bg-[#d81b60] rounded-full" />
                   </div>
-                  <span className="w-3 text-right">8</span>
+                  <span className="w-4 text-right">78</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>4 ⭐</span>
+                  <span>4 ★</span>
                   <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[15%] bg-emerald-500 rounded-full" />
+                    <div className="h-full w-[25%] bg-[#d81b60] rounded-full" />
                   </div>
-                  <span className="w-3 text-right">1</span>
+                  <span className="w-4 text-right">26</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>3 ⭐</span>
+                  <span>3 ★</span>
                   <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[0%] bg-emerald-500 rounded-full" />
+                    <div className="h-full w-[0%] bg-[#d81b60] rounded-full" />
                   </div>
-                  <span className="w-3 text-right">0</span>
+                  <span className="w-4 text-right">0</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>2 ⭐</span>
+                  <span>2 ★</span>
                   <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[0%] bg-emerald-500 rounded-full" />
+                    <div className="h-full w-[0%] bg-[#d81b60] rounded-full" />
                   </div>
-                  <span className="w-3 text-right">0</span>
+                  <span className="w-4 text-right">0</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>1 ⭐</span>
+                  <span>1 ★</span>
                   <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[0%] bg-emerald-500 rounded-full" />
+                    <div className="h-full w-[0%] bg-[#d81b60] rounded-full" />
                   </div>
-                  <span className="w-3 text-right">0</span>
+                  <span className="w-4 text-right">0</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Mobile Only: Description & Reviews Tabs (Renders below purchase panel on mobile) */}
-          <div className="block lg:hidden pt-4 border-t border-slate-200">
-            {renderDescriptionAndReviews()}
+          {/* Mobile Only: Description & Reviews Tabs (Renders below on mobile) */}
+          <div className="block lg:hidden pt-3 border-t border-slate-200">
+            {renderDescriptionAndReviewsTab()}
           </div>
 
         </div>
       </div>
 
       {/* =================================================================== */}
-      {/* SIMILAR PRODUCTS SECTION (BOTTOM FULL-WIDTH GRID) */}
+      {/* SIMILAR PRODUCTS SECTION (BOTTOM GRID) */}
       {/* =================================================================== */}
-      <section className="space-y-4 pt-6 border-t border-slate-200/80">
-        <div className="flex items-center gap-3">
-          <div className="w-2.5 h-7 rounded-full bg-emerald-500" />
-          <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">
-            Similar Products
-          </h2>
-        </div>
+      <section id="similar-products" className="space-y-3 pt-8 mt-8 border-t border-slate-200/80 px-4 sm:px-0">
+        <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">
+          Similar Products
+        </h2>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 sm:gap-1">
-          {relatedProducts.map(rel => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 md:gap-2">
+          {relatedProducts.map((rel) => (
             <PinkProductCard key={`sim-${rel.id}`} product={rel} isSlider={false} />
           ))}
         </div>
       </section>
 
-      {/* Quick Checkout Modal / Mobile Drawer */}
+      {/* Quick Checkout Modal */}
       <QuickCheckoutModal
         isOpen={isQuickCheckoutOpen}
         onClose={() => setIsQuickCheckoutOpen(false)}
         product={product}
         quantity={cartItem ? cartItem.quantity : 1}
       />
+
+      {/* =================================================================== */}
+      {/* IMAGE VIEWER LIGHTBOX MODAL (FIXED SIZE MODAL & NO IMAGE RADIUS) */}
+      {/* =================================================================== */}
+      {isImageViewerOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+          <div className="relative w-full max-w-4xl h-[560px] sm:h-[640px] bg-[#fff5f7] sm:bg-white rounded-3xl overflow-hidden shadow-2xl border border-pink-100/80 flex flex-col shrink-0">
+            
+            {/* Modal Header Row */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-pink-100 bg-[#fff5f7] shrink-0 h-14">
+              <div className="flex items-center gap-3">
+                <span className="font-extrabold text-[#d81b60] text-sm sm:text-base">
+                  {viewerActiveIdx + 1} / {galleryImages.length}
+                </span>
+                <span className="text-xs text-slate-400 font-semibold hidden sm:inline">
+                  Use arrow keys to navigate
+                </span>
+              </div>
+
+              {/* Action Toolbar */}
+              <div className="flex items-center gap-3 text-slate-600">
+                <button
+                  onClick={() => setZoomLevel((prev) => (prev === 1 ? 1.5 : prev === 1.5 ? 2 : 1))}
+                  className="p-1.5 rounded-full hover:bg-pink-100 hover:text-[#d81b60] transition"
+                  title="Zoom"
+                >
+                  <ZoomIn className="w-4.5 h-4.5" />
+                </button>
+                <button
+                  onClick={() => setRotationAngle((prev) => (prev + 90) % 360)}
+                  className="p-1.5 rounded-full hover:bg-pink-100 hover:text-[#d81b60] transition"
+                  title="Rotate"
+                >
+                  <RotateCw className="w-4.5 h-4.5" />
+                </button>
+                <button
+                  onClick={() => {
+                    setZoomLevel(1);
+                    setRotationAngle(0);
+                  }}
+                  className="p-1.5 rounded-full hover:bg-pink-100 hover:text-[#d81b60] transition"
+                  title="Reset"
+                >
+                  <Maximize2 className="w-4.5 h-4.5" />
+                </button>
+                <div className="w-px h-5 bg-slate-200" />
+                <button
+                  onClick={() => setIsImageViewerOpen(false)}
+                  className="p-1.5 rounded-full hover:bg-pink-100 text-[#d81b60] transition"
+                  title="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body Main Image Display Area (FIXED HEIGHT CONTAINER) */}
+            <div className="relative flex-1 bg-[#fff5f7] p-4 sm:p-6 flex items-center justify-center overflow-hidden h-[360px] sm:h-[450px]">
+              
+              {/* Previous Image Arrow Button */}
+              <button
+                onClick={() => setViewerActiveIdx((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)}
+                className="absolute left-3 sm:left-6 p-2.5 sm:p-3 rounded-2xl bg-white/90 hover:bg-white text-slate-800 shadow-md backdrop-blur-md transition active:scale-95 z-20"
+                title="Previous Image"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              {/* Main Displayed Image (NO RADIUS / ROUNDED-NONE) */}
+              <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                <img
+                  src={galleryImages[viewerActiveIdx]}
+                  alt={`Product view ${viewerActiveIdx + 1}`}
+                  style={{
+                    transform: `scale(${zoomLevel}) rotate(${rotationAngle}deg)`,
+                    transition: 'transform 0.3s ease',
+                  }}
+                  className="max-h-full max-w-full object-contain rounded-none"
+                />
+              </div>
+
+              {/* Next Image Arrow Button */}
+              <button
+                onClick={() => setViewerActiveIdx((prev) => (prev + 1) % galleryImages.length)}
+                className="absolute right-3 sm:right-6 p-2.5 sm:p-3 rounded-2xl bg-white/90 hover:bg-white text-slate-800 shadow-md backdrop-blur-md transition active:scale-95 z-20"
+                title="Next Image"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Bottom Horizontal Thumbnails Navigation Strip */}
+            <div className="flex items-center justify-center gap-3 p-3 sm:p-4 bg-[#fff5f7] border-t border-pink-100 overflow-x-auto no-scrollbar shrink-0">
+              {galleryImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setViewerActiveIdx(idx)}
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 transition shrink-0 ${
+                    viewerActiveIdx === idx
+                      ? 'border-2 border-[#d81b60] ring-2 ring-[#d81b60]/20 scale-105 shadow-sm'
+                      : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* MOBILE ONLY: BOTTOM FIXED STICKY ACTION BAR */}
+      {/* =================================================================== */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 p-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-2.5">
+        
+        {/* Left 1: Cart Icon Button with Count Badge */}
+        <button
+          onClick={() => setIsCartOpen(true)}
+          className="flex flex-col items-center gap-0.5 px-2 relative text-slate-700 hover:text-[#d81b60] transition shrink-0"
+        >
+          <div className="relative">
+            <ShoppingCart className="w-5 h-5" />
+            {totalItemsCount > 0 && (
+              <span className="absolute -top-1.5 -right-2.5 bg-[#d81b60] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                {totalItemsCount}
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] font-extrabold">Cart</span>
+        </button>
+
+        {/* Left 2: Chat Button */}
+        <button className="flex flex-col items-center gap-0.5 px-2 text-slate-700 hover:text-[#d81b60] transition shrink-0">
+          <MessageCircle className="w-5 h-5" />
+          <span className="text-[10px] font-extrabold">Chat</span>
+        </button>
+
+        {/* Orange Buy Now Button */}
+        <button
+          onClick={() => setIsQuickCheckoutOpen(true)}
+          className="flex-1 bg-[#ff9800] hover:bg-amber-600 active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center"
+        >
+          Buy Now
+        </button>
+
+        {/* Brand Pink Add to Cart Button */}
+        <button
+          onClick={() => addItem(product)}
+          className="flex-1 bg-[#d81b60] hover:bg-[#c2185b] active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center"
+        >
+          Add to Cart
+        </button>
+
+      </div>
+
     </main>
   );
 };

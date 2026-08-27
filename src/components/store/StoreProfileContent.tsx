@@ -277,7 +277,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
   return (
     <div className="min-h-screen bg-slate-50/60 pb-16">
       {/* ========================================================================= */}
-      {/* 1. FULL WIDTH COVER PHOTO & HEADER (FACEBOOK STYLE) */}
+      {/* 1. FULL WIDTH COVER PHOTO & HEADER (NON-STICKY) */}
       {/* ========================================================================= */}
       <div className="bg-white border-b border-slate-200/80 shadow-xs">
         
@@ -357,26 +357,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
                   <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.79-4-4-4-.495 0-.965.084-1.4.238C14.55 2.475 13.18 1.6 11.6 1.6c-1.58 0-2.95.875-3.6 2.148-.435-.154-.905-.238-1.4-.238-2.21 0-4 1.79-4 4 0 .495.084.965.238 1.4C1.575 9.55.7 10.92.7 12.5c0 1.58.875 2.95 2.148 3.6-.154.435-.238.905-.238 1.4 0 2.21 1.79 4 4 4 .495 0 .965-.084 1.4-.238 1.25 1.273 2.62 2.148 4.2 2.148 1.58 0 2.95-.875 3.6-2.148.435.154.905.238 1.4.238 2.21 0 4-1.79 4-4 0-.495-.084-.965-.238-1.4 1.273-.65 2.148-2.02 2.148-3.6zm-12.4 4.8l-4.2-4.2 1.4-1.4 2.8 2.8 7.2-7.2 1.4 1.4-8.6 8.6z" />
                 </svg>
               </h1>
-
-              {/* Category & Tag Pills */}
-              <div className="flex flex-wrap items-center justify-center gap-1.5 text-xs text-slate-500 font-medium">
-                <span className="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200/60">
-                  {store.category}
-                </span>
-                {store.tags?.map((tag, idx) => (
-                  <span key={idx} className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[11px]">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
             </div>
-
-            {/* Store Bio Text (Under Name & Photo) */}
-            {store.bio && (
-              <p className="mt-2.5 text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed italic px-4 font-normal">
-                "{store.bio}"
-              </p>
-            )}
 
             {/* Quick Stats Pill Row */}
             <div className="mt-3.5 mb-4 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-700 font-semibold">
@@ -395,31 +376,27 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
                 <MapPin className="w-4 h-4 text-emerald-600" />
                 <span>{store.distance}</span>
               </div>
-
-              {store.followersCount && (
-                <div className="flex items-center gap-1 bg-purple-50 text-purple-900 px-3 py-1.5 rounded-xl border border-purple-200/70">
-                  <Heart className="w-4 h-4 text-purple-600 fill-purple-200" />
-                  <span>{store.followersCount} Followers</span>
-                </div>
-              )}
             </div>
 
           </div>
+        </div>
+      </div>
 
-          {/* ========================================================================= */}
-          {/* 2. FACEBOOK PROFILE NAVIGATION TABS (TOUCH & MOUSE DRAG SLIDE) */}
-          {/* ========================================================================= */}
-          <div className="border-t border-slate-200 pt-1">
-            <div
-              ref={tabsContainerRef}
-              onMouseDown={handleTabsMouseDown}
-              onMouseLeave={handleTabsMouseLeave}
-              onMouseUp={handleTabsMouseUp}
-              onMouseMove={handleTabsMouseMove}
-              className={`flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 text-xs sm:text-sm font-semibold text-slate-600 select-none touch-pan-x ${
-                isTabsDragging ? 'cursor-grabbing' : 'cursor-grab'
-              }`}
-            >
+      {/* ========================================================================= */}
+      {/* 2. STORE CATEGORY & PROFILE NAVIGATION TABS (STICKY BAR ONLY) */}
+      {/* ========================================================================= */}
+      <div className="sticky top-[82px] z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+        <div className="max-w-6xl mx-auto px-4">
+          <div
+            ref={tabsContainerRef}
+            onMouseDown={handleTabsMouseDown}
+            onMouseLeave={handleTabsMouseLeave}
+            onMouseUp={handleTabsMouseUp}
+            onMouseMove={handleTabsMouseMove}
+            className={`flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 text-xs sm:text-sm font-semibold text-slate-600 select-none touch-pan-x ${
+              isTabsDragging ? 'cursor-grabbing' : 'cursor-grab'
+            }`}
+          >
               
               {/* Category Tabs */}
               {store.storeCategories && store.storeCategories.length > 0 ? (
@@ -495,9 +472,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
 
             </div>
           </div>
-
         </div>
-      </div>
 
       {/* ========================================================================= */}
       {/* 3. MAIN CONTENT LAYOUT (FULL WIDTH CONTAINER WITHOUT LEFT SIDEBAR) */}
@@ -637,64 +612,10 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
         {/* VIEW 4: PRODUCTS LIST / GRID (CLEAN FULL-WIDTH GRID USING PinkProductCard) */}
         {activeTab !== 'about' && activeTab !== 'reviews' && activeTab !== 'photos' && (
           <div className="space-y-4">
-            
-            {/* Search & Sub-Filter Toolbar */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-              {/* Search Bar */}
-              <div className="relative w-full sm:w-72">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder={`Search in ${store.name}...`}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
-                />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-
-              {/* Sub-Filters Chips */}
-              <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar">
-                <button
-                  onClick={() => setSelectedFilter('all')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                    selectedFilter === 'all'
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  All Items ({products.length})
-                </button>
-                <button
-                  onClick={() => setSelectedFilter('popular')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                    selectedFilter === 'popular'
-                      ? 'bg-amber-500 text-white'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  🔥 Popular
-                </button>
-                <button
-                  onClick={() => setSelectedFilter('discount')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                    selectedFilter === 'discount'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  🏷 Offers
-                </button>
-              </div>
-            </div>
 
             {/* Product Grid using PinkProductCard (Clean 2 to 4 column responsive layout) */}
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2.5">
                 {filteredProducts.map(product => (
                   <PinkProductCard key={product.id} product={product} />
                 ))}
