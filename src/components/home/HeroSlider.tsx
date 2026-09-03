@@ -18,7 +18,7 @@ export const HeroSlider: React.FC = () => {
             loading="lazy"
             className="object-cover object-center w-full h-full"
             style={{ position: 'absolute', inset: 0 }}
-            src="https://d62ipmwrm4ymk.cloudfront.net/home_banner/b2b489fb-a412-4532-b811-569cbbcd0468.jpg"
+            src="/home_banner.jpg"
           />
         </div>
 
