@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Category, Product, Store, CategoryDetailMeta } from '@/types';
+import { Category, Product, Store, CategoryDetailMeta, HeroBanner } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://admin.ekhanei.bd/api/v1';
 
@@ -17,7 +17,7 @@ export const apiService = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getHeroBanners: builder.query<any[], void>({
+    getHeroBanners: builder.query<HeroBanner[], void>({
       query: () => '/banners/hero',
       transformResponse: (res: any) => res.data || [],
     }),

@@ -100,6 +100,16 @@ export interface SpecialOffer {
   url?: string;
 }
 
+export interface HeroBanner {
+  id: string;
+  title?: string;
+  subtitle?: string;
+  image: string;
+  url?: string;
+  link?: string;
+  type?: string;
+}
+
 export interface Brand {
   id: string;
   name: string;
