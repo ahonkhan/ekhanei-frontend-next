@@ -21,7 +21,7 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) =
       {/* Cover Image Box */}
       <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
         <img
-          src={store.coverImage}
+          src={store.coverImage || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80'}
           alt={store.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
@@ -31,13 +31,13 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) =
         {/* Offer Tag */}
         <span className="absolute top-2.5 left-2.5 bg-emerald-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">
           <Tag className="w-3 h-3" />
-          {store.offer}
+          {store.offer || 'Special Offer'}
         </span>
 
         {/* Delivery Time Badge */}
         <span className="absolute bottom-2.5 right-2.5 bg-slate-950/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1">
           <Clock className="w-3 h-3 text-amber-400" />
-          {store.deliveryTime}
+          {store.deliveryTime || '20-30 min'}
         </span>
       </div>
 
@@ -45,7 +45,7 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) =
       <div className="p-3 sm:p-3.5 space-y-2 bg-white flex-1 flex flex-col justify-between">
         <div className="flex items-start gap-2.5">
           <img
-            src={store.logoImage}
+            src={store.logoImage || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80'}
             alt={store.name}
             className="w-10 h-10 rounded-xl object-cover border border-slate-100 shadow-xs flex-shrink-0"
           />

@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, ArrowRight, X } from 'lucide-react';
-import { PRODUCTS } from '@/data/mockData';
+import { useGetProductsQuery } from '@/store/services/apiService';
 import { Product } from '@/types';
 
 interface SearchInputProps {
@@ -31,29 +31,10 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Filter matching products in real-time
-  const matchingProducts = useMemo(() => {
-    const trimmed = query.trim().toLowerCase();
-    if (!trimmed) return [];
-
-    return PRODUCTS.filter((p) => {
-      const nameMatch = p.name.toLowerCase().includes(trimmed);
-      const catMatch = p.categoryName.toLowerCase().includes(trimmed);
-      const storeMatch = p.storeName ? p.storeName.toLowerCase().includes(trimmed) : false;
-      return nameMatch || catMatch || storeMatch;
-    }).slice(0, 6);
-  }, [query]);
+  const { data: matchingProducts = [] } = useGetProductsQuery(
+    { search: query.trim() },
+    { skip: !query.trim() }
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -15,6 +15,8 @@ export interface Category {
   iconBg: string;
   itemCount: string;
   badge: string;
+  slug?: string;
+  title?: string;
 }
 
 export interface Product {
@@ -104,9 +106,11 @@ export interface SubCategory {
   id: string;
   name: string;
   image?: string;
+  slug?: string;
 }
 
 export interface CategoryDetailMeta {
+  id?: string;
   title: string;
   heroSlides: string[];
   subCategories: SubCategory[];

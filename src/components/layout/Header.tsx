@@ -5,16 +5,20 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useLocation } from '@/context/LocationContext';
+import { useAppSelector } from '@/store/hooks';
+import { AuthModal } from '@/components/auth/AuthModal';
 import { SearchInput } from '@/components/common/SearchInput';
 import { CategoryMenuDrawer } from '@/components/layout/CategoryMenuDrawer';
-import { Menu, Heart, ShoppingCart, ChevronDown, MapPin } from 'lucide-react';
+import { Menu, Heart, ShoppingCart, ChevronDown, MapPin, User as UserIcon } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { totalItemsCount, setIsCartOpen } = useCart();
-  const { selectedLocation, openLocationDrawer } = useLocation();
+  const { selectedLocation, selectGPSLocation, openLocationDrawer } = useLocation();
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
   const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   return (
     <>
@@ -63,13 +67,14 @@ export const Header: React.FC = () => {
 
             {/* Location Pill (Desktop Header) */}
             <div
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-transparent via-white/15 to-white/35 border border-white/40 backdrop-blur-md text-left shadow-xs cursor-default select-none shrink-0 max-w-[180px]"
+              onClick={selectGPSLocation}
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-transparent via-white/15 to-white/35 border border-white/40 hover:border-white/60 hover:bg-white/20 backdrop-blur-md text-left shadow-xs cursor-pointer select-none shrink-0 max-w-[200px] transition"
             >
               <div className="w-5 h-5 rounded-full bg-white/25 text-white flex items-center justify-center text-xs shrink-0 font-black">
                 <MapPin className="w-3 h-3 text-white" />
               </div>
-              <span className="text-xs font-extrabold text-white truncate block max-w-[130px]">
-                {selectedLocation.title} 
+              <span className="text-xs font-extrabold text-white truncate block max-w-[150px]" title={selectedLocation.title || selectedLocation.address}>
+                {selectedLocation.title || selectedLocation.address || 'Locating...'} 
               </span>
             </div>
           </div>
@@ -136,20 +141,33 @@ export const Header: React.FC = () => {
             <div className="h-9 border-l border-white/40" />
 
             {/* Account Profile Trigger */}
-            <Link href="/profile">
+            {isAuthenticated ? (
+              <Link href="/profile">
+                <button
+                  type="button"
+                  className="flex h-full min-w-[130px] items-center gap-2 rounded-sm px-1 text-left text-white outline-none hover:opacity-90 transition cursor-pointer"
+                >
+                  <div className="flex size-9 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-white/20 text-xs font-bold text-white uppercase shadow-xs">
+                    <span>{user?.name ? user.name.charAt(0) : 'U'}</span>
+                  </div>
+                  <span className="flex min-w-0 flex-col text-xs font-medium leading-tight text-white">
+                    <span className="truncate font-bold">{user?.name || 'Customer'}</span>
+                    <span className="flex items-center gap-1 text-[10px] opacity-80">My Account <ChevronDown className="w-3 h-3" /></span>
+                  </span>
+                </button>
+              </Link>
+            ) : (
               <button
                 type="button"
-                className="flex h-full min-w-[140px] items-center gap-2.5 rounded-sm px-1 text-left text-white outline-none hover:opacity-90 transition"
+                onClick={() => setIsAuthModalOpen(true)}
+                className="flex h-full items-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 px-3 py-2 text-left text-white outline-none transition cursor-pointer border border-white/20 shadow-2xs"
               >
-                <div className="flex size-9 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-white/20 text-xs font-semibold text-white">
-                  <span>A</span>
-                </div>
-                <span className="flex min-w-0 flex-col text-xs font-medium leading-tight text-white">
-                  <span className="truncate font-medium">Hi, Customer</span>
-                  <span className="flex items-center gap-1 text-[11px]">Account <ChevronDown className="w-3.5 h-3.5" /></span>
+                <UserIcon className="w-4 h-4 text-white" />
+                <span className="text-xs font-extrabold text-white whitespace-nowrap">
+                  Sign In / Register
                 </span>
               </button>
-            </Link>
+            )}
 
           </div>
         </div>
@@ -158,6 +176,11 @@ export const Header: React.FC = () => {
       <CategoryMenuDrawer
         isOpen={isMenuDrawerOpen}
         onClose={() => setIsMenuDrawerOpen(false)}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </>
   );

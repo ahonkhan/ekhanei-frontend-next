@@ -369,12 +369,12 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
 
               <div className="flex items-center gap-1 bg-blue-50 text-blue-900 px-3 py-1.5 rounded-xl border border-blue-200/70">
                 <Clock className="w-4 h-4 text-blue-600" />
-                <span>{store.deliveryTime}</span>
+                <span>{store.deliveryTime || '১৫-২৫ মিনিট'}</span>
               </div>
 
               <div className="flex items-center gap-1 bg-emerald-50 text-emerald-900 px-3 py-1.5 rounded-xl border border-emerald-200/70">
                 <MapPin className="w-4 h-4 text-emerald-600" />
-                <span>{store.distance}</span>
+                <span>{store.distance || '১.১ কিমি'}</span>
               </div>
             </div>
 

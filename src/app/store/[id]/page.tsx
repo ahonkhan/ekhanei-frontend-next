@@ -1,17 +1,12 @@
 import React from 'react';
-import { STORES, getStoreById, getProductsByStore } from '@/data/mockData';
-import { StoreProfileContent } from '@/components/store/StoreProfileContent';
+import { StoreDetailPageContent } from '@/components/store/StoreDetailPageContent';
 
 export function generateStaticParams() {
-  return STORES.map((store) => ({
-    id: store.id,
-  }));
+  const storeIds = ['1', '2', '3', '4', 'sultan-dine', 'lazz-pharma', 'gadget-world', 'bengal-super-mart'];
+  return storeIds.map((id) => ({ id }));
 }
 
 export default async function StoreDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
-  const store = getStoreById(resolvedParams.id);
-  const products = getProductsByStore(store);
-
-  return <StoreProfileContent store={store} products={products} />;
+  return <StoreDetailPageContent storeId={resolvedParams.id} />;
 }

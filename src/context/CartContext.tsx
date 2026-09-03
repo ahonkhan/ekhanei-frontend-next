@@ -1,7 +1,16 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 import { Product, CartItem } from '@/types';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import {
+  addItem,
+  increment,
+  decrement,
+  removeItem,
+  clearCart,
+  setIsCartOpen,
+} from '@/store/slices/cartSlice';
 
 interface CartContextType {
   cart: CartItem[];
@@ -20,64 +29,18 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const cart = useAppSelector((state) => state.cart.cart);
+  const isCartOpen = useAppSelector((state) => state.cart.isCartOpen);
 
-  // Load cart from localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('shym_cart');
-      if (saved) {
-        setCart(JSON.parse(saved));
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
+  const handleAddItem = (product: Product) => dispatch(addItem(product));
+  const handleIncrement = (id: string) => dispatch(increment(id));
+  const handleDecrement = (id: string) => dispatch(decrement(id));
+  const handleRemoveItem = (id: string) => dispatch(removeItem(id));
+  const handleClearCart = () => dispatch(clearCart());
+  const handleSetIsCartOpen = (open: boolean) => dispatch(setIsCartOpen(open));
 
-  // Save cart to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('shym_cart', JSON.stringify(cart));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [cart]);
-
-  const addItem = (product: Product) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.id === product.id);
-      if (existing) {
-        return prev.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
-    });
-  };
-
-  const increment = (id: string) => {
-    setCart(prev =>
-      prev.map(item => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item))
-    );
-  };
-
-  const decrement = (id: string) => {
-    setCart(prev =>
-      prev
-        .map(item => (item.id === id ? { ...item, quantity: item.quantity - 1 } : item))
-        .filter(item => item.quantity > 0)
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setCart(prev => prev.filter(item => item.id !== id));
-  };
-
-  const clearCart = () => setCart([]);
-
-  const getItem = (id: string) => cart.find(item => item.id === id);
-
+  const getItem = (id: string) => cart.find((item) => item.id === id);
   const totalItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const totalAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -85,16 +48,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <CartContext.Provider
       value={{
         cart,
-        addItem,
-        increment,
-        decrement,
-        removeItem,
-        clearCart,
+        addItem: handleAddItem,
+        increment: handleIncrement,
+        decrement: handleDecrement,
+        removeItem: handleRemoveItem,
+        clearCart: handleClearCart,
         totalItemsCount,
         totalAmount,
         getItem,
         isCartOpen,
-        setIsCartOpen,
+        setIsCartOpen: handleSetIsCartOpen,
       }}
     >
       {children}

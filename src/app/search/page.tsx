@@ -4,276 +4,19 @@ import React, { useState, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
-import { Product } from '@/types';
-import { SlidersHorizontal, ChevronDown, ArrowUpDown, Filter, X, Check } from 'lucide-react';
-
-// Sample 20 Search Products matching Ekhaneilayout
-const MOCK_SEARCH_PRODUCTS: Product[] = [
-  {
-    id: 'search-1',
-    name: 'Manmode Printed Drop Shoulder Shirt',
-    price: 1390,
-    oldPrice: 1749,
-    image: 'https://d62ipmwrm4ymk.cloudfront.net/medium/product/20251009/walkaroo-blue-strap-sandals-for-mens_1_cbe3.jpg',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.8,
-    reviewsCount: 42,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-2',
-    name: 'Manmode Printed Drop Shoulder Shirt',
-    price: 1390,
-    oldPrice: 1749,
-    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.9,
-    reviewsCount: 28,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-3',
-    name: 'Manmode Printed Drop Shoulder Shirt',
-    price: 1390,
-    oldPrice: 1749,
-    image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.7,
-    reviewsCount: 19,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-4',
-    name: 'Manmode Printed Drop Shoulder Shirt',
-    price: 1390,
-    oldPrice: 1749,
-    image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.9,
-    reviewsCount: 51,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-5',
-    name: 'Manmode Printed Drop Shoulder Shirt',
-    price: 1390,
-    oldPrice: 1749,
-    image: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.8,
-    reviewsCount: 33,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-6',
-    name: 'Manmode Printed Drop Shoulder Shirt',
-    price: 1390,
-    oldPrice: 1749,
-    image: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.6,
-    reviewsCount: 22,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-7',
-    name: 'Manmode Printed Drop Shoulder Shirt',
-    price: 1390,
-    oldPrice: 1749,
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.7,
-    reviewsCount: 16,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-8',
-    name: 'Manmode Regular Fit Zipper Polo',
-    price: 1190,
-    oldPrice: 1449,
-    image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.8,
-    reviewsCount: 64,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-9',
-    name: 'Manmode Regular Fit Zipper Polo',
-    price: 1190,
-    oldPrice: 1449,
-    image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.9,
-    reviewsCount: 45,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-10',
-    name: 'Manmode Regular Fit Zipper Polo',
-    price: 1190,
-    oldPrice: 1449,
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.7,
-    reviewsCount: 37,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-11',
-    name: 'Manmode Loose Fit Stripe T-Shirt',
-    price: 890,
-    oldPrice: 1049,
-    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.8,
-    reviewsCount: 88,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-12',
-    name: 'Manmode Regular Fit Zipper Polo',
-    price: 1190,
-    oldPrice: 1449,
-    image: 'https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.6,
-    reviewsCount: 29,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-13',
-    name: 'Manmode Loose Fit Stripe T-Shirt',
-    price: 890,
-    oldPrice: 1049,
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.9,
-    reviewsCount: 72,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-14',
-    name: 'Manmode Loose Fit Stripe T-Shirt',
-    price: 890,
-    oldPrice: 1049,
-    image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.7,
-    reviewsCount: 39,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-15',
-    name: 'Manmode Loose Fit Stripe T-Shirt',
-    price: 890,
-    oldPrice: 1049,
-    image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.8,
-    reviewsCount: 41,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-16',
-    name: 'Manmode Loose Fit Stripe T-Shirt',
-    price: 890,
-    oldPrice: 1049,
-    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.8,
-    reviewsCount: 35,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-17',
-    name: 'Stealth Mode Faux Leather Cap',
-    price: 780,
-    oldPrice: 1450,
-    image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.9,
-    reviewsCount: 112,
-    storeName: 'Manmode Store',
-    unit: '1 pc'
-  },
-  {
-    id: 'search-18',
-    name: 'Dior Sauvage Eau De Parfum',
-    price: 2600,
-    oldPrice: 3500,
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 5.0,
-    reviewsCount: 230,
-    storeName: 'Manmode Store',
-    unit: '100 ml'
-  },
-  {
-    id: 'search-19',
-    name: 'Creed Aventus EDP for Men',
-    price: 5100,
-    oldPrice: 17000,
-    image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 5.0,
-    reviewsCount: 195,
-    storeName: 'Manmode Store',
-    unit: '100 ml'
-  },
-  {
-    id: 'search-20',
-    name: 'Bleu De Chanel Eau De Parfum',
-    price: 2600,
-    oldPrice: 3500,
-    image: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=600&q=80',
-    categoryId: 'fashion',
-    categoryName: 'Fashion',
-    rating: 4.9,
-    reviewsCount: 178,
-    storeName: 'Manmode Store',
-    unit: '100 ml'
-  }
-];
+import { ProductCardSkeleton } from '@/components/common/Skeletons';
+import { useGetProductsQuery, useGetCategoriesQuery } from '@/store/services/apiService';
+import { SlidersHorizontal, ChevronDown, ArrowUpDown, Filter, X, Check, Search } from 'lucide-react';
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
-  const query = searchParams.get('q') || 'manmode';
+  const query = searchParams.get('q') || '';
+
+  const { data: apiProducts = [], isLoading } = useGetProductsQuery(
+    { search: query.trim() },
+    { skip: false }
+  );
+  const { data: categories = [] } = useGetCategoriesQuery();
 
   // Mobile Drawers State
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -285,15 +28,20 @@ function SearchResultsContent() {
   const [priceRange, setPriceRange] = useState<number>(20000);
   const [sortBy, setSortBy] = useState<string>('recommended');
 
-  const categoriesList = [
-    { id: 'caps', label: 'Men Caps & Hats' },
-    { id: 'casual-shirts', label: 'Men Casual Shirts' },
-    { id: 'polo', label: 'Men Polo Shirt' },
-    { id: 'tshirts', label: 'Men T-Shirts & Tanks' },
-    { id: 'perfume', label: 'Perfume' },
-  ];
+  const categoriesList = useMemo(() => {
+    if (categories.length > 0) {
+      return categories.map((c) => ({ id: (c as any).id || c.slug, label: c.title || (c as any).name }));
+    }
+    return [
+      { id: 'fashion', label: 'Fashion & Clothing' },
+      { id: 'fresh-fish', label: 'Fish & Seafood' },
+      { id: 'grocery', label: 'Grocery & Staples' },
+      { id: 'pharmacy', label: 'Medicine & Pharmacy' },
+      { id: 'gadget-electronics', label: 'Gadget & Electronics' },
+    ];
+  }, [categories]);
 
-  const sizesList = ['6', '7', '8', '9', '10', '11-12', '12', '13-14', '14', '14-15'];
+  const sizesList = ['1 pc', '1 kg', '500g', 'S', 'M', 'L', 'XL', '2XL'];
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) =>
@@ -315,7 +63,15 @@ function SearchResultsContent() {
 
   // Filtered and Sorted Products
   const filteredProducts = useMemo(() => {
-    let result = MOCK_SEARCH_PRODUCTS.filter((p) => p.price <= priceRange);
+    let result = apiProducts.filter((p) => (p.price || 0) <= priceRange);
+
+    if (selectedCategories.length > 0) {
+      result = result.filter(
+        (p) =>
+          selectedCategories.includes(String(p.categoryId)) ||
+          selectedCategories.some((sc) => p.categoryName?.toLowerCase().includes(sc.toLowerCase()))
+      );
+    }
 
     if (sortBy === 'price-low') {
       result = [...result].sort((a, b) => a.price - b.price);
@@ -324,7 +80,7 @@ function SearchResultsContent() {
     }
 
     return result;
-  }, [priceRange, sortBy]);
+  }, [apiProducts, priceRange, selectedCategories, sortBy]);
 
   return (
     <div className="min-h-screen bg-[#fbf9fa] text-[#191919]">
@@ -507,11 +263,33 @@ function SearchResultsContent() {
             </div>
 
             {/* Product Grid (Responsive: 2 columns on mobile, 5 columns on desktop) */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 sm:gap-2 md:gap-3">
-              {filteredProducts.map((prod) => (
-                <PinkProductCard key={prod.id} product={prod} />
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 sm:gap-2 md:gap-3">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-pink-50 text-[#d81b60] flex items-center justify-center mx-auto">
+                  <Search className="w-6 h-6" />
+                </div>
+                <h4 className="font-bold text-slate-900 text-sm">"{query}" এর জন্য কোনো পণ্য পাওয়া যায়নি</h4>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">অন্য কোনো প্রোডাক্ট বা ক্যাটাগরির নাম লিখে অনুসন্ধান করার চেষ্টা করুন।</p>
+                <button
+                  onClick={clearFilters}
+                  className="text-xs font-bold text-[#d81b60] hover:underline pt-1 inline-block cursor-pointer"
+                >
+                  Reset All Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 sm:gap-2 md:gap-3">
+                {filteredProducts.map((prod) => (
+                  <PinkProductCard key={prod.id} product={prod} />
+                ))}
+              </div>
+            )}
           </div>
 
         </div>

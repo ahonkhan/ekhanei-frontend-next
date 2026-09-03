@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { PRODUCTS } from '@/data/mockData';
+import { useGetProductByIdQuery, useGetProductsQuery } from '@/store/services/apiService';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { QuickCheckoutModal } from '@/components/product/QuickCheckoutModal';
 import { useCart } from '@/context/CartContext';
@@ -13,29 +13,33 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import {
+  ArrowLeft,
+  ArrowLeftRight,
+  Utensils,
   Star,
   ShoppingCart,
   ShoppingBag,
   Plus,
   Minus,
-  Truck,
-  ShieldCheck,
-  RotateCcw,
-  ArrowLeftRight,
-  Share2,
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
   Heart,
-  MessageCircle,
-  Store as StoreIcon,
+  Share2,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
+  CheckCircle2,
+  ChevronRight,
+  ChevronLeft,
+  X,
+  Zap,
   Sparkles,
-  Utensils,
+  Award,
+  ThumbsUp,
+  MessageSquare,
+  MessageCircle,
   ZoomIn,
   RotateCw,
   Maximize2,
-  X
+  Store as StoreIcon
 } from 'lucide-react';
 
 interface ProductDetailsContentProps {
@@ -45,48 +49,43 @@ interface ProductDetailsContentProps {
 export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ productId }) => {
   const router = useRouter();
   const { addItem, increment, decrement, getItem, totalItemsCount, setIsCartOpen } = useCart();
-  const product = PRODUCTS.find(p => p.id === productId) || PRODUCTS[0];
-  const cartItem = getItem(product.id);
+  
+  const { data: product, isLoading } = useGetProductByIdQuery(productId);
+  const { data: categoryProducts = [] } = useGetProductsQuery(
+    product?.categoryId ? { categoryId: product.categoryId } : {},
+    { skip: !product?.categoryId }
+  );
+
+  const relatedProducts = React.useMemo(() => {
+    return categoryProducts.filter((p) => String(p.id) !== String(product?.id)).slice(0, 12);
+  }, [categoryProducts, product?.id]);
 
   const [isQuickCheckoutOpen, setIsQuickCheckoutOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [selectedSize, setSelectedSize] = useState('37');
-
-  const handleBuyNow = () => {
-    addItem(product);
-    router.push('/checkout-flow/checkout');
-  };
 
   // Image Viewer Modal state
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [viewerActiveIdx, setViewerActiveIdx] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [rotationAngle, setRotationAngle] = useState(0);
-
-  // Sizes List
-  const sizes = ['37', '38', '39', '40', '41', '42', '43', '44'];
-
-  // Gallery Images List (5 items to demonstrate max 4 photos + '+N' overflow)
-  const galleryImages = [
-    product.image,
-    'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80',
-  ];
   const [selectedImgIdx, setSelectedImgIdx] = useState(0);
 
   // Tabs state for desktop view: 'description' | 'reviews'
   const [activeTab, setActiveTab] = useState<'description' | 'reviews'>('description');
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
-  // Related Products
-  const relatedProducts = PRODUCTS.filter(p => p.id !== product.id).slice(0, 6);
+  // Sizes List
+  const sizes = ['37', '38', '39', '40', '41', '42', '43', '44'];
 
-  const discountPercent =
-    product.oldPrice && product.oldPrice > product.price
-      ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
-      : 28;
+  // Gallery Images List
+  const galleryImages = [
+    product?.image || '',
+    'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80',
+  ];
 
   // Keyboard navigation for Image Viewer Modal
   useEffect(() => {
@@ -103,6 +102,26 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isImageViewerOpen, galleryImages.length]);
+
+  if (isLoading || !product) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600" />
+      </div>
+    );
+  }
+
+  const cartItem = getItem(product.id);
+
+  const handleBuyNow = () => {
+    addItem(product);
+    router.push('/checkout-flow/checkout');
+  };
+
+  const discountPercent =
+    product.oldPrice && product.oldPrice > product.price
+      ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
+      : 28;
 
   // Reviews List
   const mockReviews = [

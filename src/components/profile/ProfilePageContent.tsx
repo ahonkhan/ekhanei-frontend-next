@@ -2,6 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { logout } from '@/store/slices/authSlice';
+import { AuthModal } from '@/components/auth/AuthModal';
 import {
   ShoppingBag,
   Heart,
@@ -23,15 +27,20 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { LOCATIONS } from '@/data/mockData';
+const LOCATIONS: any[] = [];
 
 interface ProfilePageContentProps {
   initialTab?: string;
 }
 
 export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialTab = 'orders' }) => {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [orderStatusTab, setOrderStatusTab] = useState<string>('all');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
 
   // Password reset state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -101,12 +110,15 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                     {/* User Name & Verified Badge */}
                     <div className="flex items-center gap-1.5">
                       <h3 className="font-extrabold text-sm sm:text-base text-slate-800 tracking-tight">
-                        Md Aohinuzzaman
+                        {user?.name || 'Saimon Hosen Rashed'}
                       </h3>
                       <svg className="w-4 h-4 text-blue-500 shrink-0 inline-block" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.79-4-4-4-.495 0-.965.084-1.4.238C14.55 2.475 13.18 1.6 11.6 1.6c-1.58 0-2.95.875-3.6 2.148-.435-.154-.905-.238-1.4-.238-2.21 0-4 1.79-4 4 0 .495.084.965.238 1.4C1.575 9.55.7 10.92.7 12.5c0 1.58.875 2.95 2.148 3.6-.154.435-.238.905-.238 1.4 0 2.21 1.79 4 4 4 .495 0 .965-.084 1.4-.238 1.25 1.273 2.62 2.148 4.2 2.148 1.58 0 2.95-.875 3.6-2.148.435.154.905.238 1.4.238 2.21 0 4-1.79 4-4 0-.495-.084-.965-.238-1.4 1.273-.65 2.148-2.02 2.148-3.6zm-12.4 4.8l-4.2-4.2 1.4-1.4 2.8 2.8 7.2-7.2 1.4 1.4-8.6 8.6z" />
                       </svg>
                     </div>
+                    <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
+                      {user?.phone || '01712345678'}
+                    </p>
                   </div>
                 </div>
 
@@ -142,15 +154,30 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                 })}
 
                 {/* Log Out */}
-                <button
-                  onClick={() => alert('Logged out successfully.')}
-                  className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold text-rose-600 hover:bg-rose-50 transition text-left"
-                >
-                  <LogOut className="w-4 h-4 text-rose-600" />
-                  <span>Log Out</span>
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => {
+                      dispatch(logout());
+                      router.push('/');
+                    }}
+                    className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold text-rose-600 hover:bg-rose-50 transition text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 text-rose-600" />
+                    <span>Log Out</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold text-emerald-600 hover:bg-emerald-50 transition text-left cursor-pointer"
+                  >
+                    <User className="w-4 h-4 text-emerald-600" />
+                    <span>Sign In / Register</span>
+                  </button>
+                )}
               </nav>
             </div>
+
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
           </aside>
 
           {/* ========================================================================= */}

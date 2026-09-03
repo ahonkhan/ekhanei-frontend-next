@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import { CATEGORIES, CATEGORY_DETAILS_DATA, PRODUCTS } from '@/data/mockData';
+import { useGetProductsQuery, useGetCategoryDetailQuery, useGetServiceCategoriesQuery } from '@/store/services/apiService';
 import { Product } from '@/types';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { ArrowLeft, ChevronLeft, ChevronRight, Loader2, Star, Flame } from 'lucide-react';
@@ -17,25 +17,24 @@ interface SubCategoryPageContentProps {
 }
 
 export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ slug, subSlug }) => {
-  const catInfo = CATEGORIES.find(c => c.id === slug) || CATEGORIES[0];
-  const catMeta = CATEGORY_DETAILS_DATA[slug] || CATEGORY_DETAILS_DATA['fresh-fish'];
-  const subObj = catMeta.subCategories.find(s => s.id === subSlug) || catMeta.subCategories[0];
+  const { data: serviceCategories = [] } = useGetServiceCategoriesQuery();
+  const { data: categoryDetail } = useGetCategoryDetailQuery(slug);
+  const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery({ categoryId: slug });
+
+  const catInfo = serviceCategories.find(c => c.id === slug || c.slug === slug) || {
+    name: slug.replace(/-/g, ' ').toUpperCase(),
+    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80'
+  };
+  const subCategories = categoryDetail?.subCategories || [];
+  const subObj = subCategories.find((s: any) => s.id === subSlug || s.slug === subSlug) || {
+    name: subSlug.replace(/-/g, ' '),
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80'
+  };
 
   const [displayedCount, setDisplayedCount] = useState(12);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Filter products for this subcategory
-  let subProducts = PRODUCTS.filter(p => p.categoryId === slug);
-  if (subProducts.length === 0) subProducts = PRODUCTS;
-
-  // Filter products by matching name/category if not 'all'
-  if (subSlug !== 'all' && subObj) {
-    const filtered = subProducts.filter(p =>
-      p.name.toLowerCase().includes(subObj.name.toLowerCase()) ||
-      p.categoryName.toLowerCase().includes(subObj.name.toLowerCase())
-    );
-    if (filtered.length > 0) subProducts = filtered;
-  }
+  const subProducts = products;
 
   // Top Rated Products (Rating >= 4.7 or first subset)
   const topRatedProducts = subProducts.filter(p => p.rating >= 4.7).concat(subProducts).slice(0, 8);
@@ -71,8 +70,8 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
       <div className="relative mb-10 sm:mb-14">
         <section className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-6 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] relative rounded-none overflow-hidden border-b border-slate-200/80 shadow-xs aspect-[21/8] sm:aspect-[24/7] group cursor-pointer touch-active">
           <img
-            src={subObj.image || catMeta.specialOffers?.[0]?.image || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80'}
-            alt={subObj.name}
+            src={subObj?.image || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80'}
+            alt={subObj?.name || 'Category Banner'}
             className="w-full h-full object-cover group-hover:scale-102 transition duration-500"
             loading="lazy"
           />

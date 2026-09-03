@@ -13,9 +13,9 @@ interface PinkProductCardProps {
 export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSlider = false }) => {
   const widthClass = isSlider ? 'snap-start flex-shrink-0 w-[calc(50%-0.25rem)] min-w-[calc(50%-0.25rem)] sm:w-[200px] sm:min-w-[200px]' : 'w-full';
 
-  // Sample card gallery images for hover sliding
+  const fallbackImg = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
   const cardImages = [
-    product.image,
+    product.image || fallbackImg,
     'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
     'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=600&q=80',
   ];

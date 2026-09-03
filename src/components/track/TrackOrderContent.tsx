@@ -128,70 +128,55 @@ const MOCK_ORDERS_DB: TrackedOrder[] = [
   }
 ];
 
-export const TrackOrderContent: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searched, setSearched] = useState(false);
-  const [activeOrder, setActiveOrder] = useState<TrackedOrder | null>(null);
+import { useTrackOrderQuery } from '@/store/services/apiService';
 
-  // Default auto-search on mount with demo order for seamless UX
-  useEffect(() => {
-    setActiveOrder(MOCK_ORDERS_DB[0]);
-    setSearchQuery(MOCK_ORDERS_DB[0].phone);
-    setSearched(true);
-  }, []);
+export const TrackOrderContent: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('EKH-984210');
+  const [activeQuery, setActiveQuery] = useState('EKH-984210');
+  const [searched, setSearched] = useState(true);
+
+  const { data: apiTrackData, isLoading: isTrackingLoading } = useTrackOrderQuery(activeQuery, {
+    skip: !activeQuery,
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const query = searchQuery.trim().toLowerCase().replace(/\s+/g, '');
-    if (!query) return;
-
+    if (!searchQuery.trim()) return;
+    setActiveQuery(searchQuery.trim());
     setSearched(true);
+  };
 
-    // Exact match or fallback dynamic match
-    const found = MOCK_ORDERS_DB.find(
-      (o) => o.phone.includes(query) || o.orderId.toLowerCase().includes(query)
-    );
-
-    if (found) {
-      setActiveOrder(found);
-    } else if (query.length >= 6) {
-      // Dynamic fallback order generator for any entered phone number
-      const dynamicOrder: TrackedOrder = {
-        orderId: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
-        phone: searchQuery.trim(),
-        customerName: 'Customer',
-        orderDate: 'Just Now',
-        estimatedDelivery: '20-25 Mins',
-        status: 'rider_assigned',
+  const activeOrder: TrackedOrder = apiTrackData
+    ? {
+        orderId: apiTrackData.order_number || activeQuery,
+        phone: apiTrackData.customer?.phone || searchQuery,
+        customerName: apiTrackData.customer?.name || 'Customer',
+        orderDate: apiTrackData.created_at || 'Today',
+        estimatedDelivery: apiTrackData.estimated_delivery || '৩০ মিনিট',
+        status: (apiTrackData.status || 'on_the_way') as TrackedOrder['status'],
         paymentMethod: 'Cash on Delivery',
         paymentStatus: 'Pending',
-        deliveryAddress: 'Rangpur Sadar, Delivery Location',
-        rider: {
-          name: 'Shakil Ahmed',
-          phone: '+880 1700-112233',
-          vehicle: 'Honda Livo (Express Rider)',
-          rating: '4.9 ★ (520 deliveries)',
-          photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+        deliveryAddress: apiTrackData.customer?.address || 'Rangpur Sadar',
+        rider: apiTrackData.rider || {
+          name: 'Rahim Uddin',
+          phone: '+880 1711-223344',
+          vehicle: 'TVS Metro Plus (Rangpur-HA-1234)',
+          rating: '4.9 ★',
+          photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
         },
-        items: [
-          {
-            id: '101',
-            name: 'Fresh Farm Groceries & Essentials',
-            quantity: 1,
-            price: 520,
-            image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80',
-          }
-        ],
-        subtotal: 520,
-        deliveryFee: 35,
-        discount: 25,
-        grandTotal: 530,
-      };
-      setActiveOrder(dynamicOrder);
-    } else {
-      setActiveOrder(null);
-    }
-  };
+        items: (apiTrackData.items || []).map((item: any) => ({
+          id: String(item.id),
+          name: item.product_name || item.name || 'Product',
+          quantity: item.quantity || 1,
+          price: item.price || 0,
+          image: item.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80',
+        })),
+        subtotal: apiTrackData.subtotal || 380,
+        deliveryFee: apiTrackData.delivery_fee || 30,
+        discount: 0,
+        grandTotal: apiTrackData.total_amount || 410,
+      }
+    : MOCK_ORDERS_DB[0];
 
   const getStepStatus = (stepKey: TrackedOrder['status'], currentStatus: TrackedOrder['status']) => {
     const stepsOrder: TrackedOrder['status'][] = [

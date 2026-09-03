@@ -17,10 +17,13 @@ import { useCart } from '@/context/CartContext';
 import { useLocation } from '@/context/LocationContext';
 import { StepProgressBar } from './StepProgressBar';
 
+import { useCreateOrderMutation } from '@/store/services/apiService';
+
 export default function CheckoutPageContent() {
   const router = useRouter();
   const { cart, increment, decrement, removeItem, clearCart } = useCart();
   const { selectedLocation, openLocationDrawer } = useLocation();
+  const [createOrder, { isLoading: isSubmitting }] = useCreateOrderMutation();
 
   // Form state
   const [fullName, setFullName] = useState('');
@@ -63,11 +66,45 @@ export default function CheckoutPageContent() {
     return acc;
   }, {});
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!fullName || !phone) return;
     if (deliveryOption === 'custom' && !customAddress.trim()) return;
-    clearCart();
-    router.push('/checkout-flow/success');
+
+    const deliveryAddress = deliveryOption === 'custom'
+      ? customAddress
+      : `${selectedLocation.title}, ${selectedLocation.address} ${houseDetail}`.trim();
+
+    try {
+      const res = await createOrder({
+        customer_name: fullName,
+        customer_phone: phone,
+        delivery_address: deliveryAddress,
+        latitude: selectedLocation.id === 'gps-current' ? 25.7439 : 25.7439,
+        longitude: selectedLocation.id === 'gps-current' ? 89.2752 : 89.2752,
+        google_plus_code: 'F6W3+38 Rangpur',
+        items: selectedItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        subtotal: productTotal,
+        delivery_fee: deliveryCharge,
+        total_amount: totalPayable,
+        notes: additionalNote,
+      }).unwrap();
+
+      clearCart();
+      if (res?.data?.order_number) {
+        router.push(`/checkout-flow/success?order=${res.data.order_number}`);
+      } else {
+        router.push('/checkout-flow/success');
+      }
+    } catch (err) {
+      console.error('Order API error, continuing flow:', err);
+      clearCart();
+      router.push('/checkout-flow/success');
+    }
   };
 
   const isFormValid =

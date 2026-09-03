@@ -26,15 +26,15 @@ export const CartDrawer: React.FC = () => {
   };
 
   return (
-    <div className="relative z-50">
+    <div className="fixed inset-0 z-[99999]">
       {/* Backdrop Overlay */}
       <div
         onClick={() => setIsCartOpen(false)}
-        className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[99999] transition-opacity animate-in fade-in duration-200"
       />
 
       {/* Slide-over Right Drawer Panel */}
-      <div className="fixed top-0 right-0 bottom-0 w-full sm:max-w-md bg-white z-50 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+      <div className="fixed top-0 right-0 bottom-0 w-full sm:max-w-md bg-white z-[99999] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
         
         {/* Drawer Header */}
         <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">

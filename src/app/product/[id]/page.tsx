@@ -1,11 +1,9 @@
 import React from 'react';
-import { PRODUCTS } from '@/data/mockData';
 import { ProductDetailsContent } from '@/components/product/ProductDetailsContent';
 
 export function generateStaticParams() {
-  return PRODUCTS.map((prod) => ({
-    id: prod.id,
-  }));
+  const defaultProductIds = ['1', '2', '3', '4', '5', '6', 'padma-hilsha-fish', 'fresh-ruhi-fish-cleaned', 'napa-extra-500mg', 'mutton-kacchi-biryani'];
+  return defaultProductIds.map(id => ({ id }));
 }
 
 export default async function ProductDetailPage({
