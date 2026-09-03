@@ -22,7 +22,7 @@ import { useCreateOrderMutation } from '@/store/services/apiService';
 export default function CheckoutPageContent() {
   const router = useRouter();
   const { cart, increment, decrement, removeItem, clearCart } = useCart();
-  const { selectedLocation, openLocationDrawer } = useLocation();
+  const { selectedLocation, openLocationDrawer, userCoords } = useLocation();
   const [createOrder, { isLoading: isSubmitting }] = useCreateOrderMutation();
 
   // Form state
@@ -74,14 +74,18 @@ export default function CheckoutPageContent() {
       ? customAddress
       : `${selectedLocation.title}, ${selectedLocation.address} ${houseDetail}`.trim();
 
+    const lat = selectedLocation.lat ?? userCoords?.lat ?? 25.7439;
+    const lng = selectedLocation.lng ?? userCoords?.lng ?? 89.2752;
+    const plusCode = selectedLocation.plusCode || (userCoords ? `${userCoords.lat.toFixed(4)}, ${userCoords.lng.toFixed(4)}` : 'F6W3+38 Rangpur');
+
     try {
       const res = await createOrder({
         customer_name: fullName,
         customer_phone: phone,
         delivery_address: deliveryAddress,
-        latitude: selectedLocation.id === 'gps-current' ? 25.7439 : 25.7439,
-        longitude: selectedLocation.id === 'gps-current' ? 89.2752 : 89.2752,
-        google_plus_code: 'F6W3+38 Rangpur',
+        latitude: lat,
+        longitude: lng,
+        google_plus_code: plusCode,
         items: selectedItems.map(item => ({
           id: item.id,
           name: item.name,

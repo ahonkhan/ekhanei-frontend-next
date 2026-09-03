@@ -4,6 +4,9 @@ export interface LocationItem {
   address: string;
   type: 'home' | 'office' | 'other';
   isSelected?: boolean;
+  lat?: number;
+  lng?: number;
+  plusCode?: string;
 }
 
 export interface Category {
@@ -94,6 +97,7 @@ export interface SpecialOffer {
   title: string;
   subtitle: string;
   image: string;
+  url?: string;
 }
 
 export interface Brand {
@@ -114,6 +118,7 @@ export interface CategoryDetailMeta {
   title: string;
   heroSlides: string[];
   subCategories: SubCategory[];
+  promoAds?: SpecialOffer[];
   specialOffers: SpecialOffer[];
   brands: Brand[];
 }

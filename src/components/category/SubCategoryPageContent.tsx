@@ -10,6 +10,7 @@ import { useGetProductsQuery, useGetCategoryDetailQuery, useGetServiceCategories
 import { Product } from '@/types';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { ArrowLeft, ChevronLeft, ChevronRight, Loader2, Star, Flame } from 'lucide-react';
+import { getImageUrl } from '@/utils/image';
 
 interface SubCategoryPageContentProps {
   slug: string;
@@ -70,7 +71,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
       <div className="relative mb-10 sm:mb-14">
         <section className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-6 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] relative rounded-none overflow-hidden border-b border-slate-200/80 shadow-xs aspect-[21/8] sm:aspect-[24/7] group cursor-pointer touch-active">
           <img
-            src={subObj?.image || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80'}
+            src={getImageUrl(subObj?.image) || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80'}
             alt={subObj?.name || 'Category Banner'}
             className="w-full h-full object-cover group-hover:scale-102 transition duration-500"
             loading="lazy"

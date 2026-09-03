@@ -115,7 +115,8 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return { areaTitle, plusCode, fullAddress: fullAddress || areaTitle };
   };
 
-  const fetchLocationDetails = async (lat: number, lng: number): Promise<{ areaTitle: string; fullAddress: string }> => {
+  const fetchLocationDetails = async (lat: number, lng: number): Promise<{ areaTitle: string; fullAddress: string; plusCode: string }> => {
+    const defaultPlusCode = encodePlusCode(lat, lng);
     // 1. Try Google Maps Geocoding API
     try {
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -125,7 +126,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (data && data.status === 'OK') {
           const parsed = extractAreaFromCoords(data, lat, lng);
           if (parsed.areaTitle && parsed.areaTitle !== `${lat.toFixed(4)}, ${lng.toFixed(4)}`) {
-            return { areaTitle: parsed.areaTitle, fullAddress: parsed.fullAddress };
+            return { areaTitle: parsed.areaTitle, fullAddress: parsed.fullAddress, plusCode: parsed.plusCode || defaultPlusCode };
           }
         }
       }
@@ -144,7 +145,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         
         const fullAddr = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
         if (village) {
-          return { areaTitle: village, fullAddress: fullAddr };
+          return { areaTitle: village, fullAddress: fullAddr, plusCode: defaultPlusCode };
         }
       }
     } catch (e) {
@@ -152,8 +153,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
 
     // 3. Fallback to Open Location Code (Plus Code)
-    const plusCode = encodePlusCode(lat, lng);
-    return { areaTitle: plusCode, fullAddress: `${lat.toFixed(4)}, ${lng.toFixed(4)}` };
+    return { areaTitle: defaultPlusCode, fullAddress: `${lat.toFixed(4)}, ${lng.toFixed(4)}`, plusCode: defaultPlusCode };
   };
 
   const selectGPSLocation = () => {
@@ -172,6 +172,9 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               title: locationData.areaTitle,
               address: locationData.fullAddress,
               type: 'home',
+              lat: latitude,
+              lng: longitude,
+              plusCode: locationData.plusCode,
             })
           );
         },
@@ -221,6 +224,9 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               title: locationData.areaTitle,
               address: locationData.fullAddress,
               type: 'home',
+              lat: latitude,
+              lng: longitude,
+              plusCode: locationData.plusCode,
             })
           );
         },
