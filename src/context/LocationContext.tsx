@@ -64,7 +64,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  // Extract exact Village / Gram / Area Name (e.g. Vendabari, Kachua, College Para)
+  // Extract exact Village / Gram / Area Name
   const extractAreaFromCoords = (data: any, lat: number, lng: number): { areaTitle: string; plusCode: string; fullAddress: string } => {
     let plusCode = encodePlusCode(lat, lng);
     let fullAddress = '';
@@ -134,13 +134,12 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.warn('Google Reverse Geocode error, trying Nominatim fallback:', e);
     }
 
-    // 2. OpenStreetMap Nominatim Reverse Geocode Fallback (No CORS, No API key needed)
+    // 2. OpenStreetMap Nominatim Reverse Geocode Fallback
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=en,bn`);
       const data = await res.json();
       if (data && data.address) {
         const addr = data.address;
-        // Only Village / Hamlet / Suburb / Neighborhood / Road
         const village = addr.village || addr.hamlet || addr.suburb || addr.neighbourhood || addr.residential || addr.quarter || addr.road || addr.county || addr.town || addr.city;
         
         const fullAddr = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
@@ -152,13 +151,49 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.warn('Nominatim reverse geocode error:', e);
     }
 
-    // 3. Fallback to Open Location Code (Plus Code)
+    // 3. Fallback to Open Location Code
     return { areaTitle: defaultPlusCode, fullAddress: `${lat.toFixed(4)}, ${lng.toFixed(4)}`, plusCode: defaultPlusCode };
   };
 
-  const selectGPSLocation = () => {
+  // High Accuracy Native GPS Geolocation (Prompts native phone location switch if off)
+  const selectGPSLocation = async () => {
+    dispatch(selectGPSAction());
+
+    // 1. Check Capacitor Geolocation if running in native app wrapper
+    if (typeof window !== 'undefined' && (window as any).Capacitor) {
+      try {
+        const capGeoModule = '@capacitor/geolocation';
+        const capGeo = await Function(`return import("${capGeoModule}")`)();
+        const Geolocation = capGeo.Geolocation;
+        const permission = await Geolocation.requestPermissions();
+        if (permission.location === 'granted') {
+          const position = await Geolocation.getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 10000,
+          });
+          const { latitude, longitude } = position.coords;
+          setUserCoords({ lat: latitude, lng: longitude });
+          const locationData = await fetchLocationDetails(latitude, longitude);
+          dispatch(
+            setSelectedLocation({
+              id: 'gps-current',
+              title: locationData.areaTitle,
+              address: locationData.fullAddress,
+              type: 'home',
+              lat: latitude,
+              lng: longitude,
+              plusCode: locationData.plusCode,
+            })
+          );
+          return;
+        }
+      } catch (err) {
+        console.warn('Capacitor geolocation error, falling back to Web Geolocation:', err);
+      }
+    }
+
+    // 2. High Accuracy Web Geolocation
     if (typeof window !== 'undefined' && 'geolocation' in navigator) {
-      dispatch(selectGPSAction());
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
@@ -182,17 +217,38 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           console.warn('Geolocation error:', error);
           if (error.code === 1) { // Explicit Permission Denied
             dispatch(setPermissionDenied(true));
+          } else {
+            // Fallback retry with maximum accuracy
+            navigator.geolocation.getCurrentPosition(
+              async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                setUserCoords({ lat: latitude, lng: longitude });
+                const locationData = await fetchLocationDetails(latitude, longitude);
+                dispatch(
+                  setSelectedLocation({
+                    id: 'gps-current',
+                    title: locationData.areaTitle,
+                    address: locationData.fullAddress,
+                    type: 'home',
+                    lat: latitude,
+                    lng: longitude,
+                    plusCode: locationData.plusCode,
+                  })
+                );
+              },
+              null,
+              { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+            );
           }
         },
-        { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
     }
   };
 
-  // Auto prompt browser GPS Geolocation permission on initial page load
+  // Auto prompt native browser GPS Geolocation permission on initial load
   React.useEffect(() => {
     if (typeof window !== 'undefined' && 'geolocation' in navigator) {
-      // Check real browser permission status first
       if (navigator.permissions && navigator.permissions.query) {
         navigator.permissions.query({ name: 'geolocation' }).then((result) => {
           if (result.state === 'denied') {
@@ -211,33 +267,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }).catch(() => {});
       }
 
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserCoords({ lat: latitude, lng: longitude });
-
-          const locationData = await fetchLocationDetails(latitude, longitude);
-
-          dispatch(
-            setSelectedLocation({
-              id: 'gps-current',
-              title: locationData.areaTitle,
-              address: locationData.fullAddress,
-              type: 'home',
-              lat: latitude,
-              lng: longitude,
-              plusCode: locationData.plusCode,
-            })
-          );
-        },
-        (err) => {
-          console.info('Auto geolocation permission status:', err);
-          if (err.code === 1) { // Only set blocked if user explicitly denied permission
-            dispatch(setPermissionDenied(true));
-          }
-        },
-        { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
-      );
+      selectGPSLocation();
     }
   }, [dispatch]);
 

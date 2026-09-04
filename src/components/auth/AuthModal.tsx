@@ -4,6 +4,13 @@ import React, { useState } from 'react';
 import { useAppDispatch } from '@/store/hooks';
 import { setCredentials } from '@/store/slices/authSlice';
 import {
+  useLoginCustomerMutation,
+  useRegisterCustomerMutation,
+  useSendOtpMutation,
+  useVerifyOtpMutation,
+  useGoogleAuthMutation,
+} from '@/store/services/apiService';
+import {
   X,
   Phone,
   Mail,
@@ -14,7 +21,8 @@ import {
   ShieldCheck,
   Eye,
   EyeOff,
-  Sparkles
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 
 interface AuthModalProps {
@@ -30,6 +38,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 }) => {
   const dispatch = useAppDispatch();
 
+  // RTK Query Mutations
+  const [loginCustomer, { isLoading: isLoginLoading }] = useLoginCustomerMutation();
+  const [registerCustomer, { isLoading: isRegisterLoading }] = useRegisterCustomerMutation();
+  const [sendOtpApi, { isLoading: isSendingOtp }] = useSendOtpMutation();
+  const [verifyOtpApi, { isLoading: isVerifyingOtp }] = useVerifyOtpMutation();
+  const [googleAuthApi, { isLoading: isGoogleLoading }] = useGoogleAuthMutation();
+
   // Mode: 'phone-otp' | 'email-login' | 'register'
   const [authMethod, setAuthMethod] = useState<'phone-otp' | 'email-login' | 'register'>(
     initialMode === 'register' ? 'register' : 'phone-otp'
@@ -39,10 +54,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [phone, setPhone] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState(['', '', '', '']);
-  const [otpTimer, setOtpTimer] = useState(60);
 
   // Email States
-  const [email, setEmail] = useState('');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -52,108 +66,131 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
 
-  // Status & Errors
-  const [loading, setLoading] = useState(false);
+  // Google Modal input / simulation fallback if needed
   const [errorMsg, setErrorMsg] = useState('');
 
   if (!isOpen) return null;
 
   // Handle Send OTP
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone || phone.length < 11) {
       setErrorMsg('Please enter a valid 11-digit mobile number');
       return;
     }
     setErrorMsg('');
-    setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      setOtpSent(true);
-      // Auto fill sample OTP code 1 2 3 4 for smooth demo
-      setOtpCode(['1', '2', '3', '4']);
-    }, 600);
+    try {
+      const res = await sendOtpApi({ phone }).unwrap();
+      if (res.success) {
+        setOtpSent(true);
+        if (res.otp) {
+          setOtpCode(res.otp.split(''));
+        }
+      } else {
+        setErrorMsg(res.message || 'Failed to send OTP code');
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || 'Failed to send OTP. Please check backend connection.');
+    }
   };
 
   // Handle Verify OTP
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     const enteredOtp = otpCode.join('');
     if (enteredOtp.length < 4) {
       setErrorMsg('Please enter 4-digit OTP code');
       return;
     }
+    setErrorMsg('');
 
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      dispatch(
-        setCredentials({
-          token: 'demo-jwt-token-ekhane-express',
-          user: {
-            id: 'u-101',
-            name: name || 'Saimon Hosen Rashed',
-            phone: phone || '01712345678',
-            email: email || 'saimon@gmail.com',
-          },
-        })
-      );
-      onClose();
-    }, 500);
+    try {
+      const res = await verifyOtpApi({ phone, otp: enteredOtp }).unwrap();
+      if (res.success && res.token && res.user) {
+        dispatch(
+          setCredentials({
+            token: res.token,
+            user: res.user,
+          })
+        );
+        onClose();
+      } else {
+        setErrorMsg(res.message || 'OTP verification failed');
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || 'OTP verification failed. Invalid OTP code.');
+    }
   };
 
-  // Handle Email Login Submit
-  const handleEmailLogin = (e: React.FormEvent) => {
+  // Handle Email / Phone Login Submit
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    if (!loginIdentifier || !password) {
       setErrorMsg('Please fill in all fields');
       return;
     }
+    setErrorMsg('');
 
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      dispatch(
-        setCredentials({
-          token: 'demo-jwt-token-ekhane-express',
-          user: {
-            id: 'u-101',
-            name: 'Saimon Hosen Rashed',
-            phone: '01712345678',
-            email: email,
-          },
-        })
-      );
-      onClose();
-    }, 600);
+    try {
+      const res = await loginCustomer({ login: loginIdentifier, password }).unwrap();
+      if (res.success && res.token && res.user) {
+        dispatch(
+          setCredentials({
+            token: res.token,
+            user: res.user,
+          })
+        );
+        onClose();
+      } else {
+        setErrorMsg(res.message || 'Authentication failed');
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || 'Invalid credentials. Please check login and password.');
+    }
   };
 
   // Handle Registration Submit
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !regPhone || !regPassword) {
       setErrorMsg('Please fill in all required fields');
       return;
     }
+    setErrorMsg('');
 
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      dispatch(
-        setCredentials({
-          token: 'demo-jwt-token-ekhane-express',
-          user: {
-            id: `u-${Date.now()}`,
-            name: name,
-            phone: regPhone,
-            email: regEmail,
-          },
-        })
-      );
-      onClose();
-    }, 600);
+    try {
+      const res = await registerCustomer({
+        name,
+        phone: regPhone,
+        email: regEmail || undefined,
+        password: regPassword,
+      }).unwrap();
+
+      if (res.success && res.token && res.user) {
+        dispatch(
+          setCredentials({
+            token: res.token,
+            user: res.user,
+          })
+        );
+        onClose();
+      } else {
+        setErrorMsg(res.message || 'Registration failed');
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.data?.message || 'Registration failed. Phone or email may already be in use.');
+    }
   };
+
+  // Handle Google Auth ("Continue with Google") via Socialite OAuth Redirect
+  const handleGoogleSignIn = () => {
+    setErrorMsg('');
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+    window.location.href = `${apiBase}/auth/google/redirect`;
+  };
+
+  const isLoading = isLoginLoading || isRegisterLoading || isSendingOtp || isVerifyingOtp || isGoogleLoading;
 
   return (
     <div className="fixed inset-0 z-[99999] bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -211,7 +248,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             }`}
           >
             <Mail className="w-3.5 h-3.5" />
-            <span>Email Password</span>
+            <span>Email / Password</span>
           </button>
 
           <button
@@ -259,16 +296,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                     />
                   </div>
-                  <p className="text-[11px] text-slate-400">We will send a 4-digit SMS OTP code for login</p>
+                  <p className="text-[11px] text-slate-400">We will send a 4-digit SMS OTP code for verification</p>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={isLoading}
                   className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
-                  <span>{loading ? 'Sending OTP...' : 'Send Verification OTP'}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {isSendingOtp ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Sending OTP...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Send Verification OTP</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </button>
               </form>
             ) : (
@@ -307,29 +353,38 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={isLoading}
                   className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>{loading ? 'Verifying...' : 'Verify OTP & Login'}</span>
+                  {isVerifyingOtp ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Verifying...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Verify OTP & Login</span>
+                    </>
+                  )}
                 </button>
               </form>
             )
           )}
 
-          {/* MODE 2: EMAIL LOGIN */}
+          {/* MODE 2: EMAIL / PHONE LOGIN */}
           {authMethod === 'email-login' && (
-            <form onSubmit={handleEmailLogin} className="space-y-3.5">
+            <form onSubmit={handleLoginSubmit} className="space-y-3.5">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 block">Email Address</label>
+                <label className="text-xs font-bold text-slate-700 block">Email or Mobile Number</label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
-                    type="email"
+                    type="text"
                     required
-                    placeholder="customer@gmail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="customer@gmail.com or 01712345678"
+                    value={loginIdentifier}
+                    onChange={(e) => setLoginIdentifier(e.target.value)}
                     className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                   />
                 </div>
@@ -364,11 +419,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isLoading}
                 className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
-                <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
-                <ArrowRight className="w-4 h-4" />
+                {isLoginLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Authenticating...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </form>
           )}
@@ -437,14 +501,65 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 pt-3"
+                disabled={isLoading}
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-1"
               >
-                <span>{loading ? 'Creating Account...' : 'Complete Registration'}</span>
-                <ArrowRight className="w-4 h-4" />
+                {isRegisterLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Creating Account...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Complete Registration</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </form>
           )}
+
+          {/* Divider */}
+          <div className="relative my-3">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200" />
+            </div>
+            <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-wider">
+              <span className="bg-white px-3 text-slate-400">Or continue with</span>
+            </div>
+          </div>
+
+          {/* GOOGLE SIGN-IN BUTTON ("Continue with Google") */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={isLoading}
+            className="w-full py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
+          >
+            {isGoogleLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
+            ) : (
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+            )}
+            <span>Continue with Google</span>
+          </button>
 
           {/* Footer Security Notice */}
           <div className="pt-2 border-t border-slate-100 text-center">

@@ -22,6 +22,32 @@ export interface Category {
   title?: string;
 }
 
+export interface ProductVariation {
+  id: string;
+  name: string;
+  type?: string;
+  value?: string;
+  price?: number;
+  oldPrice?: number;
+  stock?: number;
+  image?: string;
+  sku?: string;
+}
+
+export interface VariationAttribute {
+  name: string;
+  options: string[];
+}
+
+export interface ProductReview {
+  id: string;
+  name: string;
+  size?: string;
+  date: string;
+  rating: number;
+  comment: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -31,14 +57,28 @@ export interface Product {
   oldPrice: number;
   unit: string;
   image: string;
+  galleryImages?: string[];
   rating: number;
   reviewsCount: number;
+  soldCount?: number;
+  storeId?: string;
   storeName: string;
+  store?: Store;
   discountBadge?: string;
   isPopular?: boolean;
   isRecommended?: boolean;
   isBestSeller?: boolean;
   flashStock?: number;
+  stockQuantity?: number;
+  shortDescription?: string;
+  description?: string;
+  returnPolicy?: string;
+  exchangePolicy?: string;
+  deliveryTime?: string;
+  paymentMethod?: string;
+  variations?: ProductVariation[];
+  variationAttributes?: VariationAttribute[];
+  reviews?: ProductReview[];
 }
 
 export interface StoreCategoryTab {

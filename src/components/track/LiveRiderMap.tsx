@@ -4,13 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   MapPin, 
   Navigation, 
-  Key, 
   Compass, 
   ShieldCheck, 
-  Crosshair, 
-  Sparkles, 
-  Check, 
-  Globe,
   Radio
 } from 'lucide-react';
 
@@ -19,52 +14,56 @@ interface LiveRiderMapProps {
   vehicle: string;
   customerAddress: string;
   status: string;
+  riderLat?: number;
+  riderLng?: number;
+  customerLat?: number;
+  customerLng?: number;
 }
 
 export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
   riderName,
   vehicle,
   customerAddress,
-  status
+  status,
+  riderLat = 25.7410,
+  riderLng = 89.2710,
+  customerLat = 25.7439,
+  customerLng = 89.2752,
 }) => {
-  const [apiKey, setApiKey] = useState<string>(() => {
+  const [apiKey] = useState<string>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('google_maps_api_key') || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+      return process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
     }
     return '';
   });
 
-  const [inputKey, setInputKey] = useState('');
-  const [isKeyInputOpen, setIsKeyInputOpen] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [mapError, setMapError] = useState<string | null>(null);
+  const [mapError, setMapError] = useState<boolean>(false);
 
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapInstance = useRef<any>(null);
 
-  // Simulated live coordinates around Rangpur Sadar / Dhaka
-  const [riderCoords, setRiderCoords] = useState({ lat: 25.7445, lng: 89.2750 });
-  const destinationCoords = { lat: 25.7520, lng: 89.2810 };
-  const storeCoords = { lat: 25.7380, lng: 89.2680 };
+  // Live coordinates state
+  const [riderCoords, setRiderCoords] = useState({ lat: riderLat, lng: riderLng });
+  const destinationCoords = { lat: customerLat, lng: customerLng };
+  const storeCoords = { lat: customerLat - 0.0050, lng: customerLng - 0.0060 };
 
-  // Save API Key
-  const handleSaveApiKey = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanKey = inputKey.trim();
-    if (cleanKey) {
-      setApiKey(cleanKey);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('google_maps_api_key', cleanKey);
-      }
-      setIsKeyInputOpen(false);
-    }
-  };
-
-  // Load Google Maps JS SDK when API Key exists
   useEffect(() => {
-    if (!apiKey || typeof window === 'undefined') return;
+    setRiderCoords({ lat: riderLat, lng: riderLng });
+  }, [riderLat, riderLng]);
 
-    // Check if script already loaded
+  // Load Google Maps JS SDK when API Key exists in env
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Handle Google Maps authentication failure (invalid key, CORS, or domain restrictions)
+    (window as any).gm_authFailure = () => {
+      setMapError(true);
+      setMapLoaded(false);
+    };
+
+    if (!apiKey) return;
+
     if ((window as any).google && (window as any).google.maps) {
       initGoogleMap();
       return;
@@ -81,13 +80,11 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
       script.defer = true;
 
       script.onload = () => {
-        setMapLoaded(true);
-        setMapError(null);
         initGoogleMap();
       };
 
       script.onerror = () => {
-        setMapError('Invalid Google Maps API Key or failed to load Google Maps SDK.');
+        setMapError(true);
         setMapLoaded(false);
       };
 
@@ -105,88 +102,40 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
       const map = new google.maps.Map(mapRef.current, {
         center: riderCoords,
         zoom: 14,
+        disableDefaultUI: true,
+        zoomControl: true,
         styles: [
-          { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
-          { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
-          { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
-          {
-            featureType: 'administrative.locality',
-            elementType: 'labels.text.fill',
-            stylers: [{ color: '#d59563' }]
-          },
-          {
-            featureType: 'poi',
-            elementType: 'labels.text.fill',
-            stylers: [{ color: '#d59563' }]
-          },
-          {
-            featureType: 'road',
-            elementType: 'geometry',
-            stylers: [{ color: '#38414e' }]
-          },
-          {
-            featureType: 'road',
-            elementType: 'geometry.stroke',
-            stylers: [{ color: '#212a37' }]
-          },
-          {
-            featureType: 'road',
-            elementType: 'labels.text.fill',
-            stylers: [{ color: '#9ca5b3' }]
-          },
-          {
-            featureType: 'water',
-            elementType: 'geometry',
-            stylers: [{ color: '#17263c' }]
-          }
+          { elementType: 'geometry', stylers: [{ color: '#0f172a' }] },
+          { elementType: 'labels.text.stroke', stylers: [{ color: '#0f172a' }] },
+          { elementType: 'labels.text.fill', stylers: [{ color: '#94a3b8' }] },
+          { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#1e293b' }] },
+          { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#334155' }] },
+          { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0284c7' }] },
         ]
       });
 
       googleMapInstance.current = map;
 
-      // Customer Marker
-      new google.maps.Marker({
-        position: destinationCoords,
-        map,
-        title: 'Customer Destination',
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: '#ef4444',
-          fillOpacity: 1,
-          strokeWeight: 2,
-          strokeColor: '#ffffff',
-        }
-      });
-
-      // Store Marker
-      new google.maps.Marker({
-        position: storeCoords,
-        map,
-        title: 'ShymMarket Store',
-        icon: {
-          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-          scale: 6,
-          fillColor: '#10b981',
-          fillOpacity: 1,
-          strokeWeight: 2,
-          strokeColor: '#ffffff',
-        }
-      });
-
       // Rider Marker
       new google.maps.Marker({
         position: riderCoords,
         map,
-        title: `Rider: ${riderName}`,
+        title: riderName,
         icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 12,
+          path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          scale: 6,
           fillColor: '#f59e0b',
           fillOpacity: 1,
-          strokeWeight: 3,
+          strokeWeight: 2,
           strokeColor: '#ffffff',
         }
+      });
+
+      // Customer Destination Marker
+      new google.maps.Marker({
+        position: destinationCoords,
+        map,
+        title: customerAddress,
       });
 
       // Polyline route
@@ -201,21 +150,9 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
 
       setMapLoaded(true);
     } catch (err) {
-      console.error(err);
-      setMapError('Failed to initialize Google Map view.');
+      setMapError(true);
     }
   };
-
-  // Simulate slight rider movement updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRiderCoords((prev) => ({
-        lat: prev.lat + 0.0001,
-        lng: prev.lng + 0.00015
-      }));
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="bg-slate-900 text-white rounded-3xl border border-slate-800 p-5 sm:p-6 shadow-xl space-y-4 relative overflow-hidden">
@@ -227,7 +164,7 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
           </div>
           <div>
             <h3 className="font-extrabold text-base text-white flex items-center gap-2">
-              Google Maps Geolocation Rider Tracking
+              Live Delivery Tracking
               <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
                 LIVE GPS
               </span>
@@ -237,54 +174,12 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
             </p>
           </div>
         </div>
-
-        {/* API Key Toggle Button */}
-        <button
-          type="button"
-          onClick={() => setIsKeyInputOpen(!isKeyInputOpen)}
-          className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold border border-slate-700 transition flex items-center gap-1.5 shrink-0 cursor-pointer"
-        >
-          <Key className="w-3.5 h-3.5" />
-          <span>{apiKey ? 'Google Maps API Key Set' : 'Configure Google Maps API Key'}</span>
-        </button>
       </div>
-
-      {/* API Key Form Drawer */}
-      {isKeyInputOpen && (
-        <form onSubmit={handleSaveApiKey} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Enter Google Maps Geolocation API Key</span>
-            </label>
-            <span className="text-[10px] text-slate-500 font-mono">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span>
-          </div>
-
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={inputKey}
-              onChange={(e) => setInputKey(e.target.value)}
-              placeholder="Paste Google Maps API Key (e.g. AIzaSy...)"
-              className="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition shrink-0 cursor-pointer"
-            >
-              Save Key
-            </button>
-          </div>
-          <p className="text-[11px] text-slate-400">
-            Paste your Google Maps JavaScript API key here to render interactive Google Maps JS SDK with live rider position.
-          </p>
-        </form>
-      )}
 
       {/* Map View Area */}
       <div className="relative w-full h-[320px] rounded-2xl overflow-hidden border border-slate-800 bg-slate-950">
         {/* If Real Google Maps initialized */}
-        {apiKey && !mapError ? (
+        {apiKey && mapLoaded && !mapError ? (
           <div ref={mapRef} className="w-full h-full" />
         ) : (
           /* Styled Fallback Map Preview Canvas with Live Radar */
@@ -352,12 +247,6 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
           </div>
         )}
       </div>
-
-      {mapError && (
-        <p className="text-xs text-rose-400 font-semibold flex items-center gap-1.5">
-          <span>⚠️ {mapError}</span>
-        </p>
-      )}
     </div>
   );
 };

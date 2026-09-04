@@ -9,7 +9,9 @@ import { LocationDrawer } from "@/components/layout/LocationDrawer";
 import { LocationBlockModal } from "@/components/layout/LocationBlockModal";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 
+import { Suspense } from "react";
 import { StoreProvider } from "@/store/provider";
+import { OAuthCallbackHandler } from "@/components/auth/OAuthCallbackHandler";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,6 +32,9 @@ export default function RootLayout({
     <html lang="en" className={`scroll-smooth ${inter.className}`}>
       <body className="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col pb-16 md:pb-0">
         <StoreProvider>
+          <Suspense fallback={null}>
+            <OAuthCallbackHandler />
+          </Suspense>
           <LocationProvider>
             <CartProvider>
               <Header />

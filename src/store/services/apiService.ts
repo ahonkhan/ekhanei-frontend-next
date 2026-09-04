@@ -5,6 +5,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://admin.ekhanei.b
 
 export const apiService = createApi({
   reducerPath: 'api',
+  tagTypes: ['User', 'Orders', 'Reviews'],
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
     prepareHeaders: (headers, { getState }: any) => {
@@ -17,6 +18,74 @@ export const apiService = createApi({
     },
   }),
   endpoints: (builder) => ({
+    // Auth Endpoints
+    registerCustomer: builder.mutation<any, { name: string; phone: string; email?: string; password: string }>({
+      query: (credentials) => ({
+        url: '/auth/register',
+        method: 'POST',
+        body: credentials,
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    loginCustomer: builder.mutation<any, { login: string; password: string }>({
+      query: (credentials) => ({
+        url: '/auth/login',
+        method: 'POST',
+        body: credentials,
+      }),
+      invalidatesTags: ['User', 'Orders'],
+    }),
+
+    sendOtp: builder.mutation<any, { phone: string }>({
+      query: (data) => ({
+        url: '/auth/send-otp',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+
+    verifyOtp: builder.mutation<any, { phone: string; otp: string }>({
+      query: (data) => ({
+        url: '/auth/verify-otp',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['User', 'Orders'],
+    }),
+
+    googleAuth: builder.mutation<any, { email: string; name: string; google_id?: string; avatar?: string }>({
+      query: (data) => ({
+        url: '/auth/google',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['User', 'Orders'],
+    }),
+
+    getProfile: builder.query<any, void>({
+      query: () => '/auth/me',
+      providesTags: ['User'],
+    }),
+
+    updateProfile: builder.mutation<any, { name?: string; phone?: string; email?: string; avatar?: string | null; remove_avatar?: boolean }>({
+      query: (data) => ({
+        url: '/auth/profile',
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    changePassword: builder.mutation<any, { current_password: string; new_password: string }>({
+      query: (data) => ({
+        url: '/auth/change-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+
+    // Banners & Catalog
     getHeroBanners: builder.query<HeroBanner[], void>({
       query: () => '/banners/hero',
       transformResponse: (res: any) => res.data || [],
@@ -56,6 +125,7 @@ export const apiService = createApi({
     getProductById: builder.query<Product, string>({
       query: (id) => `/products/${id}`,
       transformResponse: (res: any) => res.data || null,
+      providesTags: ['Reviews'],
     }),
     getStores: builder.query<Store[], { lat?: number; lng?: number }>({
       query: (params) => {
@@ -75,12 +145,78 @@ export const apiService = createApi({
       },
       transformResponse: (res: any) => res.data || null,
     }),
+
+    // Reviews Endpoints
+    getProductReviews: builder.query<any, string>({
+      query: (productId) => `/products/${productId}/reviews`,
+      providesTags: ['Reviews'],
+    }),
+    submitProductReview: builder.mutation<any, { productId: string; rating: number; comment: string; customerName?: string; variantName?: string }>({
+      query: ({ productId, rating, comment, customerName, variantName }) => ({
+        url: `/products/${productId}/reviews`,
+        method: 'POST',
+        body: { rating, comment, customer_name: customerName, variant_name: variantName },
+      }),
+      invalidatesTags: ['Reviews'],
+    }),
+
+    // Admin Review Management
+    getAdminReviews: builder.query<any[], string | void>({
+      query: (status) => status ? `/admin/reviews?status=${status}` : '/admin/reviews',
+      transformResponse: (res: any) => res.reviews || [],
+      providesTags: ['Reviews'],
+    }),
+    createAdminReview: builder.mutation<any, { product_id: string; customer_name: string; rating: number; comment: string; variant_name?: string; status?: string }>({
+      query: (body) => ({
+        url: '/admin/reviews',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Reviews'],
+    }),
+    updateReviewStatus: builder.mutation<any, { id: string; status: 'approved' | 'rejected' | 'pending' }>({
+      query: ({ id, status }) => ({
+        url: `/admin/reviews/${id}/status`,
+        method: 'PATCH',
+        body: { status },
+      }),
+      invalidatesTags: ['Reviews'],
+    }),
+    deleteAdminReview: builder.mutation<any, string>({
+      query: (id) => ({
+        url: `/admin/reviews/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Reviews'],
+    }),
+
+    // Coupons
+    applyCoupon: builder.mutation<any, { code: string; subtotal: number; product_ids?: string[] }>({
+      query: (data) => ({
+        url: '/coupons/apply',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+
+    // Orders & Tracking
     createOrder: builder.mutation<any, any>({
       query: (orderData) => ({
         url: '/orders',
         method: 'POST',
         body: orderData,
       }),
+      invalidatesTags: ['Orders'],
+    }),
+    getUserOrders: builder.query<any[], void>({
+      query: () => '/user/orders',
+      transformResponse: (res: any) => res.data || [],
+      providesTags: ['Orders'],
+    }),
+    getUserOrderDetail: builder.query<any, string>({
+      query: (id) => `/user/orders/${id}`,
+      transformResponse: (res: any) => res.data || null,
+      providesTags: ['Orders'],
     }),
     trackOrder: builder.query<any, string>({
       query: (id) => `/orders/track/${id}`,
@@ -90,6 +226,14 @@ export const apiService = createApi({
 });
 
 export const {
+  useRegisterCustomerMutation,
+  useLoginCustomerMutation,
+  useSendOtpMutation,
+  useVerifyOtpMutation,
+  useGoogleAuthMutation,
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useChangePasswordMutation,
   useGetHeroBannersQuery,
   useGetPromoBannersQuery,
   useGetServiceCategoriesQuery,
@@ -100,6 +244,15 @@ export const {
   useGetProductByIdQuery,
   useGetStoresQuery,
   useGetStoreByIdQuery,
+  useGetProductReviewsQuery,
+  useSubmitProductReviewMutation,
+  useGetAdminReviewsQuery,
+  useCreateAdminReviewMutation,
+  useUpdateReviewStatusMutation,
+  useDeleteAdminReviewMutation,
+  useApplyCouponMutation,
   useCreateOrderMutation,
+  useGetUserOrdersQuery,
+  useGetUserOrderDetailQuery,
   useTrackOrderQuery,
 } = apiService;

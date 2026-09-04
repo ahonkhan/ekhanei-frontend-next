@@ -1,17 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useLocation } from '@/context/LocationContext';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { setUser } from '@/store/slices/authSlice';
+import { useGetProfileQuery } from '@/store/services/apiService';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { SearchInput } from '@/components/common/SearchInput';
 import { CategoryMenuDrawer } from '@/components/layout/CategoryMenuDrawer';
 import { Menu, Heart, ShoppingCart, ChevronDown, MapPin, User as UserIcon } from 'lucide-react';
 
 export const Header: React.FC = () => {
+  const dispatch = useAppDispatch();
   const { totalItemsCount, setIsCartOpen } = useCart();
   const { selectedLocation, selectGPSLocation, openLocationDrawer } = useLocation();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -19,6 +22,22 @@ export const Header: React.FC = () => {
   const isHomePage = pathname === '/';
   const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Global Profile Fetch
+  const { data: profileApiData, isLoading: isProfileLoading } = useGetProfileQuery(undefined, {
+    skip: !mounted || !isAuthenticated,
+  });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (profileApiData?.user) {
+      dispatch(setUser(profileApiData.user));
+    }
+  }, [profileApiData, dispatch]);
 
   return (
     <>
@@ -108,17 +127,15 @@ export const Header: React.FC = () => {
 
             <div className="hidden lg:block h-9 border-l border-white/40" />
 
-            {/* Wishlist Button */}
-            <Link href="/profile">
-              <button
-                type="button"
-                className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-4 py-2 flex flex-col items-center justify-center cursor-pointer gap-0"
-              >
-                <div className="relative">
-                  <Heart className="w-5 h-5" />
-                </div>
-                <span className="text-[11px]">Wishlist</span>
-              </button>
+            {/* Wishlist Link */}
+            <Link
+              href="/profile"
+              className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-4 py-2 flex flex-col items-center justify-center cursor-pointer gap-0"
+            >
+              <div className="relative">
+                <Heart className="w-5 h-5" />
+              </div>
+              <span className="text-[11px]">Wishlist</span>
             </Link>
 
             {/* Cart Button */}
@@ -141,20 +158,30 @@ export const Header: React.FC = () => {
             <div className="h-9 border-l border-white/40" />
 
             {/* Account Profile Trigger */}
-            {isAuthenticated ? (
-              <Link href="/profile">
-                <button
-                  type="button"
-                  className="flex h-full min-w-[130px] items-center gap-2 rounded-sm px-1 text-left text-white outline-none hover:opacity-90 transition cursor-pointer"
-                >
-                  <div className="flex size-9 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-white/20 text-xs font-bold text-white uppercase shadow-xs">
+            {!mounted || (isAuthenticated && isProfileLoading && !user?.name) ? (
+              <div className="flex h-full min-w-[130px] items-center gap-2 px-1">
+                <div className="size-9 rounded-full bg-white/25 animate-pulse shrink-0 border border-white/40" />
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <div className="w-16 h-3 bg-white/25 animate-pulse rounded-sm" />
+                  <div className="w-10 h-2 bg-white/25 animate-pulse rounded-sm" />
+                </div>
+              </div>
+            ) : isAuthenticated ? (
+              <Link
+                href="/profile"
+                className="flex h-full min-w-[130px] items-center gap-2 rounded-sm px-1 text-left text-white outline-none hover:opacity-90 transition cursor-pointer"
+              >
+                <div className="flex size-9 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-white/20 text-xs font-bold text-white uppercase shadow-xs shrink-0">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={user.name || 'User'} className="w-full h-full object-cover" />
+                  ) : (
                     <span>{user?.name ? user.name.charAt(0) : 'U'}</span>
-                  </div>
-                  <span className="flex min-w-0 flex-col text-xs font-medium leading-tight text-white">
-                    <span className="truncate font-bold">{user?.name || 'Customer'}</span>
-                    <span className="flex items-center gap-1 text-[10px] opacity-80">My Account <ChevronDown className="w-3 h-3" /></span>
-                  </span>
-                </button>
+                  )}
+                </div>
+                <span className="flex min-w-0 flex-col text-xs font-medium leading-tight text-white">
+                  <span className="truncate font-bold">{user?.name || 'Customer'}</span>
+                  <span className="flex items-center gap-1 text-[10px] opacity-80">My Account <ChevronDown className="w-3 h-3" /></span>
+                </span>
               </Link>
             ) : (
               <button
