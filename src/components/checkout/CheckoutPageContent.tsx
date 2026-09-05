@@ -316,20 +316,6 @@ export default function CheckoutPageContent() {
                 />
               </div>
 
-              {/* Email Address */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 block">
-                  ইমেইল এড্রেস (যদি থাকে)
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="আপনার ইমেইল এড্রেস লিখুন"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
-                />
-              </div>
-
               {/* WhatsApp Number (যদি থাকে) */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 block">

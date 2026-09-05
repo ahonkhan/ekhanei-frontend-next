@@ -4,11 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useAppSelector } from '@/store/hooks';
 import { CategoryMenuDrawer } from '@/components/layout/CategoryMenuDrawer';
 import { Home, Shapes, ShoppingCart, MessageCircleMore, User, ChevronDown } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { totalItemsCount, setIsCartOpen } = useCart();
+  const { totalItemsCount, setIsCartOpen, openAuthModal } = useCart();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const pathname = usePathname();
   const isProductPage = pathname ? pathname.startsWith('/product/') : false;
   const [openSection, setOpenSection] = useState<string | null>(null);
@@ -314,10 +316,21 @@ export const Footer: React.FC = () => {
             </a>
 
             {/* 5. Account Profile */}
-            <Link href="/profile" className="flex flex-col items-center justify-center gap-0.5 text-xs text-gray-600 font-medium cursor-pointer hover:scale-105 transition-transform">
-              <User className="w-5 h-5 text-gray-600" />
-              <span className="text-[10px]">Account</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/profile" className="flex flex-col items-center justify-center gap-0.5 text-xs text-gray-600 font-medium cursor-pointer hover:scale-105 transition-transform">
+                <User className="w-5 h-5 text-gray-600" />
+                <span className="text-[10px]">Account</span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openAuthModal('/profile')}
+                className="flex flex-col items-center justify-center gap-0.5 text-xs text-gray-600 font-medium cursor-pointer hover:scale-105 transition-transform border-none bg-transparent p-0"
+              >
+                <User className="w-5 h-5 text-gray-600" />
+                <span className="text-[10px]">Account</span>
+              </button>
+            )}
           </div>
         </div>
       )}

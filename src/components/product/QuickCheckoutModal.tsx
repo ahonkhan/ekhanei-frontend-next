@@ -6,7 +6,6 @@ import {
   X,
   User,
   Phone,
-  Mail,
   MessageSquare,
   MapPin,
   CheckCircle2,
@@ -171,21 +170,6 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
                   placeholder="আপনার ফোন নম্বর লিখুন"
-                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
-                />
-              </div>
-
-              {/* Form Field 3: Email Address */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-blue-500" />
-                  <span>ইমেইল এড্রেস (যদি থাকে)</span>
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="আপনার ইমেইল এড্রেস লিখুন"
                   className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
                 />
               </div>

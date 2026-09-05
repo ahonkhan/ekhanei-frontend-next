@@ -126,15 +126,28 @@ export const Header: React.FC = () => {
             <div className="hidden lg:block h-9 border-l border-white/40" />
 
             {/* Wishlist Link */}
-            <Link
-              href="/profile"
-              className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-4 py-2 flex flex-col items-center justify-center cursor-pointer gap-0"
-            >
-              <div className="relative">
-                <Heart className="w-5 h-5" />
-              </div>
-              <span className="text-[11px]">Wishlist</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href="/profile"
+                className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-4 py-2 flex flex-col items-center justify-center cursor-pointer gap-0"
+              >
+                <div className="relative">
+                  <Heart className="w-5 h-5" />
+                </div>
+                <span className="text-[11px]">Wishlist</span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openAuthModal('/profile')}
+                className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-4 py-2 flex flex-col items-center justify-center cursor-pointer gap-0 bg-transparent border-none"
+              >
+                <div className="relative">
+                  <Heart className="w-5 h-5" />
+                </div>
+                <span className="text-[11px]">Wishlist</span>
+              </button>
+            )}
 
             {/* Cart Button */}
             <button
@@ -184,7 +197,7 @@ export const Header: React.FC = () => {
             ) : (
               <button
                 type="button"
-                onClick={() => openAuthModal()}
+                onClick={() => openAuthModal('/profile')}
                 className="flex h-full items-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 px-3 py-2 text-left text-white outline-none transition cursor-pointer border border-white/20 shadow-2xs"
               >
                 <UserIcon className="w-4 h-4 text-white" />

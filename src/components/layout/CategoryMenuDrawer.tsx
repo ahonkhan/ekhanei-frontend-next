@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useGetCategoriesQuery, useGetServiceCategoriesQuery } from '@/store/services/apiService';
+import { useGetCategoriesQuery, useGetServiceCategoriesQuery, useGetCategoryDetailQuery } from '@/store/services/apiService';
 import { getImageUrl } from '@/utils/image';
 import {
   X,
@@ -15,15 +15,121 @@ import {
   MessageSquare,
   Store,
   Search,
-  Sparkles,
   ChevronRight,
-  Grid
+  Grid,
+  Loader2
 } from 'lucide-react';
 
 interface CategoryMenuDrawerProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const CategoryAccordionItem: React.FC<{
+  cat: any;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}> = ({ cat, isExpanded, onToggle, onClose }) => {
+  const catSlug = cat.slug || cat.id;
+  const catUrl = `/${catSlug}`;
+
+  const { data: categoryDetail, isLoading: isDetailLoading } = useGetCategoryDetailQuery(catSlug, {
+    skip: !isExpanded || Boolean((cat as any).subCategories || (cat as any).sub_categories || (cat as any).children),
+  });
+
+  const subCategories: any[] =
+    (cat as any).subCategories ||
+    (cat as any).sub_categories ||
+    (cat as any).children ||
+    categoryDetail?.subCategories ||
+    [];
+
+  return (
+    <div className="rounded-2xl border border-slate-100 hover:border-emerald-200 transition overflow-hidden bg-white shadow-2xs">
+      <div className="flex items-center justify-between p-2.5">
+        <Link
+          href={catUrl}
+          onClick={onClose}
+          className="flex items-center gap-3 flex-1 hover:text-emerald-600 transition min-w-0"
+        >
+          {cat.image || cat.icon ? (
+            <img
+              src={getImageUrl(cat.image || cat.icon)}
+              alt={cat.name}
+              className="w-8 h-8 rounded-xl object-cover shrink-0 border border-slate-100"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center shrink-0">
+              {cat.name.slice(0, 2)}
+            </div>
+          )}
+
+          <div className="min-w-0 flex-1">
+            <h4 className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
+              {cat.name}
+            </h4>
+            {cat.itemCount && (
+              <span className="text-[10px] text-slate-400 font-semibold block">
+                {cat.itemCount}
+              </span>
+            )}
+          </div>
+        </Link>
+
+        <button
+          type="button"
+          onClick={onToggle}
+          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition cursor-pointer"
+        >
+          {isExpanded ? (
+            <ChevronUp className="w-4 h-4 text-emerald-600" />
+          ) : (
+            <ChevronDown className="w-4 h-4" />
+          )}
+        </button>
+      </div>
+
+      {/* Expanded Subcategories / See All */}
+      {isExpanded && (
+        <div className="bg-slate-50/90 p-2.5 border-t border-slate-100 space-y-1 text-xs font-semibold text-slate-700">
+          {/* See All */}
+          <Link
+            href={catUrl}
+            onClick={onClose}
+            className="flex items-center justify-between text-[#d81b60] hover:text-[#b0144d] font-black italic py-1.5 px-3 rounded-lg hover:bg-pink-50/80 transition"
+          >
+            <span>See All</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
+
+          {isDetailLoading && subCategories.length === 0 ? (
+            <div className="py-2 px-3 text-slate-400 text-xs flex items-center gap-2 font-medium">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
+              <span>Loading subcategories...</span>
+            </div>
+          ) : subCategories.length > 0 ? (
+            subCategories.map((sub: any) => {
+              const subSlug = sub.slug || sub.id;
+              const subUrl = `/${catSlug}/${subSlug}`;
+              return (
+                <Link
+                  key={sub.id || sub.slug || sub.name}
+                  href={subUrl}
+                  onClick={onClose}
+                  className="flex items-center justify-between py-1.5 px-3 rounded-lg text-slate-800 hover:text-emerald-700 hover:bg-emerald-50 transition font-bold"
+                >
+                  <span className="truncate">{sub.name}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-2" />
+                </Link>
+              );
+            })
+          ) : null}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const CategoryMenuDrawer: React.FC<CategoryMenuDrawerProps> = ({ isOpen, onClose }) => {
   // Fetch real categories & service categories from backend
@@ -114,31 +220,7 @@ export const CategoryMenuDrawer: React.FC<CategoryMenuDrawerProps> = ({ isOpen, 
 
           {/* Categories Accordion Section */}
           <div className="flex-1 p-3 space-y-1.5">
-            {/* Quick Service Department Pills */}
-            {serviceCategories.length > 0 && !searchQuery && (
-              <div className="mb-3 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 block">
-                  Departments
-                </span>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {serviceCategories.map((sc: any) => (
-                    <Link
-                      key={sc.id}
-                      href={`/${sc.slug || sc.id}`}
-                      onClick={onClose}
-                      className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 border border-slate-100 transition group"
-                    >
-                      <img
-                        src={getImageUrl(sc.icon || sc.image)}
-                        alt={sc.name}
-                        className="w-6 h-6 rounded-lg object-contain shrink-0"
-                      />
-                      <span className="text-xs font-extrabold truncate">{sc.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+
 
             <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 block">
               All Categories ({filteredCategories.length})
@@ -150,74 +232,15 @@ export const CategoryMenuDrawer: React.FC<CategoryMenuDrawerProps> = ({ isOpen, 
                 <p className="text-xs text-slate-400 font-semibold">Loading categories...</p>
               </div>
             ) : filteredCategories.length > 0 ? (
-              filteredCategories.map((cat) => {
-                const isExpanded = expandedCategoryIds.includes(cat.id);
-                const catUrl = `/${cat.slug || cat.id}`;
-
-                return (
-                  <div
-                    key={cat.id}
-                    className="rounded-2xl border border-slate-100 hover:border-emerald-200 transition overflow-hidden bg-white shadow-2xs"
-                  >
-                    <div className="flex items-center justify-between p-2.5">
-                      <Link
-                        href={catUrl}
-                        onClick={onClose}
-                        className="flex items-center gap-3 flex-1 hover:text-emerald-600 transition min-w-0"
-                      >
-                        {cat.image || cat.icon ? (
-                          <img
-                            src={getImageUrl(cat.image || cat.icon)}
-                            alt={cat.name}
-                            className="w-8 h-8 rounded-xl object-cover shrink-0 border border-slate-100"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center shrink-0">
-                            {cat.name.slice(0, 2)}
-                          </div>
-                        )}
-
-                        <div className="min-w-0 flex-1">
-                          <h4 className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
-                            {cat.name}
-                          </h4>
-                          {cat.itemCount && (
-                            <span className="text-[10px] text-slate-400 font-semibold block">
-                              {cat.itemCount}
-                            </span>
-                          )}
-                        </div>
-                      </Link>
-
-                      <button
-                        type="button"
-                        onClick={() => toggleCategory(cat.id)}
-                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition cursor-pointer"
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="w-4 h-4 text-emerald-600" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-
-                    {/* Expanded Subcategories / Explore Link */}
-                    {isExpanded && (
-                      <div className="bg-slate-50 p-2.5 border-t border-slate-100 space-y-1.5 text-xs font-semibold text-slate-700">
-                        <Link
-                          href={catUrl}
-                          onClick={onClose}
-                          className="flex items-center justify-between text-emerald-700 font-extrabold py-1 px-2 rounded-lg bg-emerald-100/60 hover:bg-emerald-100 transition"
-                        >
-                          <span>Browse All {cat.name}</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
+              filteredCategories.map((cat) => (
+                <CategoryAccordionItem
+                  key={cat.id}
+                  cat={cat}
+                  isExpanded={expandedCategoryIds.includes(cat.id)}
+                  onToggle={() => toggleCategory(cat.id)}
+                  onClose={onClose}
+                />
+              ))
             ) : (
               <div className="py-8 text-center text-slate-400 text-xs font-semibold">
                 No categories found matching &quot;{searchQuery}&quot;

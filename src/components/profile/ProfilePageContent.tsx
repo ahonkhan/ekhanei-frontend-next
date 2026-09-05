@@ -76,6 +76,12 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (mounted && !isAuthenticated) {
+      openAuthModal('/profile');
+    }
+  }, [mounted, isAuthenticated, openAuthModal]);
+
   // RTK Query Hooks
   const { data: profileApiData } = useGetProfileQuery(undefined, { skip: !isAuthenticated });
   const { data: userOrders = [], isLoading: isOrdersLoading, refetch: refetchOrders } = useGetUserOrdersQuery(undefined, { skip: !isAuthenticated });
@@ -259,6 +265,31 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
       setPasswordMsg({ text: err?.data?.message || 'Incorrect current password or server error.', type: 'error' });
     }
   };
+
+  if (mounted && !isAuthenticated) {
+    return (
+      <div className="min-h-[70vh] bg-slate-50 flex items-center justify-center p-4 py-16">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-lg border border-slate-100 flex flex-col items-center gap-5">
+          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
+            <User className="w-8 h-8 text-emerald-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">Account Access Required</h2>
+            <p className="text-sm text-slate-500 mt-1">
+              Please sign in or register to view your profile, order history, and account settings.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => openAuthModal('/profile')}
+            className="w-full py-3.5 px-6 rounded-xl bg-[#d81b60] hover:bg-[#b0144d] active:scale-[0.99] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
+          >
+            Sign In / Register
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50/80 py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
