@@ -11,9 +11,13 @@ import { SlidersHorizontal, ChevronDown, ArrowUpDown, Filter, X, Check, Search }
 function SearchResultsContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
+  const brandId = searchParams.get('brandId') || searchParams.get('brand_id') || '';
 
   const { data: apiProducts = [], isLoading } = useGetProductsQuery(
-    { search: query.trim() },
+    {
+      search: query.trim() || undefined,
+      brandId: brandId.trim() || undefined,
+    },
     { skip: false }
   );
   const { data: categories = [] } = useGetCategoriesQuery();

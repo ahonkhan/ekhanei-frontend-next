@@ -10,11 +10,8 @@ import { getImageUrl } from '@/utils/image';
 
 export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
   const { data: catMeta, isLoading: isMetaLoading } = useGetCategoryDetailQuery(slug);
-  const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
-
   const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery({
     categoryId: catMeta?.id || slug,
-    brandId: selectedBrandId || undefined,
   });
 
   const [bottomFilterTab, setBottomFilterTab] = useState('all');
@@ -251,15 +248,6 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
               </div>
 
               <div className="flex items-center gap-1.5">
-                {selectedBrandId && (
-                  <button
-                    onClick={() => setSelectedBrandId(null)}
-                    className="flex items-center gap-1 px-3 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer mr-2"
-                  >
-                    <span>Clear Filter</span>
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
                 <button
                   onClick={() => scrollBrands(-300)}
                   className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer"
@@ -279,31 +267,24 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
               ref={brandsScrollRef}
               className="flex gap-3 overflow-x-auto no-scrollbar snap-x py-2"
             >
-              {brands.map((brand) => {
-                const isSelected = selectedBrandId === String(brand.id);
-                return (
-                  <div
-                    key={brand.id}
-                    onClick={() => setSelectedBrandId(isSelected ? null : String(brand.id))}
-                    className={`snap-start flex-shrink-0 w-28 h-28 sm:w-36 sm:h-36 aspect-square rounded-2xl bg-white border transition-all duration-300 cursor-pointer select-none relative flex items-center justify-center p-2 group ${
-                      isSelected
-                        ? 'border-2 border-emerald-600 ring-4 ring-emerald-500/20 shadow-md scale-105'
-                        : 'border-slate-200/80 hover:border-emerald-400 hover:shadow-md'
-                    }`}
-                    title={brand.name}
-                  >
-                    <img
-                      src={getImageUrl(brand.logo)}
-                      alt={brand.name}
-                      className="w-full h-full object-contain p-1"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 bg-slate-900/75 backdrop-blur-xs text-white text-[11px] font-bold text-center py-1 truncate opacity-0 group-hover:opacity-100 transition-opacity rounded-b-2xl">
-                      {brand.name}
-                    </div>
+              {brands.map((brand) => (
+                <Link
+                  key={brand.id}
+                  href={`/search?q=${encodeURIComponent(brand.name)}&brandId=${brand.id}`}
+                  className="snap-start flex-shrink-0 w-28 h-28 sm:w-36 sm:h-36 aspect-square rounded-2xl bg-white border border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all duration-300 cursor-pointer select-none relative flex items-center justify-center p-2 group"
+                  title={brand.name}
+                >
+                  <img
+                    src={getImageUrl(brand.logo)}
+                    alt={brand.name}
+                    className="w-full h-full object-contain p-1"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-slate-900/75 backdrop-blur-xs text-white text-[11px] font-bold text-center py-1 truncate opacity-0 group-hover:opacity-100 transition-opacity rounded-b-2xl">
+                    {brand.name}
                   </div>
-                );
-              })}
+                </Link>
+              ))}
             </div>
           </section>
         )}
