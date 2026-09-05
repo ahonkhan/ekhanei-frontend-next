@@ -28,7 +28,7 @@ import {
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialMode?: 'login' | 'register' | 'otp';
+  initialMode?: 'login' | 'register';
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -45,9 +45,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [verifyOtpApi, { isLoading: isVerifyingOtp }] = useVerifyOtpMutation();
   const [googleAuthApi, { isLoading: isGoogleLoading }] = useGoogleAuthMutation();
 
-  // Mode: 'phone-otp' | 'email-login' | 'register'
-  const [authMethod, setAuthMethod] = useState<'phone-otp' | 'email-login' | 'register'>(
-    initialMode === 'register' ? 'register' : 'phone-otp'
+  // Mode: 'email-login' | 'register'
+  const [authMethod, setAuthMethod] = useState<'email-login' | 'register'>(
+    initialMode === 'register' ? 'register' : 'email-login'
   );
 
   // Phone OTP States
@@ -223,21 +223,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="flex border-b border-slate-100 bg-slate-50/60 text-xs font-bold text-slate-600">
           <button
             onClick={() => {
-              setAuthMethod('phone-otp');
-              setErrorMsg('');
-            }}
-            className={`flex-1 py-3 border-b-2 text-center transition flex items-center justify-center gap-1.5 cursor-pointer ${
-              authMethod === 'phone-otp'
-                ? 'border-emerald-600 text-emerald-600 bg-white'
-                : 'border-transparent hover:text-slate-900'
-            }`}
-          >
-            <Phone className="w-3.5 h-3.5" />
-            <span>Mobile OTP</span>
-          </button>
-
-          <button
-            onClick={() => {
               setAuthMethod('email-login');
               setErrorMsg('');
             }}
@@ -248,7 +233,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             }`}
           >
             <Mail className="w-3.5 h-3.5" />
-            <span>Email / Password</span>
+            <span>Login</span>
           </button>
 
           <button
@@ -277,100 +262,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           )}
 
-          {/* MODE 1: MOBILE OTP AUTH */}
-          {authMethod === 'phone-otp' && (
-            !otpSent ? (
-              <form onSubmit={handleSendOtp} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 block">Mobile Number</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 font-bold text-xs">
-                      +88
-                    </div>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="01712345678"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
-                    />
-                  </div>
-                  <p className="text-[11px] text-slate-400">We will send a 4-digit SMS OTP code for verification</p>
-                </div>
 
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {isSendingOtp ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Sending OTP...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Send Verification OTP</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleVerifyOtp} className="space-y-4 text-center">
-                <div className="space-y-1">
-                  <p className="text-xs text-slate-600">
-                    OTP sent to <span className="font-bold text-slate-900">+88 {phone}</span>
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setOtpSent(false)}
-                    className="text-[11px] font-bold text-emerald-600 hover:underline cursor-pointer"
-                  >
-                    Change Number
-                  </button>
-                </div>
-
-                {/* 4-digit OTP Boxes */}
-                <div className="flex items-center justify-center gap-2 py-2">
-                  {otpCode.map((digit, idx) => (
-                    <input
-                      key={idx}
-                      type="text"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        const newCode = [...otpCode];
-                        newCode[idx] = val;
-                        setOtpCode(newCode);
-                      }}
-                      className="w-12 h-12 text-center text-lg font-black bg-slate-50 border-2 border-emerald-500 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-xs"
-                    />
-                  ))}
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {isVerifyingOtp ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Verifying...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Verify OTP & Login</span>
-                    </>
-                  )}
-                </button>
-              </form>
-            )
-          )}
 
           {/* MODE 2: EMAIL / PHONE LOGIN */}
           {authMethod === 'email-login' && (

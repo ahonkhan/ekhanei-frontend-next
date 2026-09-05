@@ -41,7 +41,7 @@ const calculateDistanceKm = (lat1: number, lon1: number, lat2: number, lon2: num
 
 export default function CheckoutPageContent() {
   const router = useRouter();
-  const { cart, increment, decrement, removeItem, clearCart } = useCart();
+  const { cart, increment, decrement, removeItem, clearCart, openAuthModal } = useCart();
   const { selectedLocation, openLocationDrawer, userCoords } = useLocation();
   const [createOrder, { isLoading: isSubmitting }] = useCreateOrderMutation();
   const [applyCoupon, { isLoading: isApplyingCoupon }] = useApplyCouponMutation();
@@ -102,6 +102,7 @@ export default function CheckoutPageContent() {
 
   const selectedItems = cart.filter((item) => selectedIds.has(item.id));
   const productTotal = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalSelectedQuantity = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
 
   // Per KM Delivery Charge (৳5 per KM, Minimum ৳15)
   const hubLat = 25.7439;
@@ -121,16 +122,19 @@ export default function CheckoutPageContent() {
   const discount = appliedCoupon ? appliedCoupon.discount_amount : 0;
   const totalPayable = Math.max(0, productTotal + deliveryCharge - discount);
 
-  // Handle Coupon Apply
-  const handleApplyCoupon = async () => {
-    if (!couponInput.trim()) return;
+  // Handle Coupon Apply (Optional parameter codeToApply allows 1-click apply from available vouchers list)
+  const handleApplyCoupon = async (codeToApply?: string | React.MouseEvent) => {
+    const code = (typeof codeToApply === 'string' ? codeToApply : couponInput).trim();
+    if (!code) return;
     setCouponError('');
 
     try {
       const res = await applyCoupon({
-        code: couponInput.trim(),
+        code: code,
         subtotal: productTotal,
         product_ids: selectedItems.map((item) => item.id),
+        total_quantity: totalSelectedQuantity,
+        delivery_fee: deliveryCharge,
       }).unwrap();
 
       if (res?.success && res?.coupon) {
@@ -140,6 +144,7 @@ export default function CheckoutPageContent() {
           discount_type: res.coupon.discount_type,
           message: res.message || 'Coupon code applied successfully!',
         });
+        setCouponInput(res.coupon.code);
         setCouponError('');
       } else {
         setCouponError(res?.message || 'Invalid coupon code');
@@ -164,6 +169,10 @@ export default function CheckoutPageContent() {
   }, {});
 
   const handlePlaceOrder = async () => {
+    if (!isAuthenticated) {
+      openAuthModal();
+      return;
+    }
     if (!fullName || !phone) return;
     if (deliveryOption === 'custom' && !customAddress.trim()) return;
 
@@ -214,6 +223,7 @@ export default function CheckoutPageContent() {
   };
 
   const isFormValid =
+    isAuthenticated &&
     fullName.trim() !== '' &&
     phone.trim() !== '' &&
     (deliveryOption === 'gps' || customAddress.trim() !== '') &&
@@ -231,6 +241,22 @@ export default function CheckoutPageContent() {
 
       {/* Step Bar */}
       <StepProgressBar currentStep={3} />
+
+      {!isAuthenticated && (
+        <div className="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2.5 text-amber-900">
+            <span className="font-bold text-xs sm:text-sm">
+              অর্ডার সম্পন্ন করতে প্রথমে লগইন বা রেজিস্ট্রেশন করুন।
+            </span>
+          </div>
+          <button
+            onClick={openAuthModal}
+            className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shrink-0 cursor-pointer shadow-md transition"
+          >
+            লগইন / রেজিস্টার করুন
+          </button>
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-6 mt-4">
         {/* LEFT COLUMN */}

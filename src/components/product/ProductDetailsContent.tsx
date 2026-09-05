@@ -958,54 +958,58 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
           </div>
 
           {/* 6. Delivery Guarantees & DYNAMIC STORE CARD BOX */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-emerald-50/40 border border-emerald-100 text-xs font-semibold text-slate-700">
-            <div className="space-y-1.5 text-[11px] sm:text-xs">
+          <div className="flex flex-row items-center justify-between gap-2 p-3 sm:p-4 rounded-2xl bg-emerald-50/40 border border-emerald-100 text-xs font-semibold text-slate-700">
+            <div className="space-y-1 sm:space-y-1.5 text-[10px] sm:text-xs min-w-0">
               <div className="flex items-center gap-1.5">
-                <RotateCcw className="w-3.5 h-3.5 text-emerald-600" />
-                <span><strong>Return :</strong> {product.returnPolicy || '3 Days Easy Return'}</span>
+                <RotateCcw className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="truncate"><strong>Return :</strong> {product.returnPolicy || '3 Days Easy Return'}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <ArrowLeftRight className="w-3.5 h-3.5 text-emerald-600" />
-                <span><strong>Exchange :</strong> {product.exchangePolicy || '3 Days Exchange'}</span>
+                <ArrowLeftRight className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="truncate"><strong>Exchange :</strong> {product.exchangePolicy || '3 Days Exchange'}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Truck className="w-3.5 h-3.5 text-emerald-600" />
-                <span><strong>Delivery :</strong> {product.deliveryTime || '20-30 Mins Express'}</span>
+                <Truck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="truncate"><strong>Delivery :</strong> {product.deliveryTime || '20-30 Mins Express'}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span><strong>Payment :</strong> {product.paymentMethod || 'COD & Digital Payment'}</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="truncate"><strong>Payment :</strong> {product.paymentMethod || 'COD & Digital Payment'}</span>
               </div>
             </div>
 
-            {/* DYNAMIC STORE CARD */}
+            {/* DYNAMIC STORE CARD (Right-aligned in mobile & desktop) */}
             <Link
               href={storeObj.id ? `/store/${storeObj.id}` : '#'}
-              className="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3 shrink-0 hover:border-emerald-400 transition cursor-pointer group"
+              className="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-xs flex flex-col gap-1 shrink-0 hover:border-emerald-400 transition cursor-pointer group max-w-[150px] sm:max-w-[200px]"
             >
-              {storeObj.logoImage ? (
-                <img
-                  src={storeObj.logoImage}
-                  alt={storeObj.name}
-                  className="w-10 h-10 rounded-full object-cover border border-emerald-200 shrink-0"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 font-black text-xs flex items-center justify-center shrink-0">
-                  <StoreIcon className="w-5 h-5" />
-                </div>
-              )}
+              <div className="flex items-center gap-1 text-pink-600">
+                <StoreIcon className="w-3.5 h-3.5 text-pink-600 shrink-0" />
+                <span className="text-[11px] sm:text-xs font-extrabold tracking-tight">Shop</span>
+              </div>
 
-              <div>
-                <div className="flex items-center gap-1">
-                  <span className="text-[10px] text-emerald-700 font-extrabold uppercase tracking-wider">Partner Store</span>
-                  <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded-full">Verified</span>
+              <div className="flex items-center gap-1.5 min-w-0">
+                {storeObj.logoImage ? (
+                  <img
+                    src={storeObj.logoImage}
+                    alt={storeObj.name}
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-emerald-200 shrink-0"
+                  />
+                ) : (
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-100 text-emerald-700 font-black text-[10px] flex items-center justify-center shrink-0">
+                    <StoreIcon className="w-4 h-4" />
+                  </div>
+                )}
+
+                <div className="flex items-center gap-0.5 min-w-0">
+                  <h4 className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-emerald-600 transition truncate leading-tight">
+                    {storeObj.name}
+                  </h4>
+                  <svg className="w-4 h-4 text-blue-500 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <title>Verified Store</title>
+                    <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.79-4-4-4-.495 0-.965.084-1.4.238C14.55 2.475 13.18 1.6 11.6 1.6c-1.58 0-2.95.875-3.6 2.148-.435-.154-.905-.238-1.4-.238-2.21 0-4 1.79-4 4 0 .495.084.965.238 1.4C1.575 9.55.7 10.92.7 12.5c0 1.58.875 2.95 2.148 3.6-.154.435-.238.905-.238 1.4 0 2.21 1.79 4 4 4 .495 0 .965-.084 1.4-.238 1.25 1.273 2.62 2.148 4.2 2.148 1.58 0 2.95-.875 3.6-2.148.435.154.905.238 1.4.238 2.21 0 4-1.79 4-4 0-.495-.084-.965-.238-1.4 1.273-.65 2.148-2.02 2.148-3.6zm-12.4 4.8l-4.2-4.2 1.4-1.4 2.8 2.8 7.2-7.2 1.4 1.4-8.6 8.6z" />
+                  </svg>
                 </div>
-                <h4 className="text-xs font-black text-slate-900 group-hover:text-emerald-600 transition leading-tight">
-                  {storeObj.name}
-                </h4>
-                <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
-                  {storeObj.address || 'Rangpur Sadar'} • {storeObj.deliveryTime}
-                </p>
               </div>
             </Link>
           </div>

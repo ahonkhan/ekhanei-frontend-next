@@ -106,12 +106,13 @@ export const apiService = createApi({
       query: (slug) => `/categories/${slug}`,
       transformResponse: (res: any) => res.data || null,
     }),
-    getProducts: builder.query<Product[], { categoryId?: string; subcategoryId?: string; storeId?: string; search?: string; isPopular?: boolean }>({
+    getProducts: builder.query<Product[], { categoryId?: string; subcategoryId?: string; storeId?: string; brandId?: string; search?: string; isPopular?: boolean }>({
       query: (params) => {
         const queryParams = new URLSearchParams();
         if (params?.categoryId) queryParams.append('category_id', params.categoryId);
         if (params?.subcategoryId) queryParams.append('subcategory_id', params.subcategoryId);
         if (params?.storeId) queryParams.append('store_id', params.storeId);
+        if (params?.brandId) queryParams.append('brand_id', params.brandId);
         if (params?.search) queryParams.append('search', params.search);
         if (params?.isPopular) queryParams.append('is_popular', '1');
         return `/products?${queryParams.toString()}`;
@@ -191,7 +192,11 @@ export const apiService = createApi({
     }),
 
     // Coupons
-    applyCoupon: builder.mutation<any, { code: string; subtotal: number; product_ids?: string[] }>({
+    getPublicVouchers: builder.query<any[], void>({
+      query: () => '/coupons',
+      transformResponse: (res: any) => res.data || [],
+    }),
+    applyCoupon: builder.mutation<any, { code: string; subtotal: number; product_ids?: string[]; total_quantity?: number; delivery_fee?: number }>({
       query: (data) => ({
         url: '/coupons/apply',
         method: 'POST',
@@ -250,6 +255,7 @@ export const {
   useCreateAdminReviewMutation,
   useUpdateReviewStatusMutation,
   useDeleteAdminReviewMutation,
+  useGetPublicVouchersQuery,
   useApplyCouponMutation,
   useCreateOrderMutation,
   useGetUserOrdersQuery,

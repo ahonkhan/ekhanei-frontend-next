@@ -10,6 +10,7 @@ import {
   useUpdateProfileMutation,
   useChangePasswordMutation,
   useGetProfileQuery,
+  useGetPublicVouchersQuery,
 } from '@/store/services/apiService';
 import { AuthModal } from '@/components/auth/AuthModal';
 import {
@@ -40,6 +41,9 @@ import {
   Camera,
   Upload,
   Trash2,
+  Copy,
+  Check,
+  TicketPercent,
 } from 'lucide-react';
 
 const LOCATIONS = [
@@ -74,12 +78,21 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
   // RTK Query Hooks
   const { data: profileApiData } = useGetProfileQuery(undefined, { skip: !isAuthenticated });
   const { data: userOrders = [], isLoading: isOrdersLoading, refetch: refetchOrders } = useGetUserOrdersQuery(undefined, { skip: !isAuthenticated });
+  const { data: vouchersList = [], isLoading: isVouchersLoading } = useGetPublicVouchersQuery();
   const [updateProfileApi, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
   const [changePasswordApi, { isLoading: isChangingPassword }] = useChangePasswordMutation();
 
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [orderStatusTab, setOrderStatusTab] = useState<string>('all');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+
+  // Copied code feedback state
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2500);
+  };
 
   // Selected Order for Details Modal
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
@@ -168,6 +181,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
 
   const menuItems = [
     { id: 'orders', label: 'My Orders', icon: ShoppingBag },
+    { id: 'vouchers', label: 'My Vouchers & Coupons', icon: Gift },
     { id: 'account', label: 'Account Information', icon: User },
     { id: 'settings', label: 'Settings', icon: Settings },
     { id: 'helpline', label: 'Helpline', icon: HelpCircle },
@@ -500,6 +514,159 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                     </p>
                     <p className="text-xs text-slate-400 max-w-xs">
                       When you place an order, it will show up here with real-time updates and rider tracking.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB: MY VOUCHERS & COUPONS */}
+            {activeTab === 'vouchers' && (
+              <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <Gift className="w-6 h-6 text-emerald-600" />
+                      <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                        My Vouchers & Offers
+                      </h1>
+                    </div>
+                    <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5">
+                      Exclusive discount coupons and deals available for your purchases
+                    </p>
+                  </div>
+                </div>
+
+                {isVouchersLoading ? (
+                  <div className="bg-white rounded-2xl border border-slate-200/80 p-12 min-h-[320px] flex flex-col items-center justify-center text-center shadow-xs space-y-3">
+                    <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                    <p className="text-slate-500 font-semibold text-xs sm:text-sm">Loading available vouchers...</p>
+                  </div>
+                ) : vouchersList.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {vouchersList.map((v: any) => {
+                      const isFreeDelivery = v.discount_type === 'free_delivery';
+                      const isPercentage = v.discount_type === 'percentage';
+                      const isCopied = copiedCode === v.code;
+
+                      return (
+                        <div
+                          key={v.id}
+                          className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:border-emerald-300 transition flex flex-col justify-between space-y-4 relative overflow-hidden group"
+                        >
+                          {/* Top Decorative Banner Badge */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="space-y-1">
+                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
+                                isFreeDelivery
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                  : isPercentage
+                                  ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                                  : 'bg-blue-100 text-blue-800 border border-blue-200'
+                              }`}>
+                                {isFreeDelivery ? (
+                                  <>
+                                    <Truck className="w-3.5 h-3.5" />
+                                    <span>Free Delivery</span>
+                                  </>
+                                ) : isPercentage ? (
+                                  <>
+                                    <TicketPercent className="w-3.5 h-3.5" />
+                                    <span>{v.discount_value}% OFF</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Gift className="w-3.5 h-3.5" />
+                                    <span>৳{v.discount_value} OFF</span>
+                                  </>
+                                )}
+                              </span>
+
+                              <h3 className="font-extrabold text-slate-800 text-base leading-snug pt-1">
+                                {v.title || (isFreeDelivery ? 'Free Delivery Offer' : `Flat ৳${v.discount_value} Discount`)}
+                              </h3>
+                            </div>
+                          </div>
+
+                          {/* Description & Rules */}
+                          <div className="space-y-2 text-xs">
+                            {v.description && (
+                              <p className="text-slate-600 font-medium leading-relaxed">
+                                {v.description}
+                              </p>
+                            )}
+
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                              {v.min_order_amount > 0 && (
+                                <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg font-bold text-[11px] border border-slate-200">
+                                  Min Spend: ৳{v.min_order_amount}
+                                </span>
+                              )}
+                              {v.min_quantity > 0 && (
+                                <span className="px-2.5 py-1 bg-amber-50 text-amber-800 rounded-lg font-bold text-[11px] border border-amber-200">
+                                  Min Qty: {v.min_quantity} Pcs
+                                </span>
+                              )}
+                              {v.expiry_date ? (
+                                <span className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-semibold text-[11px]">
+                                  Valid till: {new Date(v.expiry_date).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-bold text-[11px]">
+                                  No Expiration
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Code Box & Actions */}
+                          <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2 bg-slate-50 border-2 border-dashed border-emerald-300 rounded-xl px-3 py-1.5 flex-1 min-w-0">
+                              <span className="text-xs font-black text-emerald-700 tracking-wider font-mono truncate">
+                                {v.code}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyCode(v.code)}
+                                className="ml-auto text-emerald-600 hover:text-emerald-800 text-xs font-extrabold flex items-center gap-1 shrink-0 cursor-pointer"
+                                title="Copy Code"
+                              >
+                                {isCopied ? (
+                                  <>
+                                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span className="text-emerald-600 text-[11px]">Copied!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-3.5 h-3.5" />
+                                    <span className="text-[11px]">Copy</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+
+                            <Link
+                              href="/checkout"
+                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold transition shadow-xs flex items-center gap-1 shrink-0 cursor-pointer"
+                            >
+                              <span>Use Now</span>
+                              <ChevronRight className="w-3.5 h-3.5" />
+                            </Link>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-slate-200/80 p-12 min-h-[320px] flex flex-col items-center justify-center text-center shadow-xs space-y-3">
+                    <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                      <Gift className="w-8 h-8" />
+                    </div>
+                    <p className="text-slate-700 font-bold text-sm sm:text-base">
+                      No Active Vouchers Available
+                    </p>
+                    <p className="text-xs text-slate-400 max-w-xs">
+                      Check back soon! Promotional vouchers and free delivery coupons will appear here when active.
                     </p>
                   </div>
                 )}
