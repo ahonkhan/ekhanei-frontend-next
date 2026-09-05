@@ -12,7 +12,7 @@ import {
   useGetProfileQuery,
   useGetPublicVouchersQuery,
 } from '@/store/services/apiService';
-import { AuthModal } from '@/components/auth/AuthModal';
+import { useCart } from '@/context/CartContext';
 import {
   ShoppingBag,
   Gift,
@@ -68,6 +68,7 @@ interface ProfilePageContentProps {
 export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialTab = 'orders' }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { openAuthModal } = useCart();
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
   const [mounted, setMounted] = useState(false);
@@ -84,7 +85,6 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
 
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [orderStatusTab, setOrderStatusTab] = useState<string>('all');
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
 
   // Copied code feedback state
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -360,7 +360,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                   </button>
                 ) : (
                   <button
-                    onClick={() => setIsAuthModalOpen(true)}
+                    onClick={() => openAuthModal()}
                     className="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs sm:text-sm font-bold text-emerald-600 hover:bg-emerald-50 transition text-left cursor-pointer"
                   >
                     <User className="w-4 h-4 text-emerald-600" />
@@ -369,8 +369,6 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                 )}
               </nav>
             </div>
-
-            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
           </aside>
 
           {/* ========================================================================= */}
@@ -397,7 +395,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
 
                   {mounted && !isAuthenticated && (
                     <button
-                      onClick={() => setIsAuthModalOpen(true)}
+                      onClick={() => openAuthModal()}
                       className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer"
                     >
                       Login to View Orders

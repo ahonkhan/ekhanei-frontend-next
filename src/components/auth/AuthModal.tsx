@@ -29,12 +29,14 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialMode?: 'login' | 'register';
+  onSuccess?: () => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   initialMode = 'login',
+  onSuccess,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -115,6 +117,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           })
         );
         onClose();
+        if (onSuccess) onSuccess();
       } else {
         setErrorMsg(res.message || 'OTP verification failed');
       }
@@ -142,6 +145,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           })
         );
         onClose();
+        if (onSuccess) onSuccess();
       } else {
         setErrorMsg(res.message || 'Authentication failed');
       }
@@ -175,6 +179,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           })
         );
         onClose();
+        if (onSuccess) onSuccess();
       } else {
         setErrorMsg(res.message || 'Registration failed');
       }

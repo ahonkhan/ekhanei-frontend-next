@@ -52,11 +52,13 @@ export default function CheckoutPageContent() {
   // Form state
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
 
   // Redirect unauthenticated users away from checkout page directly to home + Auth Modal
   useEffect(() => {
     if (!isAuthenticated) {
-      openAuthModal();
+      openAuthModal('/checkout-flow/checkout');
       router.replace('/');
     }
   }, [isAuthenticated, router, openAuthModal]);
@@ -70,6 +72,14 @@ export default function CheckoutPageContent() {
       }
       if (activeUser.phone && !phone) {
         setPhone(activeUser.phone);
+      }
+      if (activeUser.email && !email) {
+        setEmail(activeUser.email);
+      }
+      if ((activeUser.whatsapp || activeUser.whatsapp_number) && !whatsappNumber) {
+        setWhatsappNumber(activeUser.whatsapp || activeUser.whatsapp_number || '');
+      } else if (activeUser.phone && !whatsappNumber) {
+        setWhatsappNumber(activeUser.phone);
       }
     }
   }, [user, profileApiData]);
@@ -178,7 +188,7 @@ export default function CheckoutPageContent() {
 
   const handlePlaceOrder = async () => {
     if (!isAuthenticated) {
-      openAuthModal();
+      openAuthModal('/checkout-flow/checkout');
       return;
     }
     if (!fullName || !phone) return;
@@ -199,6 +209,8 @@ export default function CheckoutPageContent() {
       const res = await createOrder({
         customer_name: fullName,
         customer_phone: phone,
+        customer_email: email.trim() || undefined,
+        whatsapp_number: whatsappNumber.trim() || undefined,
         delivery_address: deliveryAddress,
         latitude: lat,
         longitude: lng,
@@ -258,7 +270,7 @@ export default function CheckoutPageContent() {
             </span>
           </div>
           <button
-            onClick={openAuthModal}
+            onClick={() => openAuthModal('/checkout-flow/checkout')}
             className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shrink-0 cursor-pointer shadow-md transition"
           >
             লগইন / রেজিস্টার করুন
@@ -271,31 +283,68 @@ export default function CheckoutPageContent() {
         <div className="flex-1 space-y-6">
           {/* ──── SHIPPING FORM ──── */}
           <div className="bg-white rounded-xl border border-slate-100 shadow-xs p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <h3 className="font-extrabold text-sm text-slate-900">
+                গ্রাহকের তথ্য
+              </h3>
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full">
+                প্রি-ফিল্ড (পরিবর্তনযোগ্য)
+              </span>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Full Name */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">
-                  Full Name <span className="text-red-500">*</span>
+                <label className="text-xs font-bold text-slate-700 block">
+                  আপনার নাম <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
+                  placeholder="আপনার পুরো নাম লিখুন"
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
                 />
               </div>
 
               {/* Phone Number */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">
-                  Phone Number <span className="text-red-500">*</span>
+                <label className="text-xs font-bold text-slate-700 block">
+                  ফোন নম্বর <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="Enter your phone number"
+                  placeholder="আপনার মোবাইল নম্বর লিখুন"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
+                />
+              </div>
+
+              {/* Email Address */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 block">
+                  ইমেইল এড্রেস (যদি থাকে)
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="আপনার ইমেইল এড্রেস লিখুন"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
+                />
+              </div>
+
+              {/* WhatsApp Number (যদি থাকে) */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 block">
+                  হোয়াটসঅ্যাপ নম্বর (যদি থাকে)
+                </label>
+                <input
+                  type="tel"
+                  value={whatsappNumber}
+                  onChange={e => setWhatsappNumber(e.target.value)}
+                  placeholder="আপনার হোয়াটসঅ্যাপ নম্বর লিখুন"
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
                 />
               </div>

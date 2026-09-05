@@ -47,7 +47,7 @@ export default function CartPageContent() {
   const handleCheckout = () => {
     if (selectedItems.length === 0) return;
     if (!isAuthenticated) {
-      openAuthModal();
+      openAuthModal('/checkout-flow/checkout');
       return;
     }
     router.push('/checkout-flow/checkout');

@@ -189,14 +189,14 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
   const cartItem = getItem(product.id);
 
   const handleBuyNow = () => {
-    if (!isAuthenticated) {
-      openAuthModal();
-      return;
-    }
     addItem({
       ...product,
       price: activePrice,
     });
+    if (!isAuthenticated) {
+      openAuthModal('/checkout-flow/checkout');
+      return;
+    }
     router.push('/checkout-flow/checkout');
   };
 

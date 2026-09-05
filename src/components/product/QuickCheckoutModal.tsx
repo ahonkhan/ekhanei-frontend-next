@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   X,
   User,
   Phone,
+  Mail,
+  MessageSquare,
   MapPin,
   CheckCircle2,
   CreditCard,
@@ -16,6 +18,8 @@ import {
 } from 'lucide-react';
 import { Product } from '@/types';
 import { useLocation } from '@/context/LocationContext';
+import { useAppSelector } from '@/store/hooks';
+import { useGetProfileQuery } from '@/store/services/apiService';
 
 interface QuickCheckoutModalProps {
   isOpen: boolean;
@@ -33,8 +37,28 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
   const router = useRouter();
   const { selectedLocation, openLocationDrawer } = useLocation();
 
-  const [name, setName] = useState('Md Aohinuzzaman');
-  const [phone, setPhone] = useState('01700000000');
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { data: profileApiData } = useGetProfileQuery(undefined, { skip: !isAuthenticated });
+
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+
+  useEffect(() => {
+    const activeUser = profileApiData?.user || user;
+    if (activeUser) {
+      if (activeUser.name && !name) setName(activeUser.name);
+      if (activeUser.phone && !phone) setPhone(activeUser.phone);
+      if (activeUser.email && !email) setEmail(activeUser.email);
+      if ((activeUser.whatsapp || activeUser.whatsapp_number) && !whatsappNumber) {
+        setWhatsappNumber(activeUser.whatsapp || activeUser.whatsapp_number || '');
+      } else if (activeUser.phone && !whatsappNumber) {
+        setWhatsappNumber(activeUser.phone);
+      }
+    }
+  }, [user, profileApiData]);
+
   const [deliveryOption, setDeliveryOption] = useState<'gps' | 'custom'>('gps');
   const [address, setAddress] = useState(selectedLocation.address);
   const [couponCode, setCouponCode] = useState('');
@@ -125,34 +149,66 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
               </div>
             </div>
 
-            {/* Form Field 1: Your Name */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-blue-500" />
-                <span>Your Full Name</span>
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="Enter your full name"
-                className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
-              />
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Form Field 1: Your Name */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-blue-500" />
+                  <span>আপনার নাম <span className="text-red-500">*</span></span>
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="আপনার পুরো নাম লিখুন"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                />
+              </div>
 
-            {/* Form Field 2: Mobile Number */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-blue-500" />
-                <span>Mobile Phone Number</span>
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                placeholder="Enter mobile phone number"
-                className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
-              />
+              {/* Form Field 2: Mobile Number */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-blue-500" />
+                  <span>ফোন নম্বর <span className="text-red-500">*</span></span>
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="আপনার ফোন নম্বর লিখুন"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                />
+              </div>
+
+              {/* Form Field 3: Email Address */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-blue-500" />
+                  <span>ইমেইল এড্রেস (যদি থাকে)</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="আপনার ইমেইল এড্রেস লিখুন"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                />
+              </div>
+
+              {/* Form Field 4: WhatsApp Number */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>হোয়াটসঅ্যাপ নম্বর (যদি থাকে)</span>
+                </label>
+                <input
+                  type="tel"
+                  value={whatsappNumber}
+                  onChange={e => setWhatsappNumber(e.target.value)}
+                  placeholder="আপনার হোয়াটসঅ্যাপ নম্বর লিখুন"
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                />
+              </div>
             </div>
 
             {/* Form Field 3: Delivery Address */}

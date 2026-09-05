@@ -8,20 +8,18 @@ import { useLocation } from '@/context/LocationContext';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
 import { useGetProfileQuery } from '@/store/services/apiService';
-import { AuthModal } from '@/components/auth/AuthModal';
 import { SearchInput } from '@/components/common/SearchInput';
 import { CategoryMenuDrawer } from '@/components/layout/CategoryMenuDrawer';
 import { Menu, Heart, ShoppingCart, ChevronDown, MapPin, User as UserIcon } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { totalItemsCount, setIsCartOpen } = useCart();
+  const { totalItemsCount, setIsCartOpen, openAuthModal } = useCart();
   const { selectedLocation, selectGPSLocation, openLocationDrawer } = useLocation();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
   const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   // Global Profile Fetch
@@ -186,7 +184,7 @@ export const Header: React.FC = () => {
             ) : (
               <button
                 type="button"
-                onClick={() => setIsAuthModalOpen(true)}
+                onClick={() => openAuthModal()}
                 className="flex h-full items-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 px-3 py-2 text-left text-white outline-none transition cursor-pointer border border-white/20 shadow-2xs"
               >
                 <UserIcon className="w-4 h-4 text-white" />
@@ -203,11 +201,6 @@ export const Header: React.FC = () => {
       <CategoryMenuDrawer
         isOpen={isMenuDrawerOpen}
         onClose={() => setIsMenuDrawerOpen(false)}
-      />
-
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
       />
     </>
   );
