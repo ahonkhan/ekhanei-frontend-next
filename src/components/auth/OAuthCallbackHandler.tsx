@@ -34,9 +34,20 @@ export const OAuthCallbackHandler = () => {
         })
       );
 
-      // Clean up URL parameters seamlessly without page reload
-      const cleanUrl = window.location.pathname;
-      router.replace(cleanUrl);
+      // Check if there is a target post-login redirect saved in sessionStorage (e.g. checkout)
+      const postLoginRedirect =
+        typeof window !== 'undefined' ? sessionStorage.getItem('post_login_redirect') : null;
+
+      if (postLoginRedirect) {
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('post_login_redirect');
+        }
+        router.replace(postLoginRedirect);
+      } else {
+        // Clean up URL parameters seamlessly without page reload
+        const cleanUrl = window.location.pathname;
+        router.replace(cleanUrl);
+      }
     }
   }, [searchParams, dispatch, router]);
 

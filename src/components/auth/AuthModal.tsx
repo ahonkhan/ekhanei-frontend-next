@@ -191,6 +191,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   // Handle Google Auth ("Continue with Google") via Socialite OAuth Redirect
   const handleGoogleSignIn = () => {
     setErrorMsg('');
+    if (typeof window !== 'undefined' && !sessionStorage.getItem('post_login_redirect')) {
+      const currentPath = window.location.pathname;
+      if (currentPath && currentPath !== '/') {
+        sessionStorage.setItem('post_login_redirect', currentPath);
+      }
+    }
     const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
     window.location.href = `${apiBase}/auth/google/redirect`;
   };
