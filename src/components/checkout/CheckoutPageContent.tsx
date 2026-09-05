@@ -76,11 +76,6 @@ export default function CheckoutPageContent() {
       if (activeUser.email && !email) {
         setEmail(activeUser.email);
       }
-      if ((activeUser.whatsapp || activeUser.whatsapp_number) && !whatsappNumber) {
-        setWhatsappNumber(activeUser.whatsapp || activeUser.whatsapp_number || '');
-      } else if (activeUser.phone && !whatsappNumber) {
-        setWhatsappNumber(activeUser.phone);
-      }
     }
   }, [user, profileApiData]);
 

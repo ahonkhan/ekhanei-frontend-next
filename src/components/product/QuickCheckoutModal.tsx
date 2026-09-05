@@ -51,11 +51,6 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
       if (activeUser.name && !name) setName(activeUser.name);
       if (activeUser.phone && !phone) setPhone(activeUser.phone);
       if (activeUser.email && !email) setEmail(activeUser.email);
-      if ((activeUser.whatsapp || activeUser.whatsapp_number) && !whatsappNumber) {
-        setWhatsappNumber(activeUser.whatsapp || activeUser.whatsapp_number || '');
-      } else if (activeUser.phone && !whatsappNumber) {
-        setWhatsappNumber(activeUser.phone);
-      }
     }
   }, [user, profileApiData]);
 
