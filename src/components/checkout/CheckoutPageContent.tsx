@@ -53,6 +53,14 @@ export default function CheckoutPageContent() {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
 
+  // Redirect unauthenticated users away from checkout page directly to home + Auth Modal
+  useEffect(() => {
+    if (!isAuthenticated) {
+      openAuthModal();
+      router.replace('/');
+    }
+  }, [isAuthenticated, router, openAuthModal]);
+
   // Auto-fill user profile info if logged in
   useEffect(() => {
     const activeUser = profileApiData?.user || user;

@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Trash2, Minus, Plus, ShoppingCart, Store } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAppSelector } from '@/store/hooks';
 import { StepProgressBar } from './StepProgressBar';
 
 export default function CartPageContent() {
   const router = useRouter();
-  const { cart, increment, decrement, removeItem, totalAmount, totalItemsCount } = useCart();
+  const { cart, increment, decrement, removeItem, totalAmount, totalItemsCount, openAuthModal } = useCart();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(cart.map(i => i.id)));
 
   const allSelected = cart.length > 0 && selectedIds.size === cart.length;
@@ -44,6 +46,10 @@ export default function CartPageContent() {
 
   const handleCheckout = () => {
     if (selectedItems.length === 0) return;
+    if (!isAuthenticated) {
+      openAuthModal();
+      return;
+    }
     router.push('/checkout-flow/checkout');
   };
 

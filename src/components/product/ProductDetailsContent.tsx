@@ -17,6 +17,7 @@ import {
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { QuickCheckoutModal } from '@/components/product/QuickCheckoutModal';
 import { useCart } from '@/context/CartContext';
+import { useAppSelector } from '@/store/hooks';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -59,7 +60,8 @@ interface ProductDetailsContentProps {
 
 export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ productId }) => {
   const router = useRouter();
-  const { addItem, increment, decrement, getItem, totalItemsCount, setIsCartOpen } = useCart();
+  const { addItem, increment, decrement, getItem, totalItemsCount, setIsCartOpen, openAuthModal } = useCart();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   
   const { data: product, isLoading } = useGetProductByIdQuery(productId);
   const { data: categoryProducts = [] } = useGetProductsQuery(
@@ -187,6 +189,10 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
   const cartItem = getItem(product.id);
 
   const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      openAuthModal();
+      return;
+    }
     addItem({
       ...product,
       price: activePrice,
