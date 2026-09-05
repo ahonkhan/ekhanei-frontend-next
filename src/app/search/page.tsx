@@ -28,6 +28,7 @@ function SearchResultsContent() {
 
   // Filters State
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<number>(20000);
   const [sortBy, setSortBy] = useState<string>('recommended');
@@ -45,11 +46,29 @@ function SearchResultsContent() {
     ];
   }, [categories]);
 
+  const brandsList = useMemo(() => {
+    const map = new Map<string, string>();
+    apiProducts.forEach((p: any) => {
+      const bId = p.brandId || p.brand_id;
+      const bName = p.brandName || p.brand_name || p.brand?.name;
+      if (bId && bName) {
+        map.set(String(bId), bName);
+      }
+    });
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [apiProducts]);
+
   const sizesList = ['1 pc', '1 kg', '500g', 'S', 'M', 'L', 'XL', '2XL'];
 
   const toggleCategory = (catId: string) => {
     setSelectedCategories((prev) =>
       prev.includes(catId) ? prev.filter((c) => c !== catId) : [...prev, catId]
+    );
+  };
+
+  const toggleBrand = (bId: string) => {
+    setSelectedBrands((prev) =>
+      prev.includes(bId) ? prev.filter((b) => b !== bId) : [...prev, bId]
     );
   };
 
@@ -61,6 +80,7 @@ function SearchResultsContent() {
 
   const clearFilters = () => {
     setSelectedCategories([]);
+    setSelectedBrands([]);
     setSelectedSizes([]);
     setPriceRange(20000);
   };
@@ -77,6 +97,13 @@ function SearchResultsContent() {
       );
     }
 
+    if (selectedBrands.length > 0) {
+      result = result.filter((p: any) => {
+        const pBrandId = String(p.brandId || p.brand_id || '');
+        return selectedBrands.includes(pBrandId);
+      });
+    }
+
     if (sortBy === 'price-low') {
       result = [...result].sort((a, b) => a.price - b.price);
     } else if (sortBy === 'price-high') {
@@ -84,7 +111,7 @@ function SearchResultsContent() {
     }
 
     return result;
-  }, [apiProducts, priceRange, selectedCategories, sortBy]);
+  }, [apiProducts, priceRange, selectedCategories, selectedBrands, sortBy]);
 
   return (
     <div className="min-h-screen bg-[#fbf9fa] text-[#191919]">
@@ -163,18 +190,24 @@ function SearchResultsContent() {
             </div>
 
             {/* Filter Section 2: Brand */}
-            <div className="mb-6 border-t border-slate-100 pt-4">
-              <h4 className="font-bold text-xs text-slate-900 mb-3">Brand</h4>
-              <div className="space-y-2 text-xs text-slate-700">
-                <label className="flex items-center gap-2.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="w-3.5 h-3.5 accent-[#d81b60] rounded border-slate-300 cursor-pointer"
-                  />
-                  <span>Manmode</span>
-                </label>
+            {brandsList.length > 0 && (
+              <div className="mb-6 border-t border-slate-100 pt-4">
+                <h4 className="font-bold text-xs text-slate-900 mb-3">Brand</h4>
+                <div className="space-y-2 text-xs text-slate-700 max-h-48 overflow-y-auto pr-1">
+                  {brandsList.map((brand) => (
+                    <label key={brand.id} className="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                      <input
+                        type="checkbox"
+                        checked={selectedBrands.includes(brand.id)}
+                        onChange={() => toggleBrand(brand.id)}
+                        className="w-3.5 h-3.5 accent-[#d81b60] rounded border-slate-300 cursor-pointer"
+                      />
+                      <span>{brand.name}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Filter Section 3: Price Range (0 - 20000) */}
             <div className="mb-6 border-t border-slate-100 pt-4">
@@ -413,16 +446,24 @@ function SearchResultsContent() {
             </div>
 
             {/* Brand */}
-            <div className="border-t border-slate-100 pt-4">
-              <h4 className="font-bold text-xs text-slate-900 mb-3">Brand</h4>
-              <label className="flex items-center gap-3 text-xs text-slate-700 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 accent-[#d81b60] rounded border-slate-300 cursor-pointer"
-                />
-                <span>Manmode</span>
-              </label>
-            </div>
+            {brandsList.length > 0 && (
+              <div className="border-t border-slate-100 pt-4">
+                <h4 className="font-bold text-xs text-slate-900 mb-3">Brand</h4>
+                <div className="space-y-2 text-xs text-slate-700 max-h-48 overflow-y-auto pr-1">
+                  {brandsList.map((brand) => (
+                    <label key={brand.id} className="flex items-center gap-3 cursor-pointer hover:text-slate-900">
+                      <input
+                        type="checkbox"
+                        checked={selectedBrands.includes(brand.id)}
+                        onChange={() => toggleBrand(brand.id)}
+                        className="w-4 h-4 accent-[#d81b60] rounded border-slate-300 cursor-pointer"
+                      />
+                      <span>{brand.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Price Range */}
             <div className="border-t border-slate-100 pt-4">

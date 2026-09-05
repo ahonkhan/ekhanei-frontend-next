@@ -271,16 +271,16 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                 <Link
                   key={brand.id}
                   href={`/search?q=${encodeURIComponent(brand.name)}&brandId=${brand.id}`}
-                  className="snap-start flex-shrink-0 w-28 h-28 sm:w-36 sm:h-36 aspect-square rounded-2xl bg-white border border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all duration-300 cursor-pointer select-none relative flex items-center justify-center p-2 group"
+                  className="snap-start flex-shrink-0 w-28 h-28 sm:w-36 sm:h-36 aspect-square rounded-2xl overflow-hidden border border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all duration-300 cursor-pointer select-none relative group"
                   title={brand.name}
                 >
                   <img
                     src={getImageUrl(brand.logo)}
                     alt={brand.name}
-                    className="w-full h-full object-contain p-1"
+                    className="w-full h-full object-cover"
                     loading="lazy"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-slate-900/75 backdrop-blur-xs text-white text-[11px] font-bold text-center py-1 truncate opacity-0 group-hover:opacity-100 transition-opacity rounded-b-2xl">
+                  <div className="absolute inset-x-0 bottom-0 bg-slate-900/80 backdrop-blur-xs text-white text-[11px] font-bold text-center py-1.5 px-1 truncate opacity-0 group-hover:opacity-100 transition-opacity">
                     {brand.name}
                   </div>
                 </Link>
