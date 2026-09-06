@@ -12,6 +12,7 @@ import { CartDrawer } from "@/components/layout/CartDrawer";
 import { Suspense } from "react";
 import { StoreProvider } from "@/store/provider";
 import { OAuthCallbackHandler } from "@/components/auth/OAuthCallbackHandler";
+import { DisableContextMenu } from "@/components/common/DisableContextMenu";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${inter.className}`}>
       <body className="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col pb-16 md:pb-0">
+        <DisableContextMenu />
         <StoreProvider>
           <Suspense fallback={null}>
             <OAuthCallbackHandler />
