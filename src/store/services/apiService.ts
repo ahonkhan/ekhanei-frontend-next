@@ -217,6 +217,13 @@ export const apiService = createApi({
       }),
       invalidatesTags: ['Orders'],
     }),
+    saveIncompleteOrder: builder.mutation<any, any>({
+      query: (orderData) => ({
+        url: '/orders/incomplete',
+        method: 'POST',
+        body: orderData,
+      }),
+    }),
     getUserOrders: builder.query<any[], void>({
       query: () => '/user/orders',
       transformResponse: (res: any) => res.data || [],
@@ -263,6 +270,7 @@ export const {
   useGetPublicVouchersQuery,
   useApplyCouponMutation,
   useCreateOrderMutation,
+  useSaveIncompleteOrderMutation,
   useGetUserOrdersQuery,
   useGetUserOrderDetailQuery,
   useTrackOrderQuery,

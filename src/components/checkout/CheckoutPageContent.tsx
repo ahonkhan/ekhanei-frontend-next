@@ -20,7 +20,7 @@ import { useCart } from '@/context/CartContext';
 import { useLocation } from '@/context/LocationContext';
 import { StepProgressBar } from './StepProgressBar';
 
-import { useCreateOrderMutation, useGetProfileQuery, useApplyCouponMutation } from '@/store/services/apiService';
+import { useCreateOrderMutation, useSaveIncompleteOrderMutation, useGetProfileQuery, useApplyCouponMutation } from '@/store/services/apiService';
 import { useAppSelector } from '@/store/hooks';
 
 // Haversine distance calculation in KM
@@ -44,7 +44,9 @@ export default function CheckoutPageContent() {
   const { cart, increment, decrement, removeItem, clearCart, openAuthModal } = useCart();
   const { selectedLocation, openLocationDrawer, userCoords } = useLocation();
   const [createOrder, { isLoading: isSubmitting }] = useCreateOrderMutation();
+  const [saveIncompleteOrder] = useSaveIncompleteOrderMutation();
   const [applyCoupon, { isLoading: isApplyingCoupon }] = useApplyCouponMutation();
+  const [draftOrderId, setDraftOrderId] = useState<string | null>(null);
 
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const { data: profileApiData } = useGetProfileQuery(undefined, { skip: !isAuthenticated });
@@ -195,6 +197,57 @@ export default function CheckoutPageContent() {
     return acc;
   }, {});
 
+  // Auto-save draft incomplete order for abandoned checkout tracking
+  useEffect(() => {
+    if (!fullName.trim() || !phone.trim() || selectedItems.length === 0) return;
+
+    const deliveryAddress =
+      deliveryOption === 'custom'
+        ? customAddress
+        : `${selectedLocation.title}, ${selectedLocation.address} ${houseDetail}`.trim();
+
+    const lat = selectedLocation.lat ?? userCoords?.lat ?? 25.7439;
+    const lng = selectedLocation.lng ?? userCoords?.lng ?? 89.2752;
+    const plusCode =
+      selectedLocation.plusCode ||
+      (userCoords ? `${userCoords.lat.toFixed(4)}, ${userCoords.lng.toFixed(4)}` : 'F6W3+38 Rangpur');
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await saveIncompleteOrder({
+          draft_id: draftOrderId || undefined,
+          customer_name: fullName,
+          customer_phone: phone,
+          customer_email: email.trim() || undefined,
+          delivery_address: deliveryAddress,
+          latitude: lat,
+          longitude: lng,
+          google_plus_code: plusCode,
+          distance_km: distanceKm,
+          payment_method: requiresFullPayment ? 'online_payment' : paymentMethod,
+          items: selectedItems.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+          })),
+          subtotal: productTotal,
+          delivery_fee: deliveryCharge,
+          total_amount: totalPayable,
+          notes: additionalNote,
+        }).unwrap();
+
+        if (res?.data?.draft_id) {
+          setDraftOrderId(res.data.draft_id);
+        }
+      } catch (err) {
+        // Silent catch for background draft recording
+      }
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [fullName, phone, email, deliveryOption, customAddress, houseDetail, selectedLocation, selectedItems, productTotal, deliveryCharge, totalPayable, paymentMethod, draftOrderId, requiresFullPayment, userCoords, distanceKm, additionalNote, saveIncompleteOrder]);
+
   const handlePlaceOrder = async () => {
     if (!isAuthenticated) {
       openAuthModal('/checkout-flow/checkout');
@@ -218,6 +271,7 @@ export default function CheckoutPageContent() {
 
     try {
       const res = await createOrder({
+        incomplete_order_id: draftOrderId || undefined,
         customer_name: fullName,
         customer_phone: phone,
         customer_email: email.trim() || undefined,
