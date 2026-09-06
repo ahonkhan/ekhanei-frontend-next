@@ -10,22 +10,12 @@ import { HeroBanner } from '@/types';
 
 export const HeroSlider: React.FC = () => {
   const { selectedLocation } = useLocation();
-  const { data: heroBanners } = useGetHeroBannersQuery();
+  const { data: heroBanners, isLoading } = useGetHeroBannersQuery();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const touchStartX = useRef(0);
 
-  const banners: HeroBanner[] = heroBanners && heroBanners.length > 0
-    ? heroBanners
-    : [
-        {
-          id: 'default-hero',
-          title: 'Ekhanei Home Banner',
-          image: '/home_banner.jpg',
-          link: ''
-        }
-      ];
-
+  const banners: HeroBanner[] = heroBanners || [];
   const total = banners.length;
 
   const nextSlide = useCallback(() => {
@@ -59,6 +49,40 @@ export const HeroSlider: React.FC = () => {
     }
   };
 
+  // Skeleton Loader while fetching backend banners
+  if (isLoading || !heroBanners) {
+    return (
+      <div className="w-full flex flex-col pt-0">
+        <section className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[160px] sm:min-h-[220px] md:min-h-[280px] w-full overflow-hidden z-30 bg-slate-200 animate-pulse">
+          {/* Shimmer background effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+
+          {/* Search Bar Overlay Centered at Bottom */}
+          <div className="absolute inset-0 z-20 flex items-end justify-center pb-3 sm:pb-4 md:pb-6 px-4 sm:px-6 pointer-events-none">
+            <div className="w-full max-w-[350px] md:max-w-[594px] xl:max-w-[694px] pointer-events-auto">
+              <SearchInput />
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // If backend returned no banners and not loading, show gradient container with search bar
+  if (total === 0) {
+    return (
+      <div className="w-full flex flex-col pt-0">
+        <section className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[160px] sm:min-h-[220px] md:min-h-[280px] w-full overflow-hidden z-30 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
+          <div className="absolute inset-0 z-20 flex items-end justify-center pb-3 sm:pb-4 md:pb-6 px-4 sm:px-6 pointer-events-none">
+            <div className="w-full max-w-[350px] md:max-w-[594px] xl:max-w-[694px] pointer-events-auto">
+              <SearchInput />
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full flex flex-col pt-0">
       {/* Hero Main Banner & Search Overlay Section */}
@@ -82,9 +106,6 @@ export const HeroSlider: React.FC = () => {
                 className={`object-cover object-center w-full h-full transition-opacity duration-700 ease-in-out absolute inset-0 ${
                   isActive ? 'opacity-100 scale-100 z-0' : 'opacity-0 scale-105 z-[-1] pointer-events-none'
                 }`}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/home_banner.jpg';
-                }}
               />
             );
 

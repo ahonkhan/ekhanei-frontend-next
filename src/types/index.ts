@@ -20,6 +20,7 @@ export interface Category {
   badge: string;
   slug?: string;
   title?: string;
+  requiresFullPayment?: boolean;
 }
 
 export interface ProductVariation {
@@ -76,6 +77,7 @@ export interface Product {
   exchangePolicy?: string;
   deliveryTime?: string;
   paymentMethod?: string;
+  requiresFullPayment?: boolean;
   variations?: ProductVariation[];
   variationAttributes?: VariationAttribute[];
   reviews?: ProductReview[];

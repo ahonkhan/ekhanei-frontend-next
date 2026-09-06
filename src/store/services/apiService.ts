@@ -86,6 +86,10 @@ export const apiService = createApi({
     }),
 
     // Banners & Catalog
+    getSiteSettings: builder.query<any, void>({
+      query: () => '/settings',
+      transformResponse: (res: any) => res.data || {},
+    }),
     getHeroBanners: builder.query<HeroBanner[], void>({
       query: () => '/banners/hero',
       transformResponse: (res: any) => res.data || [],
@@ -239,6 +243,7 @@ export const {
   useGetProfileQuery,
   useUpdateProfileMutation,
   useChangePasswordMutation,
+  useGetSiteSettingsQuery,
   useGetHeroBannersQuery,
   useGetPromoBannersQuery,
   useGetServiceCategoriesQuery,

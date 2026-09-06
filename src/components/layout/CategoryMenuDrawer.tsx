@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useGetCategoriesQuery, useGetServiceCategoriesQuery, useGetCategoryDetailQuery } from '@/store/services/apiService';
+import { useGetCategoriesQuery, useGetServiceCategoriesQuery, useGetCategoryDetailQuery, useGetSiteSettingsQuery } from '@/store/services/apiService';
 import { getImageUrl } from '@/utils/image';
 import {
   X,
@@ -12,8 +12,6 @@ import {
   Headphones,
   Mail,
   Phone,
-  MessageSquare,
-  Store,
   Search,
   ChevronRight,
   Grid,
@@ -132,9 +130,15 @@ const CategoryAccordionItem: React.FC<{
 };
 
 export const CategoryMenuDrawer: React.FC<CategoryMenuDrawerProps> = ({ isOpen, onClose }) => {
-  // Fetch real categories & service categories from backend
+  // Fetch real categories, service categories, and site settings from backend
   const { data: apiCategories = [], isLoading: isCategoriesLoading } = useGetCategoriesQuery();
   const { data: serviceCategories = [] } = useGetServiceCategoriesQuery();
+  const { data: siteSettings } = useGetSiteSettingsQuery();
+
+  const helplineTitle = siteSettings?.helpline_title || 'Govaly Helpline';
+  const helplinePhone = siteSettings?.helpline_phone || '+8801969901212';
+  const supportEmail = siteSettings?.support_email || 'support@govaly.com.bd';
+  const contactPhone = siteSettings?.contact_phone || '01969901212';
 
   // Search filter inside sidebar
   const [searchQuery, setSearchQuery] = useState('');
@@ -251,65 +255,46 @@ export const CategoryMenuDrawer: React.FC<CategoryMenuDrawerProps> = ({ isOpen, 
           {/* Bottom Contact & Seller Link Cards (Inside the same scrollable container) */}
           <div className="p-3.5 bg-slate-50 border-t border-slate-200/80 space-y-2 mt-auto">
             {/* Card 1: EkhaneHelpline */}
-            <a
-              href="tel:+8801969901212"
-              className="flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-300 transition group"
-            >
-              <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
-                <Headphones className="w-4 h-4 text-[#E2136E]" />
-                <span>Govaly Helpline</span>
-              </div>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
-            </a>
+            {helplinePhone && (
+              <a
+                href={`tel:${helplinePhone}`}
+                className="flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-300 transition group"
+              >
+                <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
+                  <Headphones className="w-4 h-4 text-[#E2136E]" />
+                  <span>{helplineTitle}</span>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
+              </a>
+            )}
 
             {/* Card 2: Support Email */}
-            <a
-              href="mailto:support@govaly.com.bd"
-              className="flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-300 transition group"
-            >
-              <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
-                <Mail className="w-4 h-4 text-[#E2136E]" />
-                <span className="truncate">support@govaly.com.bd</span>
-              </div>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
-            </a>
+            {supportEmail && (
+              <a
+                href={`mailto:${supportEmail}`}
+                className="flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-300 transition group"
+              >
+                <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
+                  <Mail className="w-4 h-4 text-[#E2136E]" />
+                  <span className="truncate">{supportEmail}</span>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
+              </a>
+            )}
 
-            {/* Card 3: Phone Number 1 */}
-            <a
-              href="tel:01969901212"
-              className="flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-300 transition group"
-            >
-              <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
-                <Phone className="w-4 h-4 text-[#E2136E]" />
-                <span>01969901212</span>
-              </div>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
-            </a>
-
-            {/* Card 4: Phone Number 2 */}
-            <a
-              href="tel:01907104920"
-              className="flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-300 transition group"
-            >
-              <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
-                <MessageSquare className="w-4 h-4 text-[#E2136E]" />
-                <span>01907104920</span>
-              </div>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
-            </a>
-
-            {/* Card 5: Become A Seller */}
-            <Link
-              href="/become-a-seller"
-              onClick={onClose}
-              className="flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-300 transition group"
-            >
-              <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
-                <Store className="w-4 h-4 text-[#E2136E]" />
-                <span>Become A Seller</span>
-              </div>
-              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
-            </Link>
+            {/* Card 3: Phone Number */}
+            {contactPhone && (
+              <a
+                href={`tel:${contactPhone}`}
+                className="flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-300 transition group"
+              >
+                <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
+                  <Phone className="w-4 h-4 text-[#E2136E]" />
+                  <span>{contactPhone}</span>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
+              </a>
+            )}
           </div>
         </div>
       </div>

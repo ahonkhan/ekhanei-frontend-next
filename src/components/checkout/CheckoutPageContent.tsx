@@ -84,7 +84,6 @@ export default function CheckoutPageContent() {
   const [customAddress, setCustomAddress] = useState('');
   const [additionalNote, setAdditionalNote] = useState('');
   const [makeDefault, setMakeDefault] = useState(false);
-
   // Coupon state
   const [couponInput, setCouponInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{
@@ -132,10 +131,25 @@ export default function CheckoutPageContent() {
     return Math.max(15, Math.ceil(distanceKm * 5));
   }, [distanceKm]);
 
+
+
   const discount = appliedCoupon ? appliedCoupon.discount_amount : 0;
   const totalPayable = Math.max(0, productTotal + deliveryCharge - discount);
 
-  // Handle Coupon Apply (Optional parameter codeToApply allows 1-click apply from available vouchers list)
+  // Check if any selected item in cart requires full payment
+  const requiresFullPayment = useMemo(() => {
+    return selectedItems.some((item: any) => item.requiresFullPayment || item.serviceCategoryRequiresFullPayment);
+  }, [selectedItems]);
+
+  const [paymentMethod, setPaymentMethod] = useState<'cash_on_delivery' | 'online_payment'>('cash_on_delivery');
+
+  useEffect(() => {
+    if (requiresFullPayment) {
+      setPaymentMethod('online_payment');
+    }
+  }, [requiresFullPayment]);
+
+  // Handle Coupon Apply
   const handleApplyCoupon = async (codeToApply?: string | React.MouseEvent) => {
     const code = (typeof codeToApply === 'string' ? codeToApply : couponInput).trim();
     if (!code) return;
@@ -200,6 +214,8 @@ export default function CheckoutPageContent() {
       selectedLocation.plusCode ||
       (userCoords ? `${userCoords.lat.toFixed(4)}, ${userCoords.lng.toFixed(4)}` : 'F6W3+38 Rangpur');
 
+    const selectedPayment = requiresFullPayment ? 'online_payment' : paymentMethod;
+
     try {
       const res = await createOrder({
         customer_name: fullName,
@@ -211,6 +227,7 @@ export default function CheckoutPageContent() {
         longitude: lng,
         google_plus_code: plusCode,
         distance_km: distanceKm,
+        payment_method: selectedPayment,
         coupon_code: appliedCoupon?.code || undefined,
         items: selectedItems.map((item) => ({
           id: item.id,
@@ -225,17 +242,96 @@ export default function CheckoutPageContent() {
       }).unwrap();
 
       clearCart();
+      if (res?.data?.payment_url) {
+        window.location.href = res.data.payment_url;
+        return;
+      }
       if (res?.data?.order_number) {
         router.push(`/checkout-flow/success?order=${res.data.order_number}`);
       } else {
         router.push('/checkout-flow/success');
       }
-    } catch (err) {
-      console.error('Order API error, continuing flow:', err);
-      clearCart();
-      router.push('/checkout-flow/success');
+    } catch (err: any) {
+      console.error('Order API error:', err);
+      if (err?.data?.message) {
+        alert(err.data.message);
+      } else {
+        clearCart();
+        router.push('/checkout-flow/success');
+      }
     }
   };
+
+  const renderPaymentMethodSection = () => (
+    <div className="space-y-2">
+      <span className="text-xs font-bold text-slate-700">পেমেন্ট মেথড (Payment Method)</span>
+
+      {requiresFullPayment && (
+        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold flex items-center gap-2">
+          <span>⚠️ আপনার কার্টে থাকা বিশেষ পণ্যের (যেমন কেক/সার্ভিস) জন্য ফুল অনলাইন পেমেন্ট করতে হবে। Cash on Delivery প্রযোজ্য নয়।</span>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        {/* Cash on Delivery */}
+        <button
+          type="button"
+          disabled={requiresFullPayment}
+          onClick={() => setPaymentMethod('cash_on_delivery')}
+          className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl border-2 transition text-left cursor-pointer ${
+            paymentMethod === 'cash_on_delivery' && !requiresFullPayment
+              ? 'border-emerald-500 bg-emerald-50/60 shadow-xs'
+              : requiresFullPayment
+              ? 'border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed'
+              : 'border-slate-200 hover:border-slate-300 bg-white'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+              paymentMethod === 'cash_on_delivery' && !requiresFullPayment ? 'border-emerald-600' : 'border-slate-300'
+            }`}>
+              {paymentMethod === 'cash_on_delivery' && !requiresFullPayment && (
+                <div className="w-2 h-2 rounded-full bg-emerald-600" />
+              )}
+            </div>
+            <div>
+              <span className={`text-xs font-bold block ${requiresFullPayment ? 'text-slate-400 font-normal' : 'text-slate-800'}`}>
+                Cash on Delivery
+              </span>
+              <span className="text-[10px] text-slate-500 block">পণ্য হাতে পেয়ে ক্যাশ প্রদান করুন</span>
+            </div>
+          </div>
+        </button>
+
+        {/* Online Payment */}
+        <button
+          type="button"
+          onClick={() => setPaymentMethod('online_payment')}
+          className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl border-2 transition text-left cursor-pointer ${
+            paymentMethod === 'online_payment'
+              ? 'border-emerald-500 bg-emerald-50/60 shadow-xs'
+              : 'border-slate-200 hover:border-slate-300 bg-white'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+              paymentMethod === 'online_payment' ? 'border-emerald-600' : 'border-slate-300'
+            }`}>
+              {paymentMethod === 'online_payment' && (
+                <div className="w-2 h-2 rounded-full bg-emerald-600" />
+              )}
+            </div>
+            <div>
+              <span className="text-xs font-bold text-slate-800 block">
+                Online Payment
+              </span>
+              <span className="text-[10px] text-emerald-600 font-semibold block">bKash, Nagad, Card বা যেকোনো ডিজিটাল পেমেন্ট</span>
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
 
   const isFormValid =
     isAuthenticated &&
@@ -567,15 +663,7 @@ export default function CheckoutPageContent() {
               </div>
 
               {/* Payment Method */}
-              <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-700">Payment Method</span>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 border-emerald-500 bg-emerald-50">
-                  <div className="w-4 h-4 rounded-full border-2 border-emerald-500 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  </div>
-                  <span className="text-xs font-bold text-emerald-700">Cash on Delivery</span>
-                </div>
-              </div>
+              {renderPaymentMethodSection()}
 
               <button
                 onClick={handlePlaceOrder}
@@ -735,15 +823,7 @@ export default function CheckoutPageContent() {
               </div>
 
               {/* Payment Method */}
-              <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-700">Payment Method</span>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 border-emerald-500 bg-emerald-50">
-                  <div className="w-4 h-4 rounded-full border-2 border-emerald-500 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  </div>
-                  <span className="text-xs font-bold text-emerald-700">Cash on Delivery</span>
-                </div>
-              </div>
+              {renderPaymentMethodSection()}
 
               <button
                 onClick={handlePlaceOrder}
