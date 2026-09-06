@@ -266,9 +266,9 @@ export const Footer: React.FC = () => {
         </div>
       </footer>
 
-      {/* MOBILE BOTTOM NAVIGATION BAR (Flush at bottom 0 with top border only) */}
+      {/* MOBILE BOTTOM NAVIGATION BAR (Flush at bottom 0 with top shadow only) */}
       {!isProductPage && (
-        <div className="fixed inset-x-0 bottom-0 z-50 flex flex-row justify-center items-center py-2 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] md:hidden border-t border-solid border-[#d81b60] bg-white backdrop-blur-md transition-all duration-300 ease-in-out">
+        <div className="fixed inset-x-0 bottom-0 z-50 flex flex-row justify-center items-center py-2 px-4 shadow-[0_-4px_18px_rgba(216,27,96,0.35)] md:hidden bg-white backdrop-blur-md transition-all duration-300 ease-in-out">
           <div className="flex items-center justify-between w-full">
 
             {/* 1. Home */}
