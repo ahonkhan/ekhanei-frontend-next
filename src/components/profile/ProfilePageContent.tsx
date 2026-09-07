@@ -944,189 +944,47 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                 <div>
                   <div className="flex items-center gap-2.5">
                     <Palette className="w-6 h-6 text-theme-primary" />
-                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                      App Theme & Customization
+                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                      App Theme & Customization (থিম কাস্টমাইজেশন)
                     </h1>
                   </div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">
-                    পছন্দের কালার স্কিম, লাইট/ডার্ক মোড ও সলিড/গ্র্যাডিয়েন্ট থিম কাস্টমাইজ করুন
+                  <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5">
+                    পছন্দের কালার স্কিম, লাইট/ডার্ক মোড ও সলিড/গ্র্যাডিয়েন্ট থিম মোডাল পপআপ থেকে নির্বাচন করুন
                   </p>
                 </div>
 
-                {/* APP SETTINGS CARD */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4 max-w-3xl">
-                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2.5">
-                    App Settings
-                  </h3>
-
-                  {/* Row 1: Theme Mode (Light ☀️ / Dark 🌙 Switch) */}
-                  <div className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800/60">
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
-                        <Sun className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                      </div>
-                      <div>
-                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Theme Mode</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Choose your preferred theme</p>
-                      </div>
+                {/* APP THEME MODAL LAUNCHER CARD */}
+                <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-6 max-w-2xl">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-theme-primary-light text-theme-primary flex items-center justify-center shrink-0 border border-theme-primary/20">
+                      <Palette className="w-7 h-7" />
                     </div>
-
-                    <div className="inline-flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
-                      <button
-                        type="button"
-                        onClick={() => setThemeMode('light')}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
-                          themeMode === 'light'
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                        }`}
-                      >
-                        <Sun className="w-3.5 h-3.5" />
-                        <span>Light</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setThemeMode('dark')}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
-                          themeMode === 'dark'
-                            ? 'bg-slate-800 text-white shadow-xs'
-                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                        }`}
-                      >
-                        <Moon className="w-3.5 h-3.5" />
-                        <span>Dark</span>
-                      </button>
+                    <div>
+                      <h3 className="font-extrabold text-base sm:text-lg text-slate-900">
+                        Current Active Theme: <span className="text-theme-primary font-black">{currentTheme.name}</span>
+                      </h3>
+                      <p className="text-xs text-slate-500 font-medium mt-1">
+                        {currentTheme.description}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Row 2: Color Finish (Solid vs Gradient Switch) */}
-                  <div className="flex items-center justify-between py-2">
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
-                        <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                      </div>
-                      <div>
-                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Color Finish</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Solid or Gradient style background finish</p>
-                      </div>
+                  <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3 justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-600">Primary Color:</span>
+                      <span className="w-4 h-4 rounded-full shadow-xs border border-slate-300 inline-block" style={{ backgroundColor: currentTheme.primary }} />
+                      <span className="text-xs font-mono font-bold text-slate-800">{currentTheme.primary}</span>
                     </div>
 
-                    <div className="inline-flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
-                      <button
-                        type="button"
-                        onClick={() => setThemeStyle('solid')}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
-                          themeStyle === 'solid'
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                        }`}
-                      >
-                        <Layers className="w-3.5 h-3.5" />
-                        <span>Solid</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setThemeStyle('gradient')}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
-                          themeStyle === 'gradient'
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                        }`}
-                      >
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>Gradient</span>
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsThemeModalOpen(true)}
+                      className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span>Open Theme Customizer Modal</span>
+                    </button>
                   </div>
-                </div>
-
-                {/* THEME PRESET CARDS GRID */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {themes.map((themeItem) => {
-                    const isSelected = currentTheme.id === themeItem.id;
-                    return (
-                      <div
-                        key={themeItem.id}
-                        onClick={() => setThemeById(themeItem.id)}
-                        className={`bg-white dark:bg-slate-900 rounded-2xl border-2 p-5 shadow-xs transition-all cursor-pointer flex flex-col justify-between space-y-4 group relative overflow-hidden ${
-                          isSelected
-                            ? 'border-emerald-600 dark:border-emerald-400 ring-2 ring-emerald-500/20 shadow-md bg-emerald-50/20 dark:bg-emerald-950/20'
-                            : 'border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm'
-                        }`}
-                      >
-                        {/* Top row */}
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-center gap-3.5">
-                            {/* Color Swatch Preview Box */}
-                            <div
-                              className="w-12 h-12 rounded-xl shadow-xs overflow-hidden flex shrink-0 border border-slate-200 dark:border-slate-700"
-                              style={{
-                                background: themeStyle === 'solid' ? themeItem.primary : themeItem.gradient,
-                              }}
-                            />
-
-                            <div>
-                              <div className="flex items-center gap-1.5">
-                                <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
-                                  {themeItem.name}
-                                </h3>
-                                {themeItem.id === 'ekhanei-classic' && (
-                                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800">
-                                    <Sparkles className="w-2.5 h-2.5" /> লোগো থিম
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                                {themeItem.nameBn}
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Radio Indicator */}
-                          <div className="shrink-0">
-                            <div
-                              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                isSelected
-                                  ? 'border-emerald-600 bg-emerald-600 text-white'
-                                  : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400'
-                              }`}
-                            >
-                              {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800">
-                          {themeItem.description}
-                        </p>
-
-                        {/* Apply Action Bar */}
-                        <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800">
-                          <div className="flex items-center gap-2">
-                            <span className="w-3 h-3 rounded-full shadow-2xs" style={{ backgroundColor: themeItem.primary }} />
-                            <span className="w-3 h-3 rounded-full shadow-2xs" style={{ backgroundColor: themeItem.secondary }} />
-                            <span className="text-[11px] font-mono text-slate-400 font-bold">{themeItem.primary}</span>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setThemeById(themeItem.id);
-                            }}
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                              isSelected
-                                ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
-                            }`}
-                          >
-                            {isSelected ? 'Active Theme' : 'Apply Theme'}
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
             )}
