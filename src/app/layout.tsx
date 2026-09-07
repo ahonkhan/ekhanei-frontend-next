@@ -3,11 +3,13 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { LocationProvider } from "@/context/LocationContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { LocationDrawer } from "@/components/layout/LocationDrawer";
 import { LocationBlockModal } from "@/components/layout/LocationBlockModal";
 import { CartDrawer } from "@/components/layout/CartDrawer";
+import { ThemeSwitcherModal } from "@/components/common/ThemeSwitcherModal";
 
 import { Suspense } from "react";
 import { StoreProvider } from "@/store/provider";
@@ -41,21 +43,25 @@ export default function RootLayout({
       <body className="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col pb-16 md:pb-0">
         <DisableContextMenu />
         <StoreProvider>
-          <Suspense fallback={null}>
-            <OAuthCallbackHandler />
-          </Suspense>
-          <LocationProvider>
-            <CartProvider>
-              <Header />
-              <div className="flex-1">{children}</div>
-              <Footer />
-              <LocationDrawer />
-              <LocationBlockModal />
-              <CartDrawer />
-            </CartProvider>
-          </LocationProvider>
+          <ThemeProvider>
+            <Suspense fallback={null}>
+              <OAuthCallbackHandler />
+            </Suspense>
+            <LocationProvider>
+              <CartProvider>
+                <Header />
+                <div className="flex-1">{children}</div>
+                <Footer />
+                <LocationDrawer />
+                <LocationBlockModal />
+                <CartDrawer />
+                <ThemeSwitcherModal />
+              </CartProvider>
+            </LocationProvider>
+          </ThemeProvider>
         </StoreProvider>
       </body>
     </html>
   );
 }
+

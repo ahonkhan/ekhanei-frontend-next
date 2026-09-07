@@ -1,5 +1,77 @@
 @import "tailwindcss";
 
+:root {
+  --color-primary: #F56E09;
+  --color-primary-hover: #E06000;
+  --color-primary-light: #FFF7ED;
+  --color-secondary: #00A651;
+  --color-secondary-hover: #008C44;
+  --color-secondary-light: #F0FDF4;
+  --color-brand-gradient: linear-gradient(135deg, #F56E09 0%, #00A651 100%);
+  --color-primary-gradient: linear-gradient(135deg, #FF8F00 0%, #F56E09 100%);
+  --color-secondary-gradient: linear-gradient(135deg, #00C853 0%, #00A651 100%);
+}
+
+[data-theme="ekhanei-classic"] {
+  --color-primary: #F56E09;
+  --color-primary-hover: #E06000;
+  --color-primary-light: #FFF7ED;
+  --color-secondary: #00A651;
+  --color-secondary-hover: #008C44;
+  --color-secondary-light: #F0FDF4;
+  --color-brand-gradient: linear-gradient(135deg, #F56E09 0%, #00A651 100%);
+  --color-primary-gradient: linear-gradient(135deg, #FF8F00 0%, #F56E09 100%);
+  --color-secondary-gradient: linear-gradient(135deg, #00C853 0%, #00A651 100%);
+}
+
+[data-theme="royal-ocean"] {
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-light: #EFF6FF;
+  --color-secondary: #F59E0B;
+  --color-secondary-hover: #D97706;
+  --color-secondary-light: #FFFBEB;
+  --color-brand-gradient: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
+  --color-primary-gradient: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  --color-secondary-gradient: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+}
+
+[data-theme="cyber-violet"] {
+  --color-primary: #7C3AED;
+  --color-primary-hover: #6D28D9;
+  --color-primary-light: #F5F3FF;
+  --color-secondary: #EC4899;
+  --color-secondary-hover: #DB2777;
+  --color-secondary-light: #FDF2F8;
+  --color-brand-gradient: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+  --color-primary-gradient: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  --color-secondary-gradient: linear-gradient(135deg, #F472B6 0%, #EC4899 100%);
+}
+
+[data-theme="eco-nature"] {
+  --color-primary: #059669;
+  --color-primary-hover: #047857;
+  --color-primary-light: #ECFDF5;
+  --color-secondary: #84CC16;
+  --color-secondary-hover: #65A30D;
+  --color-secondary-light: #F7FEE7;
+  --color-brand-gradient: linear-gradient(135deg, #059669 0%, #84CC16 100%);
+  --color-primary-gradient: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  --color-secondary-gradient: linear-gradient(135deg, #A3E635 0%, #84CC16 100%);
+}
+
+[data-theme="speed-express"] {
+  --color-primary: #E11D48;
+  --color-primary-hover: #BE123C;
+  --color-primary-light: #FFF1F2;
+  --color-secondary: #334155;
+  --color-secondary-hover: #1E293B;
+  --color-secondary-light: #F8FAFC;
+  --color-brand-gradient: linear-gradient(135deg, #E11D48 0%, #F43F5E 100%);
+  --color-primary-gradient: linear-gradient(135deg, #F43F5E 0%, #E11D48 100%);
+  --color-secondary-gradient: linear-gradient(135deg, #475569 0%, #334155 100%);
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -7,6 +79,28 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Dynamic Theme Utility Classes */
+  .bg-theme-primary { background-color: var(--color-primary) !important; }
+  .bg-theme-primary-hover:hover { background-color: var(--color-primary-hover) !important; }
+  .text-theme-primary { color: var(--color-primary) !important; }
+  .border-theme-primary { border-color: var(--color-primary) !important; }
+  .bg-theme-primary-light { background-color: var(--color-primary-light) !important; }
+
+  .bg-theme-secondary { background-color: var(--color-secondary) !important; }
+  .bg-theme-secondary-hover:hover { background-color: var(--color-secondary-hover) !important; }
+  .text-theme-secondary { color: var(--color-secondary) !important; }
+  .border-theme-secondary { border-color: var(--color-secondary) !important; }
+  .bg-theme-secondary-light { background-color: var(--color-secondary-light) !important; }
+
+  .bg-brand-gradient { background: var(--color-brand-gradient) !important; }
+  .bg-primary-gradient { background: var(--color-primary-gradient) !important; }
+  .bg-secondary-gradient { background: var(--color-secondary-gradient) !important; }
+  .text-brand-gradient {
+    background: var(--color-brand-gradient) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
   }
 }
 
@@ -36,7 +130,7 @@ body {
   transition: all 0.3s ease !important;
 }
 .promo-swiper .swiper-pagination-bullet-active {
-  background: #10b981 !important;
+  background: var(--color-secondary) !important;
   opacity: 1 !important;
   width: 24px !important;
   border-radius: 9999px !important;
@@ -65,6 +159,7 @@ body {
   transition: transform 700ms cubic-bezier(0.25, 1, 0.5, 1) !important;
   opacity: 1 !important;
 }
+
 
 
 

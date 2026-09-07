@@ -81,13 +81,13 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
                 }}
                 aria-label={`Go to image ${idx + 1}`}
                 className={`w-[5px] h-[5px] md:w-1.5 md:h-1.5 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer ${activeImgIdx === idx
-                    ? 'bg-[#d81b60] border-[#d81b60] shadow scale-105'
+                    ? 'bg-theme-primary border-theme-primary shadow scale-105'
                     : 'bg-[#C3C3C3]/70 hover:bg-black/40'
                   }`}
                 style={{
                   boxShadow:
                     activeImgIdx === idx
-                      ? 'rgba(216, 27, 96, 0.18) 0px 1px 4px 0px'
+                      ? 'rgba(245, 110, 9, 0.18) 0px 1px 4px 0px'
                       : 'rgba(31, 38, 135, 0.1) 0px 1px 2px 0px',
                   transition: '0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
                   backdropFilter: 'blur(3px)',
@@ -111,7 +111,7 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
 
           {/* Price Strip: Current Price + Strikethrough Price + (% OFF) */}
           <div className="flex items-center flex-wrap space-x-0.5 text-left">
-            <p className="text-[#d81b60] font-semibold text-[12px] md:text-[17.23px]">
+            <p className="text-theme-primary font-semibold text-[12px] md:text-[17.23px]">
               ৳{product.price}
             </p>
             <p className="line-through font-normal text-[12px] md:text-[13.8px] text-gray-500">

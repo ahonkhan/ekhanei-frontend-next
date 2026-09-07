@@ -51,7 +51,7 @@ export const Footer: React.FC = () => {
 
                 <div className="flex py-4 flex-col gap-2 text-left">
                   <p className="font-semibold text-[14px]">
-                    Download <span className="text-[#d81b60]">Ekhanei</span> Mobile App
+                    Download <span className="text-theme-primary">Ekhanei</span> Mobile App
                   </p>
                   <div className="flex gap-3">
                     <a
@@ -268,12 +268,12 @@ export const Footer: React.FC = () => {
 
       {/* MOBILE BOTTOM NAVIGATION BAR (Flush at bottom 0 with top border and top rounded corners) */}
       {!isProductPage && (
-        <div className="fixed inset-x-0 bottom-0 z-50 flex flex-row justify-center items-center py-2 px-4 border-t border-solid border-[#d81b60] rounded-t-2xl md:hidden bg-white backdrop-blur-md transition-all duration-300 ease-in-out">
+        <div className="fixed inset-x-0 bottom-0 z-50 flex flex-row justify-center items-center py-2 px-4 border-t border-solid border-theme-primary rounded-t-2xl md:hidden bg-white backdrop-blur-md transition-all duration-300 ease-in-out">
           <div className="flex items-center justify-between w-full">
 
             {/* 1. Home */}
-            <Link href="/" className="flex flex-col items-center justify-center gap-0.5 text-xs text-[#d81b60] font-bold cursor-pointer hover:scale-105 transition-transform">
-              <Home className="w-5 h-5 text-[#d81b60]" />
+            <Link href="/" className="flex flex-col items-center justify-center gap-0.5 text-xs text-theme-primary font-bold cursor-pointer hover:scale-105 transition-transform">
+              <Home className="w-5 h-5 text-theme-primary" />
               <span className="text-[10px]">Home</span>
             </Link>
 
@@ -296,7 +296,7 @@ export const Footer: React.FC = () => {
               <div className="relative">
                 <ShoppingCart className="w-5 h-5 text-gray-600" />
                 {totalItemsCount > 0 && (
-                  <span className="absolute -top-2 -right-3 h-4 min-w-[16px] px-1 rounded-full bg-[#d81b60] text-white text-[9px] font-extrabold flex items-center justify-center border border-white">
+                  <span className="absolute -top-2 -right-3 h-4 min-w-[16px] px-1 rounded-full bg-theme-primary text-white text-[9px] font-extrabold flex items-center justify-center border border-white">
                     {totalItemsCount}
                   </span>
                 )}

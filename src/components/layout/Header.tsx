@@ -5,17 +5,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useLocation } from '@/context/LocationContext';
+import { useTheme } from '@/context/ThemeContext';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
 import { useGetProfileQuery } from '@/store/services/apiService';
 import { SearchInput } from '@/components/common/SearchInput';
 import { CategoryMenuDrawer } from '@/components/layout/CategoryMenuDrawer';
-import { Menu, Heart, ShoppingCart, ChevronDown, MapPin, User as UserIcon } from 'lucide-react';
+import { Menu, Heart, ShoppingCart, ChevronDown, MapPin, User as UserIcon, Palette } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const { totalItemsCount, setIsCartOpen, openAuthModal } = useCart();
   const { selectedLocation, selectGPSLocation, openLocationDrawer } = useLocation();
+  const { toggleThemeModal, currentTheme } = useTheme();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
@@ -53,17 +55,28 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        <a
-          href="https://play.google.com/store/apps/details?id=com.ekhanei.customer.app&pcampaignid=web_share"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="py-1.5 px-4 rounded-full bg-[#d81b60] hover:bg-[#c2185b] active:bg-[#a8144b] text-white font-extrabold text-xs shadow-xs transition active:scale-95 cursor-pointer inline-flex items-center justify-center"
-        >
-          Open App
-        </a>
+        <div className="flex items-center gap-2">
+          {/* Mobile Theme Trigger */}
+          <button
+            onClick={toggleThemeModal}
+            className="p-1.5 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+            title="থিম পরির্বতন করুন"
+          >
+            <Palette className="w-4 h-4 text-theme-primary" />
+          </button>
+
+          <a
+            href="https://play.google.com/store/apps/details?id=com.ekhanei.customer.app&pcampaignid=web_share"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="py-1.5 px-3.5 rounded-full bg-theme-primary hover:bg-theme-primary-hover active:scale-95 text-white font-extrabold text-xs shadow-xs transition cursor-pointer inline-flex items-center justify-center"
+          >
+            Open App
+          </a>
+        </div>
       </div>
 
-      <header className="w-full transition-all ease-in-out duration-500 sticky top-0 left-0 right-0 z-[1000] overflow-visible h-[50px] md:h-18 text-white bg-[#d81b60] backdrop-blur-md shadow-md">
+      <header className="w-full transition-all ease-in-out duration-500 sticky top-0 left-0 right-0 z-[1000] overflow-visible h-[50px] md:h-18 text-white bg-brand-gradient backdrop-blur-md shadow-md">
         <div className="h-13 md:h-full w-full flex justify-between items-center pr-4 sm:pr-7 pl-3.5 max-w-[1680px] mx-auto">
 
           {/* Left: Hamburger Menu & Logo */}
@@ -106,6 +119,19 @@ export const Header: React.FC = () => {
 
           {/* Right: Actions */}
           <div className="min-w-fit hidden gap-3 md:flex justify-between items-center">
+
+            {/* Theme Selector Trigger Button */}
+            <button
+              type="button"
+              onClick={toggleThemeModal}
+              className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-3 py-2 flex flex-col items-center justify-center cursor-pointer gap-0 bg-white/15 border border-white/25 hover:bg-white/25 shadow-2xs"
+              title="থিম পরিবর্তন করুন"
+            >
+              <div className="flex items-center gap-1">
+                <Palette className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-[10px] font-bold">Theme</span>
+            </button>
 
             {/* Download App Tooltip */}
             <a
@@ -158,7 +184,7 @@ export const Header: React.FC = () => {
               <div className="relative">
                 <ShoppingCart className="w-5 h-5" />
                 {totalItemsCount > 0 && (
-                  <span className="absolute flex items-center justify-center -top-2.5 -right-3 h-4.5 w-4.5 rounded-full bg-white text-[#d81b60] text-[11px] font-bold shadow-xs">
+                  <span className="absolute flex items-center justify-center -top-2.5 -right-3 h-4.5 w-4.5 rounded-full bg-white text-theme-primary text-[11px] font-bold shadow-xs">
                     {totalItemsCount}
                   </span>
                 )}
@@ -218,3 +244,4 @@ export const Header: React.FC = () => {
     </>
   );
 };
+

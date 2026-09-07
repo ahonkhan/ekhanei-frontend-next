@@ -57,7 +57,7 @@ export const TrustBadges: React.FC = () => {
                 />
               </div>
               <span className="text-gray-800 font-medium text-[16.6px]">
-                Delivery Within <span className="text-[#d81b60]">48hrs</span>
+                Delivery Within <span className="text-theme-primary">48hrs</span>
               </span>
             </div>
           </div>
@@ -130,7 +130,7 @@ export const TrustBadges: React.FC = () => {
               src="https://govaly.com.bd/assets/delivery/image-3.png"
             />
             <span className="text-gray-800 font-medium text-[8px] leading-tight text-center">
-              Delivery Within <span className="text-[#d81b60]">48 hrs</span>
+              Delivery Within <span className="text-theme-primary">48 hrs</span>
             </span>
           </div>
         </div>

@@ -282,7 +282,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
           <button
             type="button"
             onClick={() => openAuthModal('/profile')}
-            className="w-full py-3.5 px-6 rounded-xl bg-[#d81b60] hover:bg-[#b0144d] active:scale-[0.99] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
+            className="w-full py-3.5 px-6 rounded-xl bg-theme-primary hover:bg-theme-primary-hover active:scale-[0.99] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
           >
             Sign In / Register
           </button>

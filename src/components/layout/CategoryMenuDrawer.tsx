@@ -95,7 +95,7 @@ const CategoryAccordionItem: React.FC<{
           <Link
             href={catUrl}
             onClick={onClose}
-            className="flex items-center justify-between text-[#d81b60] hover:text-[#b0144d] font-black italic py-1.5 px-3 rounded-lg hover:bg-pink-50/80 transition"
+            className="flex items-center justify-between text-theme-primary hover:text-theme-primary-hover font-black italic py-1.5 px-3 rounded-lg hover:bg-slate-100 transition"
           >
             <span>See All</span>
             <ChevronRight className="w-3.5 h-3.5" />

@@ -88,7 +88,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 
           <button
             type="submit"
-            className={`inline-flex items-center justify-center gap-2 shrink-0 font-medium shadow-xs cursor-pointer outline-none hover:scale-105 transition-transform duration-200 px-4 py-2 bg-[#d81b60] hover:bg-[#c2185b] rounded-full text-white h-full text-[10px] md:text-[16px] ${buttonClassName}`}
+            className={`inline-flex items-center justify-center gap-2 shrink-0 font-medium shadow-xs cursor-pointer outline-none hover:scale-105 transition-transform duration-200 px-4 py-2 bg-theme-primary hover:bg-theme-primary-hover rounded-full text-white h-full text-[10px] md:text-[16px] ${buttonClassName}`}
           >
             {buttonText}
           </button>
@@ -108,7 +108,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
                   <div
                     key={product.id}
                     onClick={() => handleSelectProduct(product.id)}
-                    className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-pink-50/60 transition cursor-pointer group"
+                    className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-slate-50 transition cursor-pointer group"
                   >
                     {/* Product Thumbnail Image */}
                     <img
@@ -119,11 +119,11 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 
                     {/* Product Name & Price */}
                     <div className="flex-1 min-w-0 text-left">
-                      <p className="text-xs sm:text-sm font-medium text-slate-900 group-hover:text-[#d81b60] transition-colors truncate">
+                      <p className="text-xs sm:text-sm font-medium text-slate-900 group-hover:text-theme-primary transition-colors truncate">
                         {product.name}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs font-bold text-[#d81b60]">
+                        <span className="text-xs font-bold text-theme-primary">
                           ৳{product.price.toLocaleString()}
                         </span>
                         {product.oldPrice && product.oldPrice > product.price && (
@@ -141,7 +141,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="w-full py-3 px-4 bg-slate-50 hover:bg-pink-100/50 text-[#d81b60] text-xs font-bold text-center cursor-pointer transition flex items-center justify-center gap-1.5"
+                className="w-full py-3 px-4 bg-slate-50 hover:bg-slate-100 text-theme-primary text-xs font-bold text-center cursor-pointer transition flex items-center justify-center gap-1.5"
               >
                 <span>See all results for "{query}"</span>
                 <ArrowRight className="w-3.5 h-3.5" />

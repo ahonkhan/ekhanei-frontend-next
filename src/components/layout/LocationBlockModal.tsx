@@ -37,7 +37,7 @@ export const LocationBlockModal: React.FC = () => {
         {/* Enable GPS Button */}
         <button
           onClick={selectGPSLocation}
-          className="w-full py-3.5 px-6 rounded-2xl bg-[#d81b60] hover:bg-[#c2185b] text-white font-extrabold text-sm sm:text-base shadow-lg shadow-pink-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-3.5 px-6 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover text-white font-extrabold text-sm sm:text-base shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
           <Navigation className="w-5 h-5 fill-white" />
           <span>Allow GPS Access / এলাকা শনাক্ত করুন</span>
