@@ -95,12 +95,12 @@ export const Footer: React.FC = () => {
                 <div className="hidden md:block">
                   <h3 className="font-semibold mb-3">EkhaneiPolicies</h3>
                   <ul className="space-y-1 min-w-[230px]">
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/return-refund-policy">Return & Refund Policy</Link></li>
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/exchange-policy">Exchange Policy</Link></li>
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/shipping-delivery-policy">Shipping & Delivery Policy</Link></li>
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/cancellation-policy">Cancellation Policy</Link></li>
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/privacy-policy">Privacy Policy</Link></li>
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/terms-conditions">Terms & Conditions</Link></li>
+                    <li><Link className="hover:text-theme-primary transition-colors" href="/return-refund-policy">Return & Refund Policy</Link></li>
+                    <li><Link className="hover:text-theme-primary transition-colors" href="/exchange-policy">Exchange Policy</Link></li>
+                    <li><Link className="hover:text-theme-primary transition-colors" href="/shipping-delivery-policy">Shipping & Delivery Policy</Link></li>
+                    <li><Link className="hover:text-theme-primary transition-colors" href="/cancellation-policy">Cancellation Policy</Link></li>
+                    <li><Link className="hover:text-theme-primary transition-colors" href="/privacy-policy">Privacy Policy</Link></li>
+                    <li><Link className="hover:text-theme-primary transition-colors" href="/terms-conditions">Terms & Conditions</Link></li>
                   </ul>
                 </div>
 
