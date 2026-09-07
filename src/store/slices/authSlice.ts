@@ -4,6 +4,7 @@ interface UserProfile {
   id: string;
   name: string;
   phone: string;
+  whatsapp_number?: string;
   email?: string;
   avatar?: string;
 }

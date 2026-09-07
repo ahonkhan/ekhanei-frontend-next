@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import Pusher from 'pusher-js';
 import { 
   Search, 
   Truck, 
@@ -19,7 +20,11 @@ import {
   FileCheck,
   ShieldCheck,
   Home,
-  Loader2
+  Loader2,
+  Radio,
+  User,
+  Star,
+  Sparkles,
 } from 'lucide-react';
 import { LiveRiderMap } from '@/components/track/LiveRiderMap';
 import { useTrackOrderQuery } from '@/store/services/apiService';
@@ -68,9 +73,13 @@ export const TrackOrderContent: React.FC = () => {
   const [activeQuery, setActiveQuery] = useState(initialParam || '');
   const [searched, setSearched] = useState(!!initialParam);
 
-  const { data: apiTrackData, isLoading: isTrackingLoading, isError } = useTrackOrderQuery(activeQuery, {
+  const { data: apiTrackData, isLoading: isTrackingLoading } = useTrackOrderQuery(activeQuery, {
     skip: !activeQuery,
   });
+
+  const [liveRider, setLiveRider] = useState<any>(null);
+  const [liveStatus, setLiveStatus] = useState<TrackedOrder['status'] | null>(null);
+  const [isPusherConnected, setIsPusherConnected] = useState(false);
 
   useEffect(() => {
     if (initialParam) {
@@ -80,6 +89,73 @@ export const TrackOrderContent: React.FC = () => {
     }
   }, [initialParam]);
 
+  // Sync state when initial API track data returns
+  useEffect(() => {
+    if (apiTrackData) {
+      if (apiTrackData.rider) {
+        setLiveRider({
+          id: apiTrackData.rider.id,
+          name: apiTrackData.rider.name,
+          phone: apiTrackData.rider.phone,
+          vehicle: apiTrackData.rider.vehicle || 'Motorbike Express',
+          rating: `${apiTrackData.rider.rating || 4.9} ★`,
+          photo: apiTrackData.rider.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+          current_latitude: apiTrackData.rider.current_latitude ? Number(apiTrackData.rider.current_latitude) : 25.7410,
+          current_longitude: apiTrackData.rider.current_longitude ? Number(apiTrackData.rider.current_longitude) : 89.2710,
+        });
+      }
+      if (apiTrackData.status) {
+        setLiveStatus((apiTrackData.status || 'delivering') as TrackedOrder['status']);
+      }
+    }
+  }, [apiTrackData]);
+
+  // Real-time Pusher WebSockets Listener
+  useEffect(() => {
+    const orderNum = apiTrackData?.order_number || activeQuery;
+    if (!orderNum || !searched) return;
+
+    const pusherKey = process.env.NEXT_PUBLIC_PUSHER_APP_KEY || '902a9259bb7eb5c5d39d';
+    const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'ap1';
+
+    try {
+      const pusher = new Pusher(pusherKey, {
+        cluster: pusherCluster,
+      });
+
+      pusher.connection.bind('connected', () => {
+        setIsPusherConnected(true);
+      });
+
+      pusher.connection.bind('disconnected', () => {
+        setIsPusherConnected(false);
+      });
+
+      const channel = pusher.subscribe(`order.${orderNum}`);
+
+      channel.bind('OrderUpdated', (data: any) => {
+        if (data.status) {
+          setLiveStatus(data.status as TrackedOrder['status']);
+        }
+        if (data.rider) {
+          setLiveRider((prev: any) => ({
+            ...(prev || {}),
+            ...data.rider,
+            photo: data.rider.photo || prev?.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+          }));
+        }
+      });
+
+      return () => {
+        channel.unbind_all();
+        channel.unsubscribe();
+        pusher.disconnect();
+      };
+    } catch (e) {
+      console.warn('Pusher client subscription error:', e);
+    }
+  }, [apiTrackData?.order_number, activeQuery, searched]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -87,29 +163,32 @@ export const TrackOrderContent: React.FC = () => {
     setSearched(true);
   };
 
+  const effectiveStatus = liveStatus || (apiTrackData?.status as TrackedOrder['status']) || 'delivering';
+  const effectiveRider = liveRider || (apiTrackData?.rider ? {
+    id: apiTrackData.rider.id,
+    name: apiTrackData.rider.name,
+    phone: apiTrackData.rider.phone,
+    vehicle: apiTrackData.rider.vehicle || 'Motorbike Express',
+    rating: `${apiTrackData.rider.rating || 4.9} ★`,
+    photo: apiTrackData.rider.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    current_latitude: apiTrackData.rider.current_latitude ? Number(apiTrackData.rider.current_latitude) : 25.7410,
+    current_longitude: apiTrackData.rider.current_longitude ? Number(apiTrackData.rider.current_longitude) : 89.2710,
+  } : undefined);
+
   const activeOrder: TrackedOrder | null = apiTrackData
     ? {
         orderId: apiTrackData.order_number || activeQuery,
         phone: apiTrackData.customer?.phone || searchQuery,
         customerName: apiTrackData.customer?.name || 'Customer',
-        orderDate: apiTrackData.created_at || 'Today',
+        orderDate: apiTrackData.created_at ? new Date(apiTrackData.created_at).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Today',
         estimatedDelivery: apiTrackData.estimated_delivery || '৩০ মিনিট',
-        status: (apiTrackData.status || 'delivering') as TrackedOrder['status'],
+        status: effectiveStatus,
         paymentMethod: apiTrackData.payment_method || 'Cash on Delivery',
         paymentStatus: apiTrackData.payment_status || 'Pending',
         deliveryAddress: apiTrackData.customer?.address || 'Rangpur Sadar',
         customerLat: apiTrackData.customer?.latitude ? Number(apiTrackData.customer.latitude) : 25.7439,
         customerLng: apiTrackData.customer?.longitude ? Number(apiTrackData.customer.longitude) : 89.2752,
-        rider: apiTrackData.rider ? {
-          id: apiTrackData.rider.id,
-          name: apiTrackData.rider.name,
-          phone: apiTrackData.rider.phone,
-          vehicle: apiTrackData.rider.vehicle || 'Motorbike Express',
-          rating: `${apiTrackData.rider.rating || 4.9} ★`,
-          photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-          current_latitude: apiTrackData.rider.current_latitude ? Number(apiTrackData.rider.current_latitude) : 25.7410,
-          current_longitude: apiTrackData.rider.current_longitude ? Number(apiTrackData.rider.current_longitude) : 89.2710,
-        } : undefined,
+        rider: effectiveRider,
         items: (apiTrackData.items || []).map((item: any) => ({
           id: String(item.id),
           name: item.product_name || item.name || 'Product',
@@ -124,15 +203,16 @@ export const TrackOrderContent: React.FC = () => {
       }
     : null;
 
+  const stepsOrder: TrackedOrder['status'][] = [
+    'placed',
+    'confirmed',
+    'rider_assigned',
+    'packed',
+    'delivering',
+    'completed'
+  ];
+
   const getStepStatus = (stepKey: TrackedOrder['status'], currentStatus: TrackedOrder['status']) => {
-    const stepsOrder: TrackedOrder['status'][] = [
-      'placed',
-      'confirmed',
-      'rider_assigned',
-      'packed',
-      'delivering',
-      'completed'
-    ];
     const currentIndex = stepsOrder.indexOf(currentStatus);
     const stepIndex = stepsOrder.indexOf(stepKey);
 
@@ -184,7 +264,7 @@ export const TrackOrderContent: React.FC = () => {
         
         <div className="max-w-2xl space-y-4 relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
-            <Truck className="w-3.5 h-3.5" /> Live Order Tracking
+            <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" /> Live Order Tracking
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
             Track Your Order Instantly with <span className="text-emerald-400">Order ID or Mobile</span>
@@ -241,7 +321,7 @@ export const TrackOrderContent: React.FC = () => {
                           ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
                           : 'bg-amber-100 text-amber-900 border border-amber-200'
                       }`}>
-                        <span className="w-2 h-2 rounded-full bg-current" />
+                        <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
                         {getStatusBadgeLabel(activeOrder.status)}
                       </span>
                     </div>
@@ -250,18 +330,31 @@ export const TrackOrderContent: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="bg-slate-50 rounded-2xl px-4 py-3 border border-slate-200/70 text-right sm:text-left">
-                    <span className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                      Estimated Arrival
-                    </span>
-                    <span className="text-sm font-black text-emerald-700 flex items-center gap-1.5 mt-0.5">
-                      <Clock className="w-4 h-4 text-emerald-600" />
-                      {activeOrder.estimatedDelivery}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    {/* Realtime Pusher Connection Badge */}
+                    <div className="bg-slate-900 text-white rounded-2xl px-3.5 py-2 border border-slate-800 flex items-center gap-2">
+                      <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+                      <div className="text-left">
+                        <span className="block text-[9px] font-black uppercase text-emerald-400">Pusher Realtime</span>
+                        <span className="text-[11px] font-bold text-slate-200">
+                          {isPusherConnected ? 'Live Synchronized' : 'Connected'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-emerald-50 rounded-2xl px-4 py-2.5 border border-emerald-200 text-right sm:text-left">
+                      <span className="block text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">
+                        Estimated Arrival
+                      </span>
+                      <span className="text-sm font-black text-emerald-700 flex items-center gap-1.5 mt-0.5">
+                        <Clock className="w-4 h-4 text-emerald-600" />
+                        {activeOrder.estimatedDelivery}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* 6-Step Progress Stepper Rail */}
+                {/* 6-Step Horizontal Stepper Rail */}
                 <div className="py-2">
                   <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-6">
                     Live Progress Status
@@ -281,7 +374,7 @@ export const TrackOrderContent: React.FC = () => {
                               st === 'completed'
                                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
                                 : st === 'current'
-                                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30'
+                                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30 animate-pulse'
                                 : 'bg-slate-100 text-slate-400'
                             }`}>
                               <StepIcon className="w-5 h-5" />
@@ -293,6 +386,152 @@ export const TrackOrderContent: React.FC = () => {
                           </div>
                         );
                       })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ========================================================================= */}
+                {/* DETAILED ORDER TIMELINE WITH EMBEDDED RIDER PROFILE CARD */}
+                {/* ========================================================================= */}
+                <div className="pt-6 border-t border-slate-100 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-emerald-600" />
+                      Order Timeline & Delivery Stages
+                    </h3>
+                    <span className="text-xs font-bold text-slate-400">Step-by-Step Live Tracking</span>
+                  </div>
+
+                  <div className="relative pl-6 border-l-2 border-slate-200 space-y-6 ml-3 py-2">
+                    {/* Stage 1: Order Placed */}
+                    <div className="relative group">
+                      <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-emerald-600 ring-4 ring-emerald-100 flex items-center justify-center text-white">
+                        <CheckCircle2 className="w-3 h-3" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">1. Order Placed (অর্ডার গ্রহণ করা হয়েছে)</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Your order has been submitted successfully and sent to store.</p>
+                      </div>
+                    </div>
+
+                    {/* Stage 2: Confirmed */}
+                    <div className="relative group">
+                      <div className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white ${
+                        stepsOrder.indexOf(activeOrder.status) >= 1 ? 'bg-emerald-600 ring-4 ring-emerald-100' : 'bg-slate-300'
+                      }`}>
+                        <FileCheck className="w-3 h-3" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">2. Order Confirmed (অর্ডার কনফার্মড)</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Store accepted order items and started item verification.</p>
+                      </div>
+                    </div>
+
+                    {/* Stage 3: Rider Assigned - EMBEDDED RIDER PROFILE CARD */}
+                    <div className="relative group space-y-3">
+                      <div className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white ${
+                        stepsOrder.indexOf(activeOrder.status) >= 2 ? 'bg-amber-500 ring-4 ring-amber-100' : 'bg-slate-300'
+                      }`}>
+                        <ShieldCheck className="w-3 h-3" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                          3. Rider Assigned (রাইডার অ্যাসাইন করা হয়েছে)
+                          {activeOrder.rider && (
+                            <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                              Rider Ready
+                            </span>
+                          )}
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Assigned express delivery driver to collect and deliver your order.</p>
+                      </div>
+
+                      {/* EMBEDDED RIDER PROFILE CARD IN TIMELINE */}
+                      {activeOrder.rider ? (
+                        <div className="mt-3 bg-gradient-to-r from-slate-900 to-slate-800 text-white p-4 sm:p-5 rounded-2xl shadow-lg border border-slate-700 space-y-3 animate-in fade-in duration-300">
+                          <div className="flex items-center justify-between border-b border-slate-700/80 pb-3">
+                            <div className="flex items-center gap-2">
+                              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                              <span className="text-xs font-black uppercase tracking-wider text-emerald-400">Assigned Rider Profile</span>
+                            </div>
+                            <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">
+                              Verified Express Driver
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-4 flex-wrap">
+                            <div className="flex items-center gap-3.5">
+                              <img
+                                src={activeOrder.rider.photo}
+                                alt={activeOrder.rider.name}
+                                className="w-13 h-13 rounded-2xl object-cover border-2 border-emerald-400 shadow-md shrink-0"
+                              />
+                              <div>
+                                <h5 className="font-black text-base text-white">{activeOrder.rider.name}</h5>
+                                <p className="text-xs text-slate-300 font-medium mt-0.5">{activeOrder.rider.vehicle}</p>
+                                <div className="flex items-center gap-1.5 mt-1">
+                                  <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-400">
+                                    <Star className="w-3 h-3 fill-amber-400" />
+                                    {activeOrder.rider.rating}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 font-semibold">• 500+ Express Deliveries</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <a
+                              href={`tel:${activeOrder.rider.phone}`}
+                              className="bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-md cursor-pointer shrink-0"
+                            >
+                              <PhoneCall className="w-4 h-4" />
+                              <span>Call Rider ({activeOrder.rider.phone})</span>
+                            </a>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 font-medium">
+                          Assigning nearby driver to your order...
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Stage 4: Order Packed */}
+                    <div className="relative group">
+                      <div className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white ${
+                        stepsOrder.indexOf(activeOrder.status) >= 3 ? 'bg-emerald-600 ring-4 ring-emerald-100' : 'bg-slate-300'
+                      }`}>
+                        <Package className="w-3 h-3" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">4. Order Packed (প্রস্তুতি সম্পন্ন)</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Order items packed safely and handed over to rider.</p>
+                      </div>
+                    </div>
+
+                    {/* Stage 5: Out for Delivery */}
+                    <div className="relative group">
+                      <div className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white ${
+                        stepsOrder.indexOf(activeOrder.status) >= 4 ? 'bg-emerald-600 ring-4 ring-emerald-100' : 'bg-slate-300'
+                      }`}>
+                        <Truck className="w-3 h-3" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">5. Out for Delivery (রাইডার রওনা দিয়েছে)</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Rider is moving live towards your location on Google Maps.</p>
+                      </div>
+                    </div>
+
+                    {/* Stage 6: Delivered */}
+                    <div className="relative group">
+                      <div className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full flex items-center justify-center text-white ${
+                        stepsOrder.indexOf(activeOrder.status) >= 5 ? 'bg-emerald-600 ring-4 ring-emerald-100' : 'bg-slate-300'
+                      }`}>
+                        <Home className="w-3 h-3" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">6. Delivered (ডেলিভারি সম্পন্ন)</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Order received by customer with cash collection.</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -310,73 +549,39 @@ export const TrackOrderContent: React.FC = () => {
                 customerLng={activeOrder.customerLng}
               />
 
-              {/* Rider & Address Info Grid */}
+              {/* Delivery Address & Payment Details Card */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Rider Card */}
-                {activeOrder.rider ? (
-                  <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                      <h3 className="font-black text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                        <Truck className="w-4 h-4 text-emerald-600" /> Assigned Delivery Rider
-                      </h3>
-                      <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">
-                        Verified Express Driver
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={activeOrder.rider.photo}
-                        alt={activeOrder.rider.name}
-                        className="w-14 h-14 rounded-2xl object-cover border-2 border-emerald-500/30 shadow-xs"
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-extrabold text-base text-slate-900">{activeOrder.rider.name}</h4>
-                        <p className="text-xs text-slate-500 font-medium">{activeOrder.rider.vehicle}</p>
-                        <p className="text-xs text-amber-600 font-bold mt-0.5">{activeOrder.rider.rating}</p>
-                      </div>
-                      <a
-                        href={`tel:${activeOrder.rider.phone}`}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm cursor-pointer"
-                      >
-                        <PhoneCall className="w-3.5 h-3.5" /> Call Rider
-                      </a>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-3 flex items-center justify-between">
-                    <div>
-                      <h3 className="font-black text-sm text-slate-900 uppercase tracking-wider">Rider Allocation</h3>
-                      <p className="text-xs text-slate-500 mt-1">Assigning nearby express delivery driver...</p>
-                    </div>
-                    <ShieldCheck className="w-8 h-8 text-emerald-600" />
-                  </div>
-                )}
-
-                {/* Delivery Address & Payment Card */}
                 <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 className="font-black text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-emerald-600" /> Destination & Payment
+                      <MapPin className="w-4 h-4 text-emerald-600" /> Destination Address
                     </h3>
                   </div>
 
-                  <div className="space-y-3 text-xs">
+                  <div className="space-y-2 text-xs">
+                    <span className="font-bold text-slate-400 uppercase text-[10px] block">Customer Location</span>
+                    <p className="font-bold text-slate-800 text-sm">{activeOrder.deliveryAddress}</p>
+                    <p className="text-slate-500 font-medium">Customer Phone: <span className="font-bold text-slate-800">{activeOrder.phone}</span></p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="font-black text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4 text-emerald-600" /> Payment Overview
+                    </h3>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs">
                     <div>
-                      <span className="font-bold text-slate-400 uppercase text-[10px] block">Delivery Location</span>
-                      <p className="font-bold text-slate-800 text-sm">{activeOrder.deliveryAddress}</p>
+                      <span className="font-bold text-slate-400 uppercase text-[10px] block">Payment Method</span>
+                      <p className="font-bold text-slate-800">{activeOrder.paymentMethod}</p>
                     </div>
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-                      <div>
-                        <span className="font-bold text-slate-400 uppercase text-[10px] block">Payment Method</span>
-                        <p className="font-bold text-slate-800">{activeOrder.paymentMethod}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="font-bold text-slate-400 uppercase text-[10px] block">Payment Status</span>
-                        <span className="font-extrabold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md uppercase">
-                          {activeOrder.paymentStatus}
-                        </span>
-                      </div>
+                    <div className="text-right">
+                      <span className="font-bold text-slate-400 uppercase text-[10px] block">Payment Status</span>
+                      <span className="font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg uppercase border border-amber-200">
+                        {activeOrder.paymentStatus}
+                      </span>
                     </div>
                   </div>
                 </div>

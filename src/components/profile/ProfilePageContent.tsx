@@ -13,6 +13,7 @@ import {
   useGetPublicVouchersQuery,
 } from '@/store/services/apiService';
 import { useCart } from '@/context/CartContext';
+import { useTheme } from '@/context/ThemeContext';
 import {
   ShoppingBag,
   Gift,
@@ -44,6 +45,7 @@ import {
   Copy,
   Check,
   TicketPercent,
+  Palette,
 } from 'lucide-react';
 
 const LOCATIONS = [
@@ -69,6 +71,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { openAuthModal } = useCart();
+  const { currentTheme, setThemeById, themes, toggleThemeModal } = useTheme();
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
   const [mounted, setMounted] = useState(false);
@@ -107,6 +110,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
   const [profileName, setProfileName] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
   const [profileEmail, setProfileEmail] = useState('');
+  const [profileWhatsapp, setProfileWhatsapp] = useState('');
   const [profileMsg, setProfileMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   // Avatar Upload & Remove State
@@ -179,6 +183,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
       setProfileName(activeUser.name || '');
       setProfilePhone(activeUser.phone || '');
       setProfileEmail(activeUser.email || '');
+      setProfileWhatsapp(activeUser.whatsapp_number || (activeUser as any).whatsapp || '');
       if (profileApiData?.user) {
         dispatch(setUser(profileApiData.user));
       }
@@ -189,6 +194,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
     { id: 'orders', label: 'My Orders', icon: ShoppingBag },
     { id: 'vouchers', label: 'My Vouchers & Coupons', icon: Gift },
     { id: 'account', label: 'Account Information', icon: User },
+    { id: 'theme', label: 'App Theme (থিম)', icon: Palette },
     { id: 'settings', label: 'Settings', icon: Settings },
     { id: 'helpline', label: 'Helpline', icon: HelpCircle },
   ];
@@ -220,6 +226,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
         name: profileName,
         phone: profilePhone,
         email: profileEmail,
+        whatsapp_number: profileWhatsapp,
       }).unwrap();
 
       if (res.success && res.user) {
@@ -347,10 +354,22 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                   </div>
                 </div>
 
-                {/* Bell Icon */}
-                <button className="w-9 h-9 rounded-full bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 flex items-center justify-center transition border border-slate-200 flex-shrink-0 cursor-pointer">
-                  <Bell className="w-4 h-4" />
-                </button>
+                {/* Theme & Bell Action Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={toggleThemeModal}
+                    className="px-2.5 py-1 rounded-xl bg-theme-primary/10 hover:bg-theme-primary/20 text-theme-primary border border-theme-primary/30 flex flex-col items-center justify-center transition cursor-pointer shadow-2xs group shrink-0"
+                    title="থিম পরিবর্তন করুন"
+                  >
+                    <Palette className="w-4 h-4 text-theme-primary group-hover:scale-110 transition-transform" />
+                    <span className="text-[10px] font-extrabold">Theme</span>
+                  </button>
+
+                  <button className="w-9 h-9 rounded-full bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 flex items-center justify-center transition border border-slate-200 flex-shrink-0 cursor-pointer">
+                    <Bell className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -871,6 +890,16 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                           }`}
                         />
                       </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-slate-700">WhatsApp Number (হোয়াটসঅ্যাপ নম্বর)</label>
+                        <input
+                          type="tel"
+                          value={profileWhatsapp}
+                          onChange={(e) => setProfileWhatsapp(e.target.value)}
+                          placeholder="Enter WhatsApp number (e.g. 01700000000)"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none focus:border-emerald-500 transition"
+                        />
+                      </div>
                       <div className="space-y-1 sm:col-span-2">
                         <div className="flex items-center justify-between">
                           <label className="text-xs font-bold text-slate-700">Email Address</label>
@@ -901,6 +930,126 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                       )}
                     </button>
                   </form>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: APP THEME */}
+            {activeTab === 'theme' && (
+              <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <Palette className="w-6 h-6 text-theme-primary" />
+                      <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                        App Theme & Colors
+                      </h1>
+                    </div>
+                    <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5">
+                      পছন্দের কালার স্কিম ও থিম নির্বাচন করে আপনার অ্যাপ কাস্টমাইজ করুন
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={toggleThemeModal}
+                    className="px-3.5 py-2 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Palette className="w-4 h-4" />
+                    <span>Quick Theme Switcher</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {themes.map((themeItem) => {
+                    const isSelected = currentTheme.id === themeItem.id;
+                    return (
+                      <div
+                        key={themeItem.id}
+                        onClick={() => setThemeById(themeItem.id)}
+                        className={`bg-white rounded-2xl border-2 p-5 shadow-xs transition-all cursor-pointer flex flex-col justify-between space-y-4 group relative overflow-hidden ${
+                          isSelected
+                            ? 'border-slate-900 ring-2 ring-slate-900/10 shadow-md bg-slate-50/50'
+                            : 'border-slate-200/80 hover:border-slate-300 hover:shadow-sm'
+                        }`}
+                      >
+                        {/* Top row */}
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-3.5">
+                            {/* Dual Color Swatch */}
+                            <div className="w-12 h-12 rounded-xl shadow-xs overflow-hidden flex shrink-0 border border-slate-200">
+                              <div
+                                className="w-1/2 h-full transition-transform group-hover:scale-105"
+                                style={{ backgroundColor: themeItem.previewColors[0] }}
+                              />
+                              <div
+                                className="w-1/2 h-full transition-transform group-hover:scale-105"
+                                style={{ backgroundColor: themeItem.previewColors[1] }}
+                              />
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <h3 className="font-extrabold text-sm sm:text-base text-slate-900">
+                                  {themeItem.nameBn}
+                                </h3>
+                                {themeItem.id === 'ekhanei-classic' && (
+                                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800">
+                                    <Sparkles className="w-2.5 h-2.5" /> লোগো থিম
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-500 font-medium mt-0.5">
+                                {themeItem.name}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Radio Indicator */}
+                          <div className="shrink-0">
+                            <div
+                              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                                isSelected
+                                  ? 'border-slate-900 bg-slate-900 text-white'
+                                  : 'border-slate-300 group-hover:border-slate-400'
+                              }`}
+                            >
+                              {isSelected && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-xs text-slate-600 font-medium leading-relaxed bg-slate-100/60 p-2.5 rounded-xl border border-slate-200/50">
+                          {themeItem.description}
+                        </p>
+
+                        {/* Apply Action Bar */}
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+                          <div className="flex items-center gap-2">
+                            <span className="w-3 h-3 rounded-full shadow-2xs" style={{ backgroundColor: themeItem.primary }} />
+                            <span className="w-3 h-3 rounded-full shadow-2xs" style={{ backgroundColor: themeItem.secondary }} />
+                            <span className="text-[11px] font-mono text-slate-400 font-bold">{themeItem.primary}</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setThemeById(themeItem.id);
+                            }}
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                              isSelected
+                                ? 'bg-slate-900 text-white shadow-xs'
+                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                            }`}
+                          >
+                            {isSelected ? 'Active Theme' : 'Apply Theme'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -1032,6 +1181,53 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                       <p className="text-[11px] text-slate-500">Get informed about exclusive daily discounts</p>
                     </div>
                     <input type="checkbox" defaultChecked className="accent-emerald-600 w-4 h-4" />
+                  </div>
+                </div>
+
+                {/* Theme Preferences Block in Settings */}
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4 max-w-2xl">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-theme-primary/10 text-theme-primary flex items-center justify-center font-bold">
+                        <Palette className="w-4.5 h-4.5" />
+                      </div>
+                      <div>
+                        <h3 className="font-extrabold text-sm text-slate-800">App Theme (অ্যাপ থিম)</h3>
+                        <p className="text-[11px] text-slate-500">Choose your preferred color theme across the application</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={toggleThemeModal}
+                      className="px-3 py-1.5 rounded-xl bg-theme-primary text-white text-xs font-bold shadow-xs hover:bg-theme-primary-hover transition cursor-pointer flex items-center gap-1"
+                    >
+                      <Palette className="w-3.5 h-3.5" />
+                      <span>Modal Switcher</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                    {themes.map((t) => {
+                      const isSelected = currentTheme.id === t.id;
+                      return (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => setThemeById(t.id)}
+                          className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition text-center cursor-pointer ${
+                            isSelected
+                              ? 'border-slate-900 bg-slate-50 ring-2 ring-slate-900/10'
+                              : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                          }`}
+                        >
+                          <div className="w-8 h-8 rounded-lg overflow-hidden flex shadow-2xs border border-slate-200">
+                            <div className="w-1/2 h-full" style={{ backgroundColor: t.previewColors[0] }} />
+                            <div className="w-1/2 h-full" style={{ backgroundColor: t.previewColors[1] }} />
+                          </div>
+                          <span className="text-[11px] font-bold text-slate-800 truncate w-full">{t.nameBn}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

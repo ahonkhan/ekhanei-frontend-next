@@ -68,7 +68,7 @@ export const apiService = createApi({
       providesTags: ['User'],
     }),
 
-    updateProfile: builder.mutation<any, { name?: string; phone?: string; email?: string; avatar?: string | null; remove_avatar?: boolean }>({
+    updateProfile: builder.mutation<any, { name?: string; phone?: string; email?: string; whatsapp_number?: string; avatar?: string | null; remove_avatar?: boolean }>({
       query: (data) => ({
         url: '/auth/profile',
         method: 'PUT',

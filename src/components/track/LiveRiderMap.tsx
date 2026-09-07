@@ -42,6 +42,8 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
 
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMapInstance = useRef<any>(null);
+  const riderMarkerRef = useRef<any>(null);
+  const polylineRef = useRef<any>(null);
 
   // Live coordinates state
   const [riderCoords, setRiderCoords] = useState({ lat: riderLat, lng: riderLng });
@@ -50,6 +52,15 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
 
   useEffect(() => {
     setRiderCoords({ lat: riderLat, lng: riderLng });
+    if (riderMarkerRef.current) {
+      riderMarkerRef.current.setPosition({ lat: riderLat, lng: riderLng });
+    }
+    if (googleMapInstance.current) {
+      googleMapInstance.current.panTo({ lat: riderLat, lng: riderLng });
+    }
+    if (polylineRef.current) {
+      polylineRef.current.setPath([storeCoords, { lat: riderLat, lng: riderLng }, destinationCoords]);
+    }
   }, [riderLat, riderLng]);
 
   // Load Google Maps JS SDK when API Key exists in env
@@ -117,7 +128,7 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
       googleMapInstance.current = map;
 
       // Rider Marker
-      new google.maps.Marker({
+      riderMarkerRef.current = new google.maps.Marker({
         position: riderCoords,
         map,
         title: riderName,
@@ -139,7 +150,7 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
       });
 
       // Polyline route
-      new google.maps.Polyline({
+      polylineRef.current = new google.maps.Polyline({
         path: [storeCoords, riderCoords, destinationCoords],
         geodesic: true,
         strokeColor: '#10b981',
