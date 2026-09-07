@@ -18,7 +18,7 @@ export const SectionTitleSkeleton: React.FC = () => (
  */
 export const HeroHeaderSkeleton: React.FC = () => (
   <div className="w-full flex flex-col pt-0">
-    <section className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[180px] sm:min-h-[220px] md:min-h-[280px] w-full overflow-hidden z-30 bg-gradient-to-b from-[#bd0854] to-[#a30648] flex flex-col items-center justify-center px-4 pb-4 sm:pb-6 pt-3 animate-pulse">
+    <section className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[180px] sm:min-h-[220px] md:min-h-[280px] w-full overflow-hidden z-30 bg-brand-gradient flex flex-col items-center justify-center px-4 pb-4 sm:pb-6 pt-3 animate-pulse">
       {/* Top Thin Rounded Pill */}
       <div className="w-48 sm:w-64 h-3 sm:h-4 bg-white/25 rounded-full mb-2 sm:mb-3" />
       
