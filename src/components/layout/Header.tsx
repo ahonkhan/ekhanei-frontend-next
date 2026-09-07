@@ -56,15 +56,6 @@ export const Header: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Mobile Theme Trigger */}
-          <button
-            onClick={toggleThemeModal}
-            className="p-1.5 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
-            title="থিম পরির্বতন করুন"
-          >
-            <Palette className="w-4 h-4 text-theme-primary" />
-          </button>
-
           <a
             href="https://play.google.com/store/apps/details?id=com.ekhanei.customer.app&pcampaignid=web_share"
             target="_blank"
@@ -119,19 +110,6 @@ export const Header: React.FC = () => {
 
           {/* Right: Actions */}
           <div className="min-w-fit hidden gap-3 md:flex justify-between items-center">
-
-            {/* Theme Selector Trigger Button */}
-            <button
-              type="button"
-              onClick={toggleThemeModal}
-              className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-3 py-2 flex flex-col items-center justify-center cursor-pointer gap-0 bg-white/15 border border-white/25 hover:bg-white/25 shadow-2xs"
-              title="থিম পরিবর্তন করুন"
-            >
-              <div className="flex items-center gap-1">
-                <Palette className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-[10px] font-bold">Theme</span>
-            </button>
 
             {/* Download App Tooltip */}
             <a

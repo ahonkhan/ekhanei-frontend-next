@@ -353,17 +353,17 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
             {/* Form Field 4: Payment Method */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-blue-500" />
+                <CreditCard className="w-3.5 h-3.5 text-theme-primary" />
                 <span>Payment Method</span>
               </label>
               
-              <div className="p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+              <div className="p-3.5 rounded-2xl border-2 border-theme-primary bg-theme-primary-light flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-theme-primary-light text-theme-primary flex items-center justify-center shrink-0 border border-theme-primary/20">
                   <Banknote className="w-4 h-4" />
                 </div>
                 <div>
                   <h5 className="font-extrabold text-xs sm:text-sm text-slate-900">Cash on Delivery</h5>
-                  <p className="text-xs text-emerald-700 font-medium">Pay cash upon receiving your order</p>
+                  <p className="text-xs text-theme-primary font-medium">Pay cash upon receiving your order</p>
                 </div>
               </div>
             </div>
@@ -371,7 +371,7 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
             {/* Form Field 5: Promo / Voucher Code */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <TicketPercent className="w-3.5 h-3.5 text-blue-500" />
+                <TicketPercent className="w-3.5 h-3.5 text-theme-primary" />
                 <span>Promo or Voucher Code</span>
               </label>
               <div className="flex gap-2">
@@ -380,12 +380,12 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                   value={couponCode}
                   onChange={e => setCouponCode(e.target.value)}
                   placeholder="কুপন কোড লিখুন"
-                  className="flex-1 px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                  className="flex-1 px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-theme-primary focus:bg-white transition"
                 />
                 <button
                   type="button"
                   onClick={handleApplyCoupon}
-                  className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs transition shrink-0 cursor-pointer"
+                  className="px-5 py-3 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover text-white font-extrabold text-xs transition shrink-0 cursor-pointer"
                 >
                   {isCouponApplied ? 'Applied' : 'Apply'}
                 </button>
@@ -403,15 +403,15 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                 <span className="font-bold text-slate-900">TK {deliveryFee}</span>
               </div>
               {discountAmount > 0 && (
-                <div className="flex justify-between text-emerald-600">
+                <div className="flex justify-between text-theme-primary font-bold">
                   <span>Discount</span>
-                  <span className="font-bold">- TK {discountAmount}</span>
+                  <span>- TK {discountAmount}</span>
                 </div>
               )}
               <hr className="border-slate-200 my-1" />
               <div className="flex justify-between text-sm sm:text-base pt-1">
                 <span className="font-black text-slate-900">Total Amount</span>
-                <span className="font-black text-blue-600">TK {totalCost}</span>
+                <span className="font-black text-theme-primary">TK {totalCost}</span>
               </div>
             </div>
 
@@ -421,7 +421,7 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
           <div className="pt-3 pb-2 sm:pb-0 border-t border-slate-100 shrink-0">
             <button
               onClick={handleConfirmOrder}
-              className="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-sm sm:text-base shadow-md shadow-blue-500/20 flex items-center justify-center transition active:scale-[0.99] cursor-pointer"
+              className="w-full py-4 px-6 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover text-white font-black text-sm sm:text-base shadow-md flex items-center justify-center transition active:scale-[0.99] cursor-pointer"
             >
               <span>Confirm Order (TK {totalCost})</span>
             </button>

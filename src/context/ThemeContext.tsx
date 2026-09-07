@@ -175,7 +175,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           document.documentElement.classList.remove('dark');
         }
       } else {
+        setThemeModeState('light');
         document.documentElement.setAttribute('data-mode', 'light');
+        document.documentElement.classList.remove('dark');
       }
 
       // 3. Theme Style (Gradient / Solid)

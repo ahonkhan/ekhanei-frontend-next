@@ -39,14 +39,14 @@ export const CartDrawer: React.FC = () => {
         {/* Drawer Header */}
         <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-xl bg-theme-primary-light text-theme-primary flex items-center justify-center font-bold">
               <ShoppingBasket className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
                 <span>Your Shopping Cart</span>
                 {totalItemsCount > 0 && (
-                  <span className="text-xs bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded-full">
+                  <span className="text-xs bg-theme-primary text-white font-extrabold px-2 py-0.5 rounded-full">
                     {totalItemsCount}
                   </span>
                 )}
@@ -67,7 +67,7 @@ export const CartDrawer: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 custom-scrollbar">
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-12">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-theme-primary-light text-theme-primary flex items-center justify-center">
                 <ShoppingBag className="w-8 h-8" />
               </div>
               <div className="space-y-1">
@@ -78,7 +78,7 @@ export const CartDrawer: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsCartOpen(false)}
-                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs transition shadow-sm"
+                className="px-5 py-2.5 rounded-xl bg-theme-primary hover:bg-theme-primary-hover text-white font-extrabold text-xs transition shadow-sm cursor-pointer"
               >
                 Start Shopping
               </button>
@@ -106,7 +106,7 @@ export const CartDrawer: React.FC = () => {
                   <p className="text-[11px] text-slate-500 mt-0.5">
                     ৳{item.price} x {item.quantity}
                   </p>
-                  <p className="font-extrabold text-xs text-emerald-600 mt-1">
+                  <p className="font-extrabold text-xs text-theme-primary mt-1">
                     ৳{item.price * item.quantity}
                   </p>
                 </div>
@@ -133,7 +133,7 @@ export const CartDrawer: React.FC = () => {
                     </span>
                     <button
                       onClick={() => increment(item.id)}
-                      className="w-5 h-5 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs hover:bg-emerald-700"
+                      className="w-5 h-5 rounded-lg bg-theme-primary text-white flex items-center justify-center text-xs font-bold shadow-2xs hover:bg-theme-primary-hover"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
@@ -157,7 +157,7 @@ export const CartDrawer: React.FC = () => {
             {/* Checkout Button */}
             <button
               onClick={handleCheckoutClick}
-              className="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-extrabold text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 transition active:scale-[0.99]"
+              className="w-full py-3 px-5 rounded-2xl bg-brand-gradient text-white font-extrabold text-sm shadow-md flex items-center justify-center gap-2 transition active:scale-[0.99] cursor-pointer"
             >
               <span>Checkout</span>
               <ArrowRight className="w-4 h-4" />

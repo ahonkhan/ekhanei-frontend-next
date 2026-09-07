@@ -326,7 +326,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
         <button
           onClick={() => setActiveTab('description')}
           className={`pb-2 font-extrabold text-sm sm:text-base transition relative cursor-pointer ${activeTab === 'description'
-              ? 'text-slate-900 border-b-2 border-emerald-600'
+              ? 'text-slate-900 border-b-2 border-theme-primary'
               : 'text-slate-400 hover:text-slate-700'
             }`}
         >
@@ -335,12 +335,12 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
         <button
           onClick={() => setActiveTab('reviews')}
           className={`pb-2 font-extrabold text-sm sm:text-base transition relative flex items-center gap-1.5 cursor-pointer ${activeTab === 'reviews'
-              ? 'text-slate-900 border-b-2 border-emerald-600'
+              ? 'text-slate-900 border-b-2 border-theme-primary'
               : 'text-slate-400 hover:text-slate-700'
             }`}
         >
           <span>Product Reviews</span>
-          <span className="text-[10px] font-black bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">
+          <span className="text-[10px] font-black bg-theme-primary-light text-theme-primary px-1.5 py-0.5 rounded-full">
             {reviewsList.length}
           </span>
         </button>
@@ -402,7 +402,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             <button
               type="button"
               onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
-              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-theme-primary hover:bg-theme-primary-hover text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Write a Review</span>
@@ -484,7 +484,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                 <button
                   type="submit"
                   disabled={isSubmittingReview}
-                  className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-1.5 rounded-xl bg-theme-primary hover:bg-theme-primary-hover text-white text-xs font-bold transition disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmittingReview ? 'Submitting...' : 'Submit Review (Pending Admin Approval)'}
                 </button>
@@ -872,13 +872,13 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
           {/* 2. Price Strip */}
           <div className="flex items-baseline gap-2.5 pt-0.5">
-            <span className="font-black text-2xl sm:text-3xl text-emerald-700 tracking-tight">
+            <span className="font-black text-2xl sm:text-3xl text-theme-primary tracking-tight">
               ৳{activePrice}
             </span>
             <span className="line-through text-slate-400 text-sm sm:text-base font-bold">
               ৳{activeOldPrice}
             </span>
-            <span className="text-emerald-700 text-xs font-black bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+            <span className="text-theme-primary text-xs font-black bg-theme-primary-light px-2 py-0.5 rounded-md border border-theme-primary/30">
               ({discountPercent}% OFF)
             </span>
             <span className="text-xs text-slate-400 font-bold">/ {product.unit}</span>
@@ -907,8 +907,8 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                       onClick={() => setSelectedVariationVal(opt)}
                       className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center shrink-0 border cursor-pointer ${
                         isSelected
-                          ? 'border-emerald-600 bg-emerald-50 text-emerald-700 ring-2 ring-emerald-500/20 font-extrabold shadow-xs'
-                          : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-300'
+                          ? 'border-theme-primary bg-theme-primary-light text-theme-primary ring-2 ring-[var(--color-primary)]/20 font-extrabold shadow-xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-theme-primary'
                       }`}
                     >
                       {opt}
@@ -948,7 +948,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
           <div className="flex items-center gap-2 sm:gap-3 pt-2 w-full">
             <button
               onClick={() => addItem({ ...product, price: activePrice })}
-              className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
+              className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover active:scale-98 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
             >
               <ShoppingCart className="w-4 h-4" />
               <span>Add to Cart</span>
@@ -956,7 +956,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
             <button
               onClick={handleBuyNow}
-              className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-amber-500 hover:bg-amber-600 active:scale-98 text-slate-950 font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
+              className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-theme-secondary hover:bg-theme-secondary-hover active:scale-98 text-white font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
             >
               <ShoppingBag className="w-4 h-4" />
               <span>Buy Now</span>
@@ -1212,12 +1212,12 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200 p-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-2.5">
         <button
           onClick={() => setIsCartOpen(true)}
-          className="flex flex-col items-center gap-0.5 px-2 relative text-slate-700 hover:text-emerald-600 transition shrink-0 cursor-pointer"
+          className="flex flex-col items-center gap-0.5 px-2 relative text-slate-700 hover:text-theme-primary transition shrink-0 cursor-pointer"
         >
           <div className="relative">
             <ShoppingCart className="w-5 h-5" />
             {totalItemsCount > 0 && (
-              <span className="absolute -top-1.5 -right-2.5 bg-emerald-600 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+              <span className="absolute -top-1.5 -right-2.5 bg-theme-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
                 {totalItemsCount}
               </span>
             )}
@@ -1227,14 +1227,14 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
         <button
           onClick={() => addItem({ ...product, price: activePrice })}
-          className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
+          className="flex-1 bg-theme-primary hover:bg-theme-primary-hover active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
         >
           Add to Cart
         </button>
 
         <button
           onClick={handleBuyNow}
-          className="flex-1 bg-amber-500 hover:bg-amber-600 active:scale-98 text-slate-950 font-black text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
+          className="flex-1 bg-theme-secondary hover:bg-theme-secondary-hover active:scale-98 text-white font-black text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
         >
           Buy Now
         </button>

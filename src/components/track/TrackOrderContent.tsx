@@ -258,45 +258,7 @@ export const TrackOrderContent: React.FC = () => {
         <span className="text-slate-900 font-bold">Track Order</span>
       </div>
 
-      {/* Hero Header Banner */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white rounded-3xl p-6 sm:p-10 relative overflow-hidden shadow-xl border border-slate-800">
-        <div className="absolute right-0 top-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="max-w-2xl space-y-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
-            <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" /> Live Order Tracking
-          </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-            Track Your Order Instantly with <span className="text-emerald-400">Order ID or Mobile</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
-            Enter your order number (e.g. EKH-XXXXXX) or registered mobile number for real-time status and live rider GPS location.
-          </p>
 
-          {/* Search Box Form */}
-          <form onSubmit={handleSearch} className="pt-2">
-            <div className="flex flex-col sm:flex-row items-stretch gap-2.5 max-w-xl">
-              <div className="relative flex-1">
-                <Phone className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Enter order number or mobile number"
-                  className="w-full pl-11 pr-4 py-3.5 bg-white text-slate-900 text-sm font-bold rounded-2xl border border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow-lg placeholder:text-slate-400 placeholder:font-normal"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm px-7 py-3.5 rounded-2xl transition shadow-md hover:shadow-emerald-500/25 flex items-center justify-center gap-2 flex-shrink-0 cursor-pointer"
-              >
-                <Search className="w-4 h-4" />
-                <span>Track Now</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
 
       {/* TRACKING RESULTS CONTENT */}
       {isTrackingLoading ? (
@@ -331,16 +293,7 @@ export const TrackOrderContent: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {/* Realtime Pusher Connection Badge */}
-                    <div className="bg-slate-900 text-white rounded-2xl px-3.5 py-2 border border-slate-800 flex items-center gap-2">
-                      <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-                      <div className="text-left">
-                        <span className="block text-[9px] font-black uppercase text-emerald-400">Pusher Realtime</span>
-                        <span className="text-[11px] font-bold text-slate-200">
-                          {isPusherConnected ? 'Live Synchronized' : 'Connected'}
-                        </span>
-                      </div>
-                    </div>
+
 
                     <div className="bg-emerald-50 rounded-2xl px-4 py-2.5 border border-emerald-200 text-right sm:text-left">
                       <span className="block text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">
@@ -354,41 +307,7 @@ export const TrackOrderContent: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 6-Step Horizontal Stepper Rail */}
-                <div className="py-2">
-                  <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-6">
-                    Live Progress Status
-                  </h3>
 
-                  <div className="relative">
-                    {/* Line connecting steps */}
-                    <div className="absolute top-5 left-6 right-6 h-1 bg-slate-100 -z-0 hidden md:block" />
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 relative z-10">
-                      {stepsList.map((step) => {
-                        const st = getStepStatus(step.key, activeOrder.status);
-                        const StepIcon = step.Icon;
-                        return (
-                          <div key={step.key} className="flex md:flex-col items-center md:items-start gap-3">
-                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold transition shrink-0 ${
-                              st === 'completed'
-                                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
-                                : st === 'current'
-                                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30 animate-pulse'
-                                : 'bg-slate-100 text-slate-400'
-                            }`}>
-                              <StepIcon className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <p className="text-xs sm:text-sm font-extrabold text-slate-900">{step.title}</p>
-                              <p className="text-[11px] font-medium text-slate-500">{step.sub}</p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
 
                 {/* ========================================================================= */}
                 {/* DETAILED ORDER TIMELINE WITH EMBEDDED RIDER PROFILE CARD */}

@@ -367,18 +367,8 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                   </div>
                 </div>
 
-                {/* Theme & Bell Action Buttons */}
+                {/* Bell Action Button */}
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={toggleThemeModal}
-                    className="px-2.5 py-1 rounded-xl bg-theme-primary/10 hover:bg-theme-primary/20 text-theme-primary border border-theme-primary/30 flex flex-col items-center justify-center transition cursor-pointer shadow-2xs group shrink-0"
-                    title="থিম পরিবর্তন করুন"
-                  >
-                    <Palette className="w-4 h-4 text-theme-primary group-hover:scale-110 transition-transform" />
-                    <span className="text-[10px] font-extrabold">Theme</span>
-                  </button>
-
                   <button className="w-9 h-9 rounded-full bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 flex items-center justify-center transition border border-slate-200 flex-shrink-0 cursor-pointer">
                     <Bell className="w-4 h-4" />
                   </button>
@@ -951,30 +941,19 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
             {/* TAB: APP THEME */}
             {activeTab === 'theme' && (
               <div className="space-y-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2.5">
-                      <Palette className="w-6 h-6 text-theme-primary" />
-                      <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                        App Theme & Customization
-                      </h1>
-                    </div>
-                    <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">
-                      পছন্দের কালার স্কিম, লাইট/ডার্ক মোড ও সলিড/গ্র্যাডিয়েন্ট থিম কাস্টমাইজ করুন
-                    </p>
+                <div>
+                  <div className="flex items-center gap-2.5">
+                    <Palette className="w-6 h-6 text-theme-primary" />
+                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                      App Theme & Customization
+                    </h1>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsThemeModalOpen(true)}
-                    className="px-3.5 py-2 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Palette className="w-4 h-4" />
-                    <span>Color Scheme Modal</span>
-                  </button>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                    পছন্দের কালার স্কিম, লাইট/ডার্ক মোড ও সলিড/গ্র্যাডিয়েন্ট থিম কাস্টমাইজ করুন
+                  </p>
                 </div>
 
-                {/* APP SETTINGS CARD MATCHING USER SCREENSHOTS 1 & 2 */}
+                {/* APP SETTINGS CARD */}
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs space-y-4 max-w-3xl">
                   <h3 className="font-extrabold text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2.5">
                     App Settings
@@ -984,7 +963,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                   <div className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800/60">
                     <div className="flex items-center gap-3.5">
                       <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
-                        <Sun className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        <Sun className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Theme Mode</h4>
@@ -992,13 +971,13 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                       </div>
                     </div>
 
-                    <div className="inline-flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-300/50 dark:border-slate-700">
+                    <div className="inline-flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
                       <button
                         type="button"
                         onClick={() => setThemeMode('light')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1 cursor-pointer ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
                           themeMode === 'light'
-                            ? 'bg-indigo-900 text-white shadow-xs'
+                            ? 'bg-emerald-600 text-white shadow-xs'
                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                         }`}
                       >
@@ -1008,9 +987,9 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                       <button
                         type="button"
                         onClick={() => setThemeMode('dark')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1 cursor-pointer ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
                           themeMode === 'dark'
-                            ? 'bg-indigo-900 text-white shadow-xs'
+                            ? 'bg-slate-800 text-white shadow-xs'
                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                         }`}
                       >
@@ -1020,29 +999,11 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                     </div>
                   </div>
 
-                  {/* Row 2: Color Scheme Trigger */}
-                  <div
-                    onClick={() => setIsThemeModalOpen(true)}
-                    className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-xl px-2 -mx-2 transition cursor-pointer group"
-                  >
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
-                        <Palette className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                      </div>
-                      <div>
-                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Color Scheme</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{currentTheme.name}</p>
-                      </div>
-                    </div>
-
-                    <ChevronRight className="w-4.5 h-4.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition" />
-                  </div>
-
-                  {/* Row 3: Color Finish (Solid vs Gradient Switch) */}
+                  {/* Row 2: Color Finish (Solid vs Gradient Switch) */}
                   <div className="flex items-center justify-between py-2">
                     <div className="flex items-center gap-3.5">
                       <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
-                        <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Color Finish</h4>
@@ -1050,13 +1011,13 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                       </div>
                     </div>
 
-                    <div className="inline-flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-300/50 dark:border-slate-700">
+                    <div className="inline-flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
                       <button
                         type="button"
                         onClick={() => setThemeStyle('solid')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1 cursor-pointer ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
                           themeStyle === 'solid'
-                            ? 'bg-slate-900 text-white shadow-xs'
+                            ? 'bg-emerald-600 text-white shadow-xs'
                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                         }`}
                       >
@@ -1066,9 +1027,9 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                       <button
                         type="button"
                         onClick={() => setThemeStyle('gradient')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1 cursor-pointer ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
                           themeStyle === 'gradient'
-                            ? 'bg-slate-900 text-white shadow-xs'
+                            ? 'bg-emerald-600 text-white shadow-xs'
                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                         }`}
                       >
@@ -1089,8 +1050,8 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                         onClick={() => setThemeById(themeItem.id)}
                         className={`bg-white dark:bg-slate-900 rounded-2xl border-2 p-5 shadow-xs transition-all cursor-pointer flex flex-col justify-between space-y-4 group relative overflow-hidden ${
                           isSelected
-                            ? 'border-slate-900 dark:border-slate-100 ring-2 ring-slate-900/10 shadow-md bg-slate-50/50 dark:bg-slate-800/50'
-                            : 'border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm'
+                            ? 'border-emerald-600 dark:border-emerald-400 ring-2 ring-emerald-500/20 shadow-md bg-emerald-50/20 dark:bg-emerald-950/20'
+                            : 'border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-sm'
                         }`}
                       >
                         {/* Top row */}
@@ -1126,7 +1087,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                             <div
                               className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                                 isSelected
-                                  ? 'border-slate-900 dark:border-white bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                                  ? 'border-emerald-600 bg-emerald-600 text-white'
                                   : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400'
                               }`}
                             >
@@ -1136,7 +1097,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                         </div>
 
                         {/* Description */}
-                        <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed bg-slate-100/60 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200/50 dark:border-slate-800">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800">
                           {themeItem.description}
                         </p>
 
@@ -1156,7 +1117,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                             }}
                             className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
                               isSelected
-                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs'
+                                ? 'bg-emerald-600 text-white shadow-xs'
                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
                             }`}
                           >
