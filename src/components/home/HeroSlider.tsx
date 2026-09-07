@@ -58,10 +58,10 @@ export const HeroSlider: React.FC = () => {
   // If backend returned no banners and not loading, show gradient container with search bar
   if (total === 0) {
     return (
-      <div className="w-full flex flex-col pt-0">
-        <section className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[160px] sm:min-h-[220px] md:min-h-[280px] w-full overflow-hidden z-30 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
-          <div className="absolute inset-0 z-20 flex items-end justify-center pb-3 sm:pb-4 md:pb-6 px-4 sm:px-6 pointer-events-none">
-            <div className="w-full max-w-[350px] md:max-w-[594px] xl:max-w-[694px] pointer-events-auto">
+      <div className="w-full flex flex-col pt-0 relative z-40">
+        <section className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[160px] sm:min-h-[220px] md:min-h-[280px] w-full z-30 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
+          <div className="absolute inset-0 z-40 flex items-end justify-center pb-3 sm:pb-4 md:pb-6 px-4 sm:px-6 pointer-events-none">
+            <div className="w-full max-w-[350px] md:max-w-[594px] xl:max-w-[694px] pointer-events-auto relative z-50">
               <SearchInput />
             </div>
           </div>
@@ -71,14 +71,14 @@ export const HeroSlider: React.FC = () => {
   }
 
   return (
-    <div className="w-full flex flex-col pt-0">
+    <div className="w-full flex flex-col pt-0 relative z-40">
       {/* Hero Main Banner & Search Overlay Section */}
       <section
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[160px] sm:min-h-[220px] md:min-h-[280px] w-full overflow-hidden z-30 bg-slate-900 group"
+        className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[160px] sm:min-h-[220px] md:min-h-[280px] w-full bg-slate-900 group"
       >
         {/* Banner Images Carousel */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -157,8 +157,8 @@ export const HeroSlider: React.FC = () => {
         )}
 
         {/* Search Bar Overlay Centered at Bottom of Hero Banner */}
-        <div className="absolute inset-0 z-20 flex items-end justify-center pb-3 sm:pb-4 md:pb-6 px-4 sm:px-6 pointer-events-none">
-          <div className="w-full max-w-[350px] md:max-w-[594px] xl:max-w-[694px] pointer-events-auto">
+        <div className="absolute inset-0 z-40 flex items-end justify-center pb-3 sm:pb-4 md:pb-6 px-4 sm:px-6 pointer-events-none">
+          <div className="w-full max-w-[350px] md:max-w-[594px] xl:max-w-[694px] pointer-events-auto relative z-50">
             <SearchInput />
           </div>
         </div>
