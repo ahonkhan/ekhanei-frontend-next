@@ -22,6 +22,7 @@ import { StepProgressBar } from './StepProgressBar';
 
 import { useCreateOrderMutation, useSaveIncompleteOrderMutation, useGetProfileQuery, useApplyCouponMutation } from '@/store/services/apiService';
 import { useAppSelector } from '@/store/hooks';
+import { trackInitiateCheckout, trackPurchase } from '@/utils/facebookPixel';
 
 // Haversine distance calculation in KM
 const calculateDistanceKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -217,8 +218,12 @@ export default function CheckoutPageContent() {
 
     const timer = setTimeout(async () => {
       try {
+        const eventId = `initiate_checkout_${draftOrderId || Date.now()}`;
+        trackInitiateCheckout(selectedItems, totalPayable, eventId);
+
         const res = await saveIncompleteOrder({
           draft_id: draftOrderId || undefined,
+          event_id: eventId,
           customer_name: fullName,
           customer_phone: phone,
           customer_email: email.trim() || undefined,
@@ -271,10 +276,12 @@ export default function CheckoutPageContent() {
       (userCoords ? `${userCoords.lat.toFixed(4)}, ${userCoords.lng.toFixed(4)}` : 'F6W3+38 Rangpur');
 
     const selectedPayment = requiresFullPayment ? 'online_payment' : paymentMethod;
+    const purchaseEventId = `purchase_${Date.now()}`;
 
     try {
       const res = await createOrder({
         incomplete_order_id: draftOrderId || undefined,
+        event_id: purchaseEventId,
         customer_name: fullName,
         customer_phone: phone,
         customer_email: email.trim() || undefined,
@@ -297,6 +304,9 @@ export default function CheckoutPageContent() {
         total_amount: totalPayable,
         notes: additionalNote,
       }).unwrap();
+
+      const orderNo = res?.data?.order_number || 'ORDER';
+      trackPurchase(orderNo, selectedItems, totalPayable, purchaseEventId);
 
       clearCart();
       if (res?.data?.payment_url) {
@@ -450,7 +460,7 @@ export default function CheckoutPageContent() {
                   type="text"
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
-                  placeholder="আপনার পুরো নাম লিখুন"
+                  placeholder="আপনার নাম লিখুন"
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
                 />
               </div>
@@ -464,7 +474,7 @@ export default function CheckoutPageContent() {
                   type="tel"
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="আপনার মোবাইল নম্বর লিখুন"
+                  placeholder="আপনার নাম্বার লিখুন"
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
                 />
               </div>
@@ -478,7 +488,7 @@ export default function CheckoutPageContent() {
                   type="tel"
                   value={whatsappNumber}
                   onChange={e => setWhatsappNumber(e.target.value)}
-                  placeholder="আপনার হোয়াটসঅ্যাপ নম্বর লিখুন"
+                  placeholder="আপনার হোয়াটসঅ্যাপ নম্বর লিখুন (ঐচ্ছিক)"
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
                 />
               </div>
@@ -587,7 +597,7 @@ export default function CheckoutPageContent() {
                     type="text"
                     value={customAddress}
                     onChange={e => setCustomAddress(e.target.value)}
-                    placeholder="যেখানে পাঠাবেন সেই জায়গার ঠিকানা লিখুন"
+                    placeholder="আপনার সম্পূর্ণ ঠিকানা লিখুন"
                     className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
                   />
                 </div>
@@ -600,7 +610,7 @@ export default function CheckoutPageContent() {
                     type="text"
                     value={houseDetail}
                     onChange={e => setHouseDetail(e.target.value)}
-                    placeholder="আপনার ঠিকানা লিখুন"
+                    placeholder="আপনার সম্পূর্ণ ঠিকানা লিখুন (ঐচ্ছিক)"
                     className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
                   />
                 </div>
@@ -614,7 +624,7 @@ export default function CheckoutPageContent() {
                 type="text"
                 value={additionalNote}
                 onChange={e => setAdditionalNote(e.target.value)}
-                placeholder="Enter additional instruction for the address (optional)"
+                placeholder="বিশেষ নির্দেশনা বা ডেলিভারি নোট লিখুন (ঐচ্ছিক)"
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-100 transition"
               />
             </div>
@@ -670,7 +680,7 @@ export default function CheckoutPageContent() {
                       type="text"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      placeholder="Enter coupon code (e.g. SUMMER50)"
+                      placeholder="কুপন কোড লিখুন"
                       className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold uppercase placeholder:normal-case placeholder-slate-400 focus:outline-none focus:border-emerald-400 transition"
                     />
                     <button
@@ -830,7 +840,7 @@ export default function CheckoutPageContent() {
                       type="text"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      placeholder="Enter coupon code (e.g. SUMMER50)"
+                      placeholder="কুপন কোড লিখুন"
                       className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold uppercase placeholder:normal-case placeholder-slate-400 focus:outline-none focus:border-emerald-400 transition"
                     />
                     <button

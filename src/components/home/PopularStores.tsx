@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { useGetStoresQuery } from '@/store/services/apiService';
 import { useLocation } from '@/context/LocationContext';
 import { StoreCard } from '@/components/common/StoreCard';
-import { StoreCardSkeleton } from '@/components/common/Skeletons';
+import { StoreCardSkeleton, SectionTitleSkeleton } from '@/components/common/Skeletons';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 
 export const PopularStores: React.FC = () => {
@@ -49,6 +49,21 @@ export const PopularStores: React.FC = () => {
     scrollContainerRef.current.scrollLeft = scrollLeftState - walk;
   };
 
+  if (isLoading) {
+    return (
+      <section id="popular-stores" className="space-y-4 pt-1">
+        <SectionTitleSkeleton />
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <StoreCardSkeleton key={i} />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (stores.length === 0) return null;
+
   return (
     <section id="popular-stores" className="space-y-4 pt-1">
       <div className="flex items-center justify-between">
@@ -89,29 +104,20 @@ export const PopularStores: React.FC = () => {
         </div>
       </div>
 
-      {/* SKELETON LOADING OR STORES LIST */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <StoreCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : stores.length === 0 ? null : (
-        <div
-          ref={scrollContainerRef}
-          onMouseDown={handleMouseDown}
-          onMouseLeave={handleMouseLeave}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-          className={`flex gap-4 sm:gap-5 overflow-x-auto no-scrollbar snap-x py-1.5 select-none ${
-            isDragging ? 'cursor-grabbing' : 'cursor-grab'
-          }`}
-        >
-          {stores.map((store) => (
-            <StoreCard key={store.id} store={store} />
-          ))}
-        </div>
-      )}
+      <div
+        ref={scrollContainerRef}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        className={`flex gap-4 sm:gap-5 overflow-x-auto no-scrollbar snap-x py-1.5 select-none ${
+          isDragging ? 'cursor-grabbing' : 'cursor-grab'
+        }`}
+      >
+        {stores.map((store) => (
+          <StoreCard key={store.id} store={store} />
+        ))}
+      </div>
     </section>
   );
 };

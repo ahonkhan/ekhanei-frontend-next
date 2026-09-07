@@ -13,6 +13,7 @@ import {
   clearCart,
   setIsCartOpen,
 } from '@/store/slices/cartSlice';
+import { trackAddToCart } from '@/utils/facebookPixel';
 
 interface CartContextType {
   cart: CartItem[];
@@ -69,6 +70,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const handleAddItem = (product: Product) => {
     dispatch(addItem(product));
+    try {
+      trackAddToCart(product);
+    } catch (e) {
+      console.error('Meta Pixel AddToCart Error:', e);
+    }
   };
 
   const handleIncrement = (id: string) => {

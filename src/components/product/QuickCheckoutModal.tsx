@@ -18,7 +18,7 @@ import {
 import { Product } from '@/types';
 import { useLocation } from '@/context/LocationContext';
 import { useAppSelector } from '@/store/hooks';
-import { useGetProfileQuery } from '@/store/services/apiService';
+import { useGetProfileQuery, useCreateOrderMutation } from '@/store/services/apiService';
 
 interface QuickCheckoutModalProps {
   isOpen: boolean;
@@ -38,6 +38,7 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
 
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const { data: profileApiData } = useGetProfileQuery(undefined, { skip: !isAuthenticated });
+  const [createOrder, { isLoading: isSubmitting }] = useCreateOrderMutation();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -75,9 +76,44 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
     }
   };
 
-  const handleConfirmOrder = () => {
-    onClose();
-    router.push('/checkout-flow/success');
+  const handleConfirmOrder = async () => {
+    if (!name || !phone) return;
+
+    try {
+      const res = await createOrder({
+        customer_name: name,
+        customer_phone: phone,
+        customer_email: email.trim() || undefined,
+        whatsapp_number: whatsappNumber.trim() || undefined,
+        delivery_address: address || selectedLocation.address,
+        latitude: selectedLocation.lat ?? 25.7439,
+        longitude: selectedLocation.lng ?? 89.2752,
+        payment_method: 'online_payment',
+        items: [{
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          quantity: quantity,
+        }],
+        subtotal: productSubtotal,
+        delivery_fee: deliveryFee,
+        total_amount: totalCost,
+      }).unwrap();
+
+      onClose();
+      if (res?.data?.payment_url) {
+        window.location.href = res.data.payment_url;
+        return;
+      }
+      if (res?.data?.order_number) {
+        router.push(`/checkout-flow/success?order=${res.data.order_number}`);
+      } else {
+        router.push('/checkout-flow/success');
+      }
+    } catch (err) {
+      onClose();
+      router.push('/checkout-flow/success');
+    }
   };
 
   return (
@@ -154,7 +190,7 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  placeholder="আপনার পুরো নাম লিখুন"
+                  placeholder="আপনার নাম লিখুন"
                   className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
                 />
               </div>
@@ -169,7 +205,7 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                   type="tel"
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="আপনার ফোন নম্বর লিখুন"
+                  placeholder="আপনার নাম্বার লিখুন"
                   className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
                 />
               </div>
@@ -184,7 +220,7 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                   type="tel"
                   value={whatsappNumber}
                   onChange={e => setWhatsappNumber(e.target.value)}
-                  placeholder="আপনার হোয়াটসঅ্যাপ নম্বর লিখুন"
+                  placeholder="আপনার হোয়াটসঅ্যাপ নম্বর লিখুন (ঐচ্ছিক)"
                   className="w-full px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
                 />
               </div>
@@ -294,7 +330,7 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                     type="text"
                     value={address}
                     onChange={e => setAddress(e.target.value)}
-                    placeholder="যেখানে পাঠাবেন সেই জায়গার ঠিকানা লিখুন"
+                    placeholder="আপনার সম্পূর্ণ ঠিকানা লিখুন"
                     className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
                   />
                 </div>
@@ -307,7 +343,7 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                     type="text"
                     value={address}
                     onChange={e => setAddress(e.target.value)}
-                    placeholder="আপনার ঠিকানা লিখুন"
+                    placeholder="আপনার সম্পূর্ণ ঠিকানা লিখুন (ঐচ্ছিক)"
                     className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
                   />
                 </div>
@@ -343,7 +379,7 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                   type="text"
                   value={couponCode}
                   onChange={e => setCouponCode(e.target.value)}
-                  placeholder="e.g. SHYAM10, WELCOME50"
+                  placeholder="কুপন কোড লিখুন"
                   className="flex-1 px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition"
                 />
                 <button

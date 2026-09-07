@@ -728,7 +728,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
               <textarea
                 rows={4}
                 required
-                placeholder="Share your experience with food quality, packaging, and delivery speed..."
+                placeholder="Write your feedback..."
                 value={newReviewComment}
                 onChange={(e) => setNewReviewComment(e.target.value)}
                 className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"

@@ -3,10 +3,25 @@
 import React from 'react';
 import Link from 'next/link';
 import { useGetCategoriesQuery } from '@/store/services/apiService';
-import { CategoryCardSkeleton } from '@/components/common/Skeletons';
+import { CategoryCardSkeleton, SectionTitleSkeleton } from '@/components/common/Skeletons';
 
 export const ServiceCategories: React.FC = () => {
   const { data: categories = [], isLoading } = useGetCategoriesQuery();
+
+  if (isLoading) {
+    return (
+      <section id="service-categories" className="space-y-4 sm:space-y-5 pt-0">
+        <SectionTitleSkeleton />
+        <div className="grid grid-cols-5 md:grid-cols-5 lg:grid-cols-10 gap-2.5 sm:gap-4">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <CategoryCardSkeleton key={i} />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (categories.length === 0) return null;
 
   return (
     <section id="service-categories" className="space-y-4 sm:space-y-5 pt-0">
@@ -23,16 +38,8 @@ export const ServiceCategories: React.FC = () => {
         </div>
       </div>
 
-      {/* SKELETON LOADING STATE */}
-      {isLoading ? (
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3.5 sm:gap-5 lg:gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <CategoryCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : categories.length === 0 ? null : (
-        /* GRID: 3 ITEMS ON MOBILE, 6 ITEMS ON DESKTOP */
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-3.5 sm:gap-5 lg:gap-6">
+      {/* GRID: 3 ITEMS ON MOBILE, 6 ITEMS ON DESKTOP */}
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-3.5 sm:gap-5 lg:gap-6">
           {categories.map((cat) => (
             <Link
               key={cat.id}
@@ -59,7 +66,6 @@ export const ServiceCategories: React.FC = () => {
             </Link>
           ))}
         </div>
-      )}
     </section>
   );
 };

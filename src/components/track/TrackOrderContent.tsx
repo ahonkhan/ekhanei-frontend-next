@@ -282,7 +282,7 @@ export const TrackOrderContent: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Enter Order ID or Mobile (e.g. EKH-123456)"
+                  placeholder="Enter order number or mobile number"
                   className="w-full pl-11 pr-4 py-3.5 bg-white text-slate-900 text-sm font-bold rounded-2xl border border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow-lg placeholder:text-slate-400 placeholder:font-normal"
                 />
               </div>

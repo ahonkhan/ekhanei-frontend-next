@@ -879,6 +879,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                           required
                           value={profileName}
                           onChange={(e) => setProfileName(e.target.value)}
+                          placeholder="Enter your full name"
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none focus:border-emerald-500 transition"
                         />
                       </div>
@@ -895,7 +896,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                           disabled={Boolean(user?.phone && user.phone.trim() !== '')}
                           value={profilePhone}
                           onChange={(e) => setProfilePhone(e.target.value)}
-                          placeholder="Enter phone number"
+                          placeholder="Enter your mobile number"
                           className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition ${
                             Boolean(user?.phone && user.phone.trim() !== '')
                               ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
@@ -909,7 +910,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                           type="tel"
                           value={profileWhatsapp}
                           onChange={(e) => setProfileWhatsapp(e.target.value)}
-                          placeholder="Enter WhatsApp number (e.g. 01700000000)"
+                          placeholder="Enter your WhatsApp number (optional)"
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none focus:border-emerald-500 transition"
                         />
                       </div>
@@ -922,7 +923,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                           type="email"
                           disabled
                           value={profileEmail}
-                          placeholder="customer@gmail.com"
+                          placeholder="Enter your email address"
                           className="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-400 cursor-not-allowed"
                         />
                       </div>

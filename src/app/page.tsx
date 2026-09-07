@@ -1,10 +1,26 @@
+'use client';
+
 import React from 'react';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { ServiceCategories } from '@/components/home/ServiceCategories';
 import { TrustBadges } from '@/components/home/TrustBadges';
 import { PopularStores } from '@/components/home/PopularStores';
+import { HomePageSkeleton } from '@/components/common/Skeletons';
+import {
+  useGetHeroBannersQuery,
+  useGetCategoriesQuery,
+} from '@/store/services/apiService';
 
 export default function HomePage() {
+  const { isLoading: isHeroLoading } = useGetHeroBannersQuery();
+  const { isLoading: isCategoriesLoading } = useGetCategoriesQuery();
+
+  const isInitialLoading = isHeroLoading || isCategoriesLoading;
+
+  if (isInitialLoading) {
+    return <HomePageSkeleton />;
+  }
+
   return (
     <main className="w-full space-y-4 sm:space-y-6 pt-0 pb-10">
       {/* HERO BANNER (Managed via Admin Panel) */}
