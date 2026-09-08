@@ -15,6 +15,8 @@ import {
   Check,
   X,
   Loader2,
+  CreditCard,
+  Info,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useLocation } from '@/context/LocationContext';
@@ -142,10 +144,17 @@ export default function CheckoutPageContent() {
   const discount = appliedCoupon ? appliedCoupon.discount_amount : 0;
   const totalPayable = Math.max(0, productTotal + deliveryCharge - discount);
 
-  // Check if any selected item in cart requires full payment
-  const requiresFullPayment = useMemo(() => {
-    return selectedItems.some((item: any) => item.requiresFullPayment || item.serviceCategoryRequiresFullPayment);
+  // Check if any selected item in cart requires advance payment
+  const maxAdvancePercentage = useMemo(() => {
+    let max = 0;
+    selectedItems.forEach((item: any) => {
+      const advance = item.advancePaymentPercentage || (item.requiresFullPayment ? 100 : 0);
+      if (advance > max) max = advance;
+    });
+    return max;
   }, [selectedItems]);
+
+  const requiresFullPayment = maxAdvancePercentage > 0;
 
   const [paymentMethod, setPaymentMethod] = useState<'cash_on_delivery' | 'online_payment'>('cash_on_delivery');
 
@@ -360,12 +369,19 @@ export default function CheckoutPageContent() {
               {paymentMethod === 'cash_on_delivery' && !requiresFullPayment && (
                 <div className="w-2 h-2 rounded-full bg-emerald-600" />
               )}
+              paymentMethod === 'cash_on_delivery' && maxAdvancePercentage !== 100 ? 'border-emerald-600' : 'border-slate-300'
+            }`}>
+              {paymentMethod === 'cash_on_delivery' && maxAdvancePercentage !== 100 && (
+                <div className="w-2 h-2 rounded-full bg-emerald-600" />
+              )}
             </div>
             <div>
-              <span className={`text-xs font-bold block ${requiresFullPayment ? 'text-slate-400 font-normal' : 'text-slate-800'}`}>
+              <span className={`text-xs font-bold block ${maxAdvancePercentage === 100 ? 'text-slate-400 font-normal' : 'text-slate-800'}`}>
                 Cash on Delivery
               </span>
-              <span className="text-[10px] text-slate-500 block">পণ্য হাতে পেয়ে ক্যাশ প্রদান করুন</span>
+              <span className={`text-[10px] sm:text-xs font-medium block mt-1 ${maxAdvancePercentage === 100 ? 'text-rose-500' : 'text-slate-500'}`}>
+                {maxAdvancePercentage === 100 ? `Disabled (${maxAdvancePercentage}% Advance Req)` : 'Pay when you receive'}
+              </span>
             </div>
           </div>
         </button>
@@ -729,6 +745,15 @@ export default function CheckoutPageContent() {
                 <span className="font-black text-emerald-700 text-lg">৳{totalPayable.toLocaleString()}</span>
               </div>
 
+              {requiresFullPayment && (
+                <div className="flex justify-between text-sm bg-indigo-50 p-2 rounded-lg mt-2">
+                  <span className="font-black text-indigo-700 flex items-center gap-1">
+                    <CreditCard className="w-4 h-4"/> Payable Now ({maxAdvancePercentage}%)
+                  </span>
+                  <span className="font-black text-indigo-700 text-lg">৳{(totalPayable * (maxAdvancePercentage / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+              )}
+
               {/* Payment Method */}
               {renderPaymentMethodSection()}
 
@@ -888,6 +913,15 @@ export default function CheckoutPageContent() {
                 <span className="font-black text-slate-900">Total Payable</span>
                 <span className="font-black text-emerald-700 text-lg">৳{totalPayable.toLocaleString()}</span>
               </div>
+
+              {requiresFullPayment && (
+                <div className="flex justify-between text-sm bg-indigo-50 p-2 rounded-lg mt-2">
+                  <span className="font-black text-indigo-700 flex items-center gap-1">
+                    <CreditCard className="w-4 h-4"/> Payable Now ({maxAdvancePercentage}%)
+                  </span>
+                  <span className="font-black text-indigo-700 text-lg">৳{(totalPayable * (maxAdvancePercentage / 100)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+              )}
 
               {/* Payment Method */}
               {renderPaymentMethodSection()}

@@ -21,6 +21,7 @@ export interface Category {
   slug?: string;
   title?: string;
   requiresFullPayment?: boolean;
+  advancePaymentPercentage?: number;
 }
 
 export interface ProductVariation {
@@ -69,6 +70,8 @@ export interface Product {
   isPopular?: boolean;
   isRecommended?: boolean;
   isBestSeller?: boolean;
+  requiresFullPayment?: boolean;
+  advancePaymentPercentage?: number;
   flashStock?: number;
   stockQuantity?: number;
   shortDescription?: string;
