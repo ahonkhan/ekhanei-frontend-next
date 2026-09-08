@@ -254,11 +254,11 @@ export default function ChatWidget() {
                 <div className="flex items-center space-x-3">
                   <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center border border-emerald-400/60 shadow-xs overflow-hidden shrink-0">
                     <img
-                      src="/logo.png"
-                      alt="Ekhanei Logo"
-                      className="w-full h-full object-contain p-0.5 bg-white"
+                      src="/chat-logo.jpeg"
+                      alt="Ekhanei Support Logo"
+                      className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/app-icon.png';
+                        (e.target as HTMLImageElement).src = '/logo.png';
                       }}
                     />
                   </div>
@@ -278,7 +278,7 @@ export default function ChatWidget() {
                     </h3>
                     <div className="flex items-center space-x-1.5 text-xs text-emerald-200">
                       <span className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' || conversationId ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-                      <span>{connectionStatus === 'connected' || conversationId ? 'Online • 20 Min Hyperlocal Express' : 'Connecting...'}</span>
+                      <span>{connectionStatus === 'connected' || conversationId ? 'Online' : 'Connecting...'}</span>
                     </div>
                   </div>
                 </div>

@@ -183,11 +183,11 @@ export default function CustomerChatPage() {
             <div className="relative shrink-0">
               <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-emerald-400/60 shadow-xs overflow-hidden shrink-0">
                 <img
-                  src="/logo.png"
-                  alt="Ekhanei Logo"
-                  className="w-full h-full object-contain p-0.5 bg-white"
+                  src="/chat-logo.jpeg"
+                  alt="Ekhanei Support Logo"
+                  className="w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/app-icon.png';
+                    (e.target as HTMLImageElement).src = '/logo.png';
                   }}
                 />
               </div>
@@ -209,7 +209,7 @@ export default function CustomerChatPage() {
                   />
                 </svg>
               </h1>
-              <p className="text-[11px] text-emerald-100 font-medium">Online • 20 Min Hyperlocal Express</p>
+              <p className="text-[11px] text-emerald-100 font-medium">Online</p>
             </div>
           </div>
 
