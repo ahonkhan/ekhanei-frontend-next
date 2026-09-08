@@ -56,12 +56,23 @@ export default function ChatWidget() {
     }
   }, [messagesResponse]);
 
+  // Auto-poll messages every 3s when chat is open for real-time fallback
+  useEffect(() => {
+    if (!isAuthenticated || !conversationId || !isOpen || isMinimized) return;
+
+    const interval = setInterval(() => {
+      refetchMessages();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, conversationId, isOpen, isMinimized, refetchMessages]);
+
   // Handle Pusher WebSockets
   useEffect(() => {
     if (!isAuthenticated || !conversationId) return;
 
-    const pusherKey = process.env.NEXT_PUBLIC_PUSHER_APP_KEY;
-    const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1';
+    const pusherKey = process.env.NEXT_PUBLIC_PUSHER_APP_KEY || process.env.NEXT_PUBLIC_PUSHER_KEY || '902a9259bb7eb5c5d39d';
+    const pusherCluster = process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || process.env.NEXT_PUBLIC_PUSHER_CLUSTER || 'ap1';
 
     if (!pusherKey) return;
 
@@ -89,9 +100,8 @@ export default function ChatWidget() {
 
     const channel = pusher.subscribe(`private-chat.${conversationId}`);
 
-    // Listen to MessageSent
-    channel.bind('MessageSent', (data: any) => {
-      if (data.conversation_id === conversationId) {
+    const handleNewMessage = (data: any) => {
+      if (data && (Number(data.conversation_id) === Number(conversationId) || !data.conversation_id)) {
         setMessages((prev) => {
           if (prev.some((m) => Number(m.id) === Number(data.id))) return prev;
           return [...prev, data];
@@ -101,11 +111,23 @@ export default function ChatWidget() {
           markReadApi(conversationId);
         }
       }
+    };
+
+    // Listen to MessageSent variations
+    channel.bind('MessageSent', handleNewMessage);
+    channel.bind('.MessageSent', handleNewMessage);
+    channel.bind('App\\Events\\MessageSent', handleNewMessage);
+
+    // Global event fallback
+    channel.bind_global((eventName: string, data: any) => {
+      if (eventName.includes('MessageSent') || (data && data.id && data.message)) {
+        handleNewMessage(data);
+      }
     });
 
     // Listen to typing
     channel.bind('client-typing', (data: any) => {
-      if (data.sender_type === 'admin') {
+      if (data && data.sender_type === 'admin') {
         setIsTyping(true);
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
         typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
@@ -117,7 +139,7 @@ export default function ChatWidget() {
       pusher.unsubscribe(`private-chat.${conversationId}`);
       pusher.disconnect();
     };
-  }, [isAuthenticated, conversationId, isOpen, isMinimized, token]);
+  }, [isAuthenticated, conversationId, isOpen, isMinimized, token, markReadApi]);
 
   // Auto-scroll to bottom
   useEffect(() => {
