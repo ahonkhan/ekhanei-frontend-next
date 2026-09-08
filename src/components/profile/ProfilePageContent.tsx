@@ -514,18 +514,12 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => setSelectedOrder(ord)}
-                                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold rounded-xl transition cursor-pointer"
-                              >
-                                Order Details
-                              </button>
                               <Link
                                 href={`/track-order?id=${ord.order_number || ord.id}`}
-                                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl transition flex items-center gap-1 cursor-pointer"
+                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-xs"
                               >
                                 <Truck className="w-3.5 h-3.5" />
-                                <span>Track</span>
+                                <span>Order Details & Track</span>
                               </Link>
                             </div>
                           </div>

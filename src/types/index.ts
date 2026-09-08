@@ -80,7 +80,6 @@ export interface Product {
   exchangePolicy?: string;
   deliveryTime?: string;
   paymentMethod?: string;
-  requiresFullPayment?: boolean;
   variations?: ProductVariation[];
   variationAttributes?: VariationAttribute[];
   reviews?: ProductReview[];

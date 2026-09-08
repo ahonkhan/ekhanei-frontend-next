@@ -491,15 +491,17 @@ export const TrackOrderContent: React.FC = () => {
                     </h3>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-xs pt-1">
                     <div>
-                      <span className="font-bold text-slate-400 uppercase text-[10px] block">Payment Method</span>
-                      <p className="font-bold text-slate-800">{activeOrder.paymentMethod}</p>
+                      <span className="font-bold text-slate-400 uppercase text-[10px] block mb-1.5">Payment Method</span>
+                      <p className="font-bold text-slate-800 capitalize">
+                        {activeOrder.paymentMethod ? String(activeOrder.paymentMethod).replace(/_/g, ' ') : 'Cash on Delivery'}
+                      </p>
                     </div>
                     <div className="text-right">
-                      <span className="font-bold text-slate-400 uppercase text-[10px] block">Payment Status</span>
-                      <span className="font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg uppercase border border-amber-200">
-                        {activeOrder.paymentStatus}
+                      <span className="font-bold text-slate-400 uppercase text-[10px] block mb-1.5">Payment Status</span>
+                      <span className="inline-block font-extrabold text-amber-700 bg-amber-50 px-3 py-1 rounded-lg uppercase border border-amber-200 text-[11px] tracking-wide">
+                        {activeOrder.paymentStatus || 'Pending'}
                       </span>
                     </div>
                   </div>

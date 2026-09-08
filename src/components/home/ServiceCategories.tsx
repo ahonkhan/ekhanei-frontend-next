@@ -33,7 +33,7 @@ export const ServiceCategories: React.FC = () => {
             Service Categories
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-            Explore daily services & doorstep deliveries available in your area
+            পছন্দের ক্যাটাগরি তে ক্লিক করে প্রোডাক্ট দেখুন
           </p>
         </div>
       </div>

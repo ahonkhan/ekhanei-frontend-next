@@ -369,11 +369,6 @@ export default function CheckoutPageContent() {
               {paymentMethod === 'cash_on_delivery' && !requiresFullPayment && (
                 <div className="w-2 h-2 rounded-full bg-emerald-600" />
               )}
-              paymentMethod === 'cash_on_delivery' && maxAdvancePercentage !== 100 ? 'border-emerald-600' : 'border-slate-300'
-            }`}>
-              {paymentMethod === 'cash_on_delivery' && maxAdvancePercentage !== 100 && (
-                <div className="w-2 h-2 rounded-full bg-emerald-600" />
-              )}
             </div>
             <div>
               <span className={`text-xs font-bold block ${maxAdvancePercentage === 100 ? 'text-slate-400 font-normal' : 'text-slate-800'}`}>

@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://admin.ekhanei.b
 
 export const apiService = createApi({
   reducerPath: 'api',
-  tagTypes: ['User', 'Orders', 'Reviews'],
+  tagTypes: ['User', 'Orders', 'Reviews', 'Chat'],
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
     prepareHeaders: (headers, { getState }: any) => {
@@ -238,6 +238,38 @@ export const apiService = createApi({
       query: (id) => `/orders/track/${id}`,
       transformResponse: (res: any) => res.data || null,
     }),
+
+    // Customer Live Chat Endpoints
+    getChatConversation: builder.query<any, void>({
+      query: () => '/customer/chat/conversations',
+      providesTags: ['Chat'],
+    }),
+    startChatConversation: builder.mutation<any, void>({
+      query: () => ({
+        url: '/customer/chat/conversations',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Chat'],
+    }),
+    getChatMessages: builder.query<any, { conversationId: number | string; page?: number }>({
+      query: ({ conversationId, page = 1 }) => `/customer/chat/conversations/${conversationId}/messages?page=${page}`,
+      providesTags: ['Chat'],
+    }),
+    sendChatMessage: builder.mutation<any, { conversationId: number | string; message: string }>({
+      query: ({ conversationId, message }) => ({
+        url: `/customer/chat/conversations/${conversationId}/messages`,
+        method: 'POST',
+        body: { message },
+      }),
+      invalidatesTags: ['Chat'],
+    }),
+    markChatRead: builder.mutation<any, number | string>({
+      query: (conversationId) => ({
+        url: `/customer/chat/conversations/${conversationId}/read`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Chat'],
+    }),
   }),
 });
 
@@ -274,4 +306,9 @@ export const {
   useGetUserOrdersQuery,
   useGetUserOrderDetailQuery,
   useTrackOrderQuery,
+  useGetChatConversationQuery,
+  useStartChatConversationMutation,
+  useGetChatMessagesQuery,
+  useSendChatMessageMutation,
+  useMarkChatReadMutation,
 } = apiService;

@@ -10,6 +10,7 @@ import { LocationDrawer } from "@/components/layout/LocationDrawer";
 import { LocationBlockModal } from "@/components/layout/LocationBlockModal";
 import { CartDrawer } from "@/components/layout/CartDrawer";
 import { ThemeSwitcherModal } from "@/components/common/ThemeSwitcherModal";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 import { Suspense } from "react";
 import { StoreProvider } from "@/store/provider";
@@ -60,6 +61,7 @@ export default function RootLayout({
                 <LocationBlockModal />
                 <CartDrawer />
                 <ThemeSwitcherModal />
+                <ChatWidget />
               </CartProvider>
             </LocationProvider>
           </ThemeProvider>
