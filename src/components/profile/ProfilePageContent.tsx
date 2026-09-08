@@ -945,32 +945,32 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                   </p>
                 </div>
 
-                <div className="bg-[#1b1d2e] rounded-3xl border border-[#2a2d40] p-6 sm:p-7 shadow-xl max-w-2xl">
-                  <h3 className="text-[#888c9f] font-medium text-sm mb-4 px-1">App Settings</h3>
+                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 sm:p-7 shadow-xl max-w-2xl">
+                  <h3 className="text-slate-500 dark:text-slate-400 font-medium text-sm mb-4 px-1">App Settings</h3>
                   
                   <div className="space-y-3">
                     {/* Theme Mode */}
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-[#24273a] hover:bg-[#2a2d40] transition">
+                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 transition">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#2f334d] flex items-center justify-center text-[#a5a9c0] shrink-0">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0">
                           <Moon className="w-6 h-6" />
                         </div>
                         <div>
-                          <h4 className="text-white font-semibold text-base">Theme Mode</h4>
-                          <p className="text-[#a5a9c0] text-xs font-medium mt-0.5">Choose your preferred theme</p>
+                          <h4 className="text-slate-900 dark:text-white font-semibold text-base">Theme Mode</h4>
+                          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium mt-0.5">Choose your preferred theme</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center bg-[#2f334d] p-1.5 rounded-xl">
+                      <div className="flex items-center bg-slate-100 dark:bg-slate-700 p-1.5 rounded-xl">
                         <button 
                           onClick={() => setThemeMode('light')}
-                          className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${themeMode === 'light' ? 'bg-[#828df8] text-white shadow-md' : 'text-[#a5a9c0] hover:text-white'}`}
+                          className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${themeMode === 'light' ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
                           <Sun className="w-4 h-4"/>
                         </button>
                         <button 
                           onClick={() => setThemeMode('dark')}
-                          className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${themeMode === 'dark' ? 'bg-[#828df8] text-white shadow-md' : 'text-[#a5a9c0] hover:text-white'}`}
+                          className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${themeMode === 'dark' ? 'bg-slate-800 dark:bg-slate-900 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                         >
                           <Moon className="w-4 h-4"/>
                         </button>
@@ -979,19 +979,19 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
 
                     {/* Color Scheme */}
                     <div 
-                      className="flex items-center justify-between p-4 rounded-2xl bg-[#24273a] hover:bg-[#2a2d40] transition cursor-pointer"
+                      className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 transition cursor-pointer"
                       onClick={() => setIsThemeModalOpen(true)}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#2f334d] flex items-center justify-center text-[#a5a9c0] shrink-0">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 shrink-0">
                           <Palette className="w-6 h-6" />
                         </div>
                         <div>
-                          <h4 className="text-white font-semibold text-base">Color Scheme</h4>
-                          <p className="text-[#a5a9c0] text-xs font-medium mt-0.5">{currentTheme.name}</p>
+                          <h4 className="text-slate-900 dark:text-white font-semibold text-base">Color Scheme</h4>
+                          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium mt-0.5">{currentTheme.name}</p>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-[#a5a9c0]" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 dark:text-slate-500" />
                     </div>
                   </div>
                 </div>
