@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Force Tailwind v4 to use class-based dark mode instead of OS media preference */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --color-primary: #F56E09;
   --color-primary-hover: #E06000;

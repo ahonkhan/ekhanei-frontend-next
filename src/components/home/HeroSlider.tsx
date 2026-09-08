@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { SearchInput } from '@/components/common/SearchInput';
 import { useLocation } from '@/context/LocationContext';
@@ -9,46 +9,19 @@ import { MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HeroBanner } from '@/types';
 import { HeroHeaderSkeleton } from '@/components/common/Skeletons';
 
+// Swiper
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay, EffectFade } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/effect-fade';
+
 export const HeroSlider: React.FC = () => {
   const { selectedLocation } = useLocation();
   const { data: heroBanners, isLoading } = useGetHeroBannersQuery();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  const touchStartX = useRef(0);
 
   const banners: HeroBanner[] = heroBanners || [];
   const total = banners.length;
-
-  const nextSlide = useCallback(() => {
-    if (total <= 1) return;
-    setCurrentIndex((prev) => (prev + 1) % total);
-  }, [total]);
-
-  const prevSlide = useCallback(() => {
-    if (total <= 1) return;
-    setCurrentIndex((prev) => (prev - 1 + total) % total);
-  }, [total]);
-
-  useEffect(() => {
-    if (total <= 1 || isHovered) return;
-    const timer = setInterval(() => {
-      nextSlide();
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [total, isHovered, nextSlide]);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (total <= 1) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) {
-      if (diff > 0) nextSlide();
-      else prevSlide();
-    }
-  };
 
   // Skeleton Loader while fetching backend banners
   if (isLoading || !heroBanners) {
@@ -73,47 +46,49 @@ export const HeroSlider: React.FC = () => {
   return (
     <div className="w-full flex flex-col pt-0 relative z-40">
       {/* Hero Main Banner & Search Overlay Section */}
-      <section
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[160px] sm:min-h-[220px] md:min-h-[280px] w-full bg-slate-900 group"
-      >
-        {/* Banner Images Carousel */}
+      <section className="relative aspect-[5/2] lg:aspect-[5/1] min-h-[160px] sm:min-h-[220px] md:min-h-[280px] w-full bg-slate-900 group">
+        
+        {/* Banner Images Carousel using Swiper */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-          {banners.map((banner, idx) => {
-            const isActive = idx === currentIndex;
-            const targetLink = banner.link || banner.url;
+          <Swiper
+            modules={[Navigation, Autoplay, EffectFade]}
+            effect="fade"
+            navigation={{
+              prevEl: '.hero-prev',
+              nextEl: '.hero-next',
+            }}
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            loop={total > 1}
+            className="w-full h-full"
+          >
+            {banners.map((banner, idx) => {
+              const targetLink = banner.link || banner.url;
 
-            const imageContent = (
-              <img
-                src={banner.image}
-                alt={banner.title || 'Ekhanei Home banner'}
-                className={`object-cover object-center w-full h-full transition-opacity duration-700 ease-in-out absolute inset-0 ${
-                  isActive ? 'opacity-100 scale-100 z-0' : 'opacity-0 scale-105 z-[-1] pointer-events-none'
-                }`}
-              />
-            );
-
-            if (!isActive) return null;
-
-            if (targetLink && targetLink.trim() !== '' && targetLink !== '#') {
-              return (
-                <Link key={banner.id || idx} href={targetLink} className="block w-full h-full absolute inset-0">
-                  {imageContent}
-                </Link>
+              const imageContent = (
+                <img
+                  src={banner.image}
+                  alt={banner.title || 'Ekhanei Home banner'}
+                  className="object-cover object-center w-full h-full"
+                />
               );
-            }
 
-            return <div key={banner.id || idx} className="w-full h-full absolute inset-0">{imageContent}</div>;
-          })}
+              return (
+                <SwiperSlide key={banner.id || idx}>
+                  {targetLink && targetLink.trim() !== '' && targetLink !== '#' ? (
+                    <Link href={targetLink} className="block w-full h-full">
+                      {imageContent}
+                    </Link>
+                  ) : (
+                    <div className="w-full h-full">{imageContent}</div>
+                  )}
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
         </div>
 
         {/* Mobile Top-Left Location Pill */}
-        <div
-          className="absolute top-2 left-2 z-20 flex lg:hidden items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-transparent via-white/15 to-white/35 border border-white/40 backdrop-blur-md text-left shadow-md cursor-default max-w-[180px]"
-        >
+        <div className="absolute top-2 left-2 z-20 flex lg:hidden items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-transparent via-white/15 to-white/35 border border-white/40 backdrop-blur-md text-left shadow-md cursor-default max-w-[180px]">
           <div className="w-5 h-5 rounded-full bg-white/25 text-white flex items-center justify-center text-xs shrink-0 font-black">
             <MapPin className="w-3 h-3 text-white" />
           </div>
@@ -122,37 +97,21 @@ export const HeroSlider: React.FC = () => {
           </span>
         </div>
 
-        {/* Carousel Controls & Indicators (Only if multiple banners) */}
+        {/* Carousel Controls (Only if multiple banners) */}
         {total > 1 && (
           <>
             <button
-              onClick={prevSlide}
               aria-label="Previous Slide"
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg"
+              className="hero-prev absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              onClick={nextSlide}
               aria-label="Next Slide"
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg"
+              className="hero-next absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
-
-            {/* Slider Dot Indicators */}
-            <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
-              {banners.map((_, dotIdx) => (
-                <button
-                  key={dotIdx}
-                  onClick={() => setCurrentIndex(dotIdx)}
-                  aria-label={`Go to slide ${dotIdx + 1}`}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    dotIdx === currentIndex ? 'w-4 bg-emerald-400' : 'w-1.5 bg-white/60 hover:bg-white'
-                  }`}
-                />
-              ))}
-            </div>
           </>
         )}
 
@@ -166,4 +125,5 @@ export const HeroSlider: React.FC = () => {
     </div>
   );
 };
+
 
