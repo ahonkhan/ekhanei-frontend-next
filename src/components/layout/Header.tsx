@@ -39,6 +39,8 @@ export const Header: React.FC = () => {
     }
   }, [profileApiData, dispatch]);
 
+  if (pathname === '/chat') return null;
+
   return (
     <>
       {/* Mobile App Download Banner (Positioned ABOVE Header) */}

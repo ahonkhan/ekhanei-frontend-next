@@ -10,9 +10,11 @@ import {
   useSendChatMessageMutation,
   useMarkChatReadMutation,
 } from '@/store/services/apiService';
+import { usePathname } from 'next/navigation';
 import { useAppSelector } from '@/store/hooks';
 
 export default function ChatWidget() {
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -199,7 +201,7 @@ export default function ChatWidget() {
 
   const unreadCount = conversation?.unread_count || 0;
 
-  if (!mounted) return null;
+  if (!mounted || pathname === '/chat') return null;
 
   return (
     <>

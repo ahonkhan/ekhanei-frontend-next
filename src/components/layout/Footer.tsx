@@ -21,6 +21,8 @@ export const Footer: React.FC = () => {
     setOpenSection(openSection === section ? null : section);
   };
 
+  if (isChatPage) return null;
+
   return (
     <>
       <footer className="bg-white border-t mt-5 text-[#191919] w-full">
