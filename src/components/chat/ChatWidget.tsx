@@ -203,11 +203,11 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* FLOATING ACTION BUTTON */}
+      {/* FLOATING ACTION BUTTON (Desktop Only) */}
       {!isOpen && (
         <button
           onClick={handleOpenChat}
-          className="fixed bottom-6 right-6 z-40 bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center group"
+          className="hidden sm:flex fixed bottom-6 right-6 z-40 bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 items-center justify-center group"
           aria-label="Live Chat Support"
         >
           <MessageSquare className="w-6 h-6" />

@@ -13,6 +13,7 @@ export const Footer: React.FC = () => {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
   const pathname = usePathname();
   const isProductPage = pathname ? pathname.startsWith('/product/') : false;
+  const isChatPage = pathname === '/chat';
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
 
@@ -267,7 +268,7 @@ export const Footer: React.FC = () => {
       </footer>
 
       {/* MOBILE BOTTOM NAVIGATION BAR (Flush at bottom 0 with top border and top rounded corners) */}
-      {!isProductPage && (
+      {!isProductPage && !isChatPage && (
         <div className="fixed inset-x-0 bottom-0 z-50 flex flex-row justify-center items-center py-2 px-4 border-t border-solid border-theme-primary rounded-t-2xl md:hidden bg-white backdrop-blur-md transition-all duration-300 ease-in-out">
           <div className="flex items-center justify-between w-full">
 
@@ -305,15 +306,13 @@ export const Footer: React.FC = () => {
             </button>
 
             {/* 4. Live Chat */}
-            <a
-              href="https://wa.me/8801907104920"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/chat"
               className="flex flex-col items-center justify-center gap-0.5 text-xs text-gray-600 font-medium cursor-pointer hover:scale-105 transition-transform border-none bg-transparent p-0"
             >
               <MessageCircleMore className="w-5 h-5 text-gray-600" />
               <span className="text-[10px]">Live Chat</span>
-            </a>
+            </Link>
 
             {/* 5. Account Profile */}
             {isAuthenticated ? (

@@ -1,7 +1,22 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, Send, Loader2, Check, CheckCheck, RefreshCw, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { 
+  MessageSquare, 
+  Send, 
+  Loader2, 
+  Check, 
+  CheckCheck, 
+  RefreshCw, 
+  AlertCircle,
+  ArrowLeft,
+  Phone,
+  Paperclip,
+  Smile,
+  ShieldCheck
+} from 'lucide-react';
 import Pusher from 'pusher-js';
 import {
   useGetChatConversationQuery,
@@ -12,6 +27,7 @@ import {
 import { useAppSelector } from '@/store/hooks';
 
 export default function CustomerChatPage() {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
@@ -45,7 +61,7 @@ export default function CustomerChatPage() {
     }
   }, [messagesResponse]);
 
-  // Auto-poll messages every 3s as fallback
+  // Auto-poll messages every 3s as fallback for instant sync
   useEffect(() => {
     if (!isAuthenticated || !conversationId) return;
 
@@ -56,6 +72,7 @@ export default function CustomerChatPage() {
     return () => clearInterval(interval);
   }, [isAuthenticated, conversationId, refetchMessages]);
 
+  // Handle Pusher WebSockets
   useEffect(() => {
     if (!isAuthenticated || !conversationId) return;
 
@@ -138,144 +155,198 @@ export default function CustomerChatPage() {
   };
 
   return (
-    <main className="max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col my-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 flex flex-col overflow-hidden min-h-[500px] max-h-[750px]">
-          {/* HEADER */}
-          <div className="bg-emerald-700 text-white p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-base border border-emerald-500">
+    <div className="w-full min-h-[100dvh] sm:min-h-0 sm:py-6 sm:px-4 bg-[#efeae2] sm:bg-slate-100 flex flex-col items-center justify-center">
+      
+      {/* WHATSAPP CONTAINER (Full-screen on Mobile, Card Dialog on Desktop) */}
+      <div className="w-full h-[100dvh] sm:h-[650px] sm:max-w-4xl bg-[#efeae2] sm:rounded-3xl sm:shadow-2xl sm:border sm:border-slate-200 flex flex-col overflow-hidden">
+        
+        {/* WHATSAPP TOP HEADER */}
+        <div className="bg-[#075e54] text-white px-3 py-3 sm:px-5 flex items-center justify-between shadow-md shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            
+            {/* Back Button */}
+            <button
+              onClick={() => {
+                if (window.history.length > 1) {
+                  router.back();
+                } else {
+                  router.push('/');
+                }
+              }}
+              className="p-1.5 hover:bg-emerald-800 rounded-full transition text-white"
+              title="Go Back"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+
+            {/* Support Avatar */}
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-black text-sm border border-emerald-400 text-white shadow-xs">
                 CS
               </div>
-              <div>
-                <h1 className="font-semibold text-base">Ekhanei Customer Support</h1>
-                <p className="text-xs text-emerald-200">Real-time Live Chat Assistant</p>
-              </div>
+              <span className="w-3 h-3 bg-emerald-400 border-2 border-[#075e54] rounded-full absolute bottom-0 right-0" />
             </div>
+
+            {/* Title & Online Status */}
+            <div>
+              <h1 className="font-extrabold text-sm sm:text-base leading-tight flex items-center gap-1.5">
+                <span>Ekhanei Support</span>
+                <ShieldCheck className="w-4 h-4 text-emerald-300 inline" />
+              </h1>
+              <p className="text-[11px] text-emerald-100 font-medium">Online • 20 Min Hyperlocal Express</p>
+            </div>
+          </div>
+
+          {/* Header Action Buttons */}
+          <div className="flex items-center space-x-2">
+            <a
+              href="tel:01907104920"
+              className="p-2 hover:bg-emerald-800 rounded-full transition text-emerald-100"
+              title="Call Customer Support"
+            >
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+            </a>
+
             {!conversationId && isAuthenticated && (
               <button
                 onClick={() => startConversation()}
                 disabled={isStarting}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-xl font-bold transition flex items-center space-x-1 shadow-xs"
               >
                 {isStarting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <span>Start Chat</span>}
               </button>
             )}
           </div>
+        </div>
 
-          {/* MESSAGES */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
-            {!isAuthenticated ? (
-              <div className="flex flex-col items-center justify-center h-full text-center p-6 text-slate-500">
-                <AlertCircle className="w-12 h-12 text-amber-500 mb-2" />
-                <h3 className="font-semibold text-slate-800 text-base">Authentication Required</h3>
-                <p className="text-xs text-slate-500 mt-1 max-w-sm">Please log in to your account to access real-time live support with our customer care team.</p>
-              </div>
-            ) : isStarting ? (
-              <div className="flex flex-col items-center justify-center h-full text-slate-400">
-                <Loader2 className="w-6 h-6 animate-spin text-emerald-600 mb-2" />
-                <span className="text-xs">Connecting to support team...</span>
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center p-6 text-slate-500">
-                <MessageSquare className="w-12 h-12 text-slate-300 mb-2" />
-                <h3 className="font-semibold text-slate-800 text-base">Welcome to Ekhanei Support</h3>
-                <p className="text-xs text-slate-500 mt-1 max-w-sm">Have any questions regarding orders, delivery, or products? Send us a message below!</p>
-              </div>
-            ) : (
-              messages.map((msg: any, idx: number) => {
-                if (msg.message_type === 'system') {
-                  return (
-                    <div key={msg.id || idx} className="text-center my-2">
-                      <span className="text-xs bg-slate-200 text-slate-600 px-3 py-1 rounded-full inline-block">
-                        {msg.message}
-                      </span>
-                    </div>
-                  );
-                }
-
-                const isCustomer = msg.sender_type === 'customer';
-                const time = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-
-                return (
-                  <div key={msg.id || idx} className={`flex ${isCustomer ? 'justify-end' : 'justify-start'}`}>
-                    <div
-                      className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm shadow-sm ${
-                        isCustomer
-                          ? 'bg-emerald-600 text-white rounded-br-none'
-                          : 'bg-white text-slate-800 border border-slate-200/80 rounded-bl-none'
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.message}</p>
-                      <div
-                        className={`flex items-center justify-end space-x-1 text-[10px] mt-1 ${
-                          isCustomer ? 'text-emerald-200' : 'text-slate-400'
-                        }`}
-                      >
-                        <span>{time}</span>
-                        {isCustomer && (
-                          msg.read_at ? <CheckCheck className="w-3.5 h-3.5 text-emerald-200" /> : <Check className="w-3.5 h-3.5 text-emerald-300" />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-none px-4 py-2.5 text-xs text-slate-500 flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce" />
-                  <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.2s]" />
-                  <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.4s]" />
-                  <span className="ml-1 text-slate-400">Support is typing...</span>
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
+        {/* CHAT MESSAGES CANVAS (WhatsApp Beige/Sand Background) */}
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 bg-[#efeae2]">
+          
+          {/* Encryption / Security Banner */}
+          <div className="flex justify-center my-2">
+            <span className="text-[11px] bg-[#ffeebd] text-[#544214] font-medium px-3 py-1.5 rounded-xl shadow-xs text-center max-w-xs border border-[#f0dfaa]/60">
+              🔒 End-to-end support messaging with Ekhanei Care Team.
+            </span>
           </div>
 
-          {/* COMPOSER */}
-          {isAuthenticated && (
-            <div className="p-3.5 bg-white border-t border-slate-100">
-              {conversation?.status === 'closed' ? (
-                <div className="text-center py-2">
-                  <p className="text-xs text-slate-500 mb-2">This conversation has been closed by support.</p>
-                  <button
-                    onClick={async () => {
-                      await startConversation().unwrap();
-                      refetchConv();
-                    }}
-                    className="text-xs bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 transition-colors inline-flex items-center space-x-1.5"
+          {!isAuthenticated ? (
+            <div className="flex flex-col items-center justify-center h-64 text-center p-6 text-slate-600 bg-white/80 rounded-3xl border border-slate-200/60 my-auto shadow-xs">
+              <AlertCircle className="w-12 h-12 text-amber-500 mb-2" />
+              <h3 className="font-bold text-slate-800 text-base">Authentication Required</h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm">Please log in to your account to access real-time live support with our customer care team.</p>
+              <Link href="/profile" className="mt-4 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-xs">
+                Log In / Register
+              </Link>
+            </div>
+          ) : isStarting ? (
+            <div className="flex flex-col items-center justify-center h-64 text-slate-500">
+              <Loader2 className="w-7 h-7 animate-spin text-emerald-700 mb-2" />
+              <span className="text-xs font-semibold">Connecting to support team...</span>
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-64 text-center p-6 text-slate-600 bg-white/80 rounded-3xl border border-slate-200/60 my-auto shadow-xs">
+              <MessageSquare className="w-12 h-12 text-emerald-600 mb-2" />
+              <h3 className="font-black text-slate-800 text-base">Welcome to Ekhanei Support</h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm">Have questions regarding your order, delivery time, or products? Send us a message below!</p>
+            </div>
+          ) : (
+            messages.map((msg: any, idx: number) => {
+              if (msg.message_type === 'system') {
+                return (
+                  <div key={msg.id || idx} className="text-center my-2">
+                    <span className="text-[11px] bg-slate-200/90 text-slate-700 font-bold px-3 py-1 rounded-full inline-block shadow-xs">
+                      {msg.message}
+                    </span>
+                  </div>
+                );
+              }
+
+              const isCustomer = msg.sender_type === 'customer';
+              const time = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+              return (
+                <div key={msg.id || idx} className={`flex ${isCustomer ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[82%] sm:max-w-[70%] rounded-2xl px-3.5 py-2 text-xs sm:text-sm shadow-xs leading-relaxed ${
+                      isCustomer
+                        ? 'bg-[#d9fdd3] text-slate-900 rounded-tr-none border border-[#c4f0bd]'
+                        : 'bg-white text-slate-900 rounded-tl-none border border-slate-200/80'
+                    }`}
                   >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Start New Support Chat</span>
-                  </button>
+                    <p className="whitespace-pre-wrap break-words">{msg.message}</p>
+                    <div
+                      className={`flex items-center justify-end space-x-1 text-[10px] font-semibold mt-1 ${
+                        isCustomer ? 'text-emerald-800' : 'text-slate-400'
+                      }`}
+                    >
+                      <span>{time}</span>
+                      {isCustomer && (
+                        msg.read_at ? <CheckCheck className="w-3.5 h-3.5 text-emerald-700" /> : <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      )}
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
+              );
+            })
+          )}
+
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="bg-white border border-slate-200/80 rounded-2xl rounded-tl-none px-3.5 py-2 text-xs text-slate-500 shadow-xs flex items-center space-x-2">
+                <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce" />
+                <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.2s]" />
+                <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.4s]" />
+                <span className="ml-1 text-slate-500 font-medium">Support is typing...</span>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* WHATSAPP BOTTOM COMPOSER */}
+        {isAuthenticated && (
+          <div className="p-2.5 sm:p-3 bg-[#f0f2f5] border-t border-slate-200/80 shrink-0">
+            {conversation?.status === 'closed' ? (
+              <div className="text-center py-2">
+                <p className="text-xs text-slate-500 mb-2 font-medium">This conversation has been closed by support.</p>
+                <button
+                  onClick={async () => {
+                    await startConversation().unwrap();
+                    refetchConv();
+                  }}
+                  className="text-xs bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-emerald-700 transition inline-flex items-center space-x-1.5 shadow-xs"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Start New Support Chat</span>
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                <div className="flex-1 bg-white rounded-full px-4 py-2 sm:py-2.5 border border-slate-200 flex items-center gap-2 shadow-inner">
                   <input
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Write a message to support..."
-                    className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                    placeholder="Type a message..."
+                    className="flex-1 bg-transparent text-xs sm:text-sm text-slate-800 focus:outline-none"
                     disabled={isSending || isStarting}
                   />
-                  <button
-                    type="submit"
-                    disabled={!inputMessage.trim() || isSending || isStarting}
-                    className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white px-4 py-2.5 rounded-xl transition-colors font-medium text-sm flex items-center space-x-1.5"
-                  >
-                    {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    <span className="hidden sm:inline">Send</span>
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-        </div>
-      </main>
+                </div>
+                <button
+                  type="submit"
+                  disabled={!inputMessage.trim() || isSending || isStarting}
+                  className="w-10 h-10 rounded-full bg-[#075e54] hover:bg-[#064e46] disabled:bg-slate-300 text-white flex items-center justify-center shadow-md transition-all active:scale-95 shrink-0"
+                  title="Send Message"
+                >
+                  {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                </button>
+              </form>
+            )}
+          </div>
+        )}
+
+      </div>
+    </div>
   );
 }
