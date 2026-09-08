@@ -238,7 +238,7 @@ export default function ChatWidget() {
             <div className="flex items-center justify-between w-full" onClick={() => setIsMinimized(false)}>
               <div className="flex items-center space-x-2">
                 <MessageSquare className="w-5 h-5" />
-                <span className="font-semibold text-sm">Customer Support</span>
+                <span className="font-semibold text-sm">Ekhanei Support</span>
                 {unreadCount > 0 && <span className="bg-red-500 text-xs px-2 py-0.5 rounded-full font-bold">{unreadCount}</span>}
               </div>
               <div className="flex items-center space-x-1">
@@ -264,7 +264,7 @@ export default function ChatWidget() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-sm leading-tight flex items-center gap-1.5">
-                      <span>Customer Support</span>
+                      <span>Ekhanei Support</span>
                       <svg className="w-4 h-4 inline-block shrink-0" viewBox="0 0 24 24" fill="none" aria-label="Verified Badge">
                         <path
                           d="M22.5 12c0-1.58-.8-2.97-2-3.79.44-1.54.15-3.23-.87-4.25-1.02-1.02-2.71-1.31-4.25-.87-.82-1.2-2.21-2-3.79-2s-2.97.8-3.79 2c-1.54-.44-3.23-.15-4.25.87-1.02 1.02-1.31 2.71-.87 4.25-1.2.82-2 2.21-2 3.79s.8 2.97 2 3.79c-.44 1.54-.15 3.23.87 4.25 1.02 1.02 2.71 1.31 4.25.87.82 1.2 2.21 2 3.79 2s2.97-.8 3.79-2c1.54.44 3.23.15 4.25-.87-1.02-1.02-1.31-2.71.87-4.25 1.2-.82 2-2.21 2-3.79z"
@@ -278,7 +278,7 @@ export default function ChatWidget() {
                     </h3>
                     <div className="flex items-center space-x-1.5 text-xs text-emerald-200">
                       <span className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' || conversationId ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-                      <span>{connectionStatus === 'connected' || conversationId ? 'Online Support' : 'Connecting...'}</span>
+                      <span>{connectionStatus === 'connected' || conversationId ? 'Online • 20 Min Hyperlocal Express' : 'Connecting...'}</span>
                     </div>
                   </div>
                 </div>
