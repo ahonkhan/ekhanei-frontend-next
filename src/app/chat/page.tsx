@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import { MessageSquare, Send, Loader2, Check, CheckCheck, RefreshCw, AlertCircle } from 'lucide-react';
 import Pusher from 'pusher-js';
 import {
@@ -140,9 +138,7 @@ export default function CustomerChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col">
-      <Header />
-      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col">
+    <main className="max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col my-4">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex-1 flex flex-col overflow-hidden min-h-[500px] max-h-[750px]">
           {/* HEADER */}
           <div className="bg-emerald-700 text-white p-4 flex items-center justify-between">
@@ -281,7 +277,5 @@ export default function CustomerChatPage() {
           )}
         </div>
       </main>
-      <Footer />
-    </div>
   );
 }

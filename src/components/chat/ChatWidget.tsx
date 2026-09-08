@@ -92,11 +92,17 @@ export default function ChatWidget() {
 
     pusherRef.current = pusher;
 
-    pusher.connection.bind('state_change', (states: any) => {
-      if (states.current === 'connected') setConnectionStatus('connected');
-      else if (states.current === 'connecting') setConnectionStatus('connecting');
+    const checkConnection = () => {
+      const state = pusher.connection.state;
+      if (state === 'connected') setConnectionStatus('connected');
+      else if (state === 'connecting') setConnectionStatus('connecting');
       else setConnectionStatus('disconnected');
-    });
+    };
+
+    checkConnection();
+    pusher.connection.bind('state_change', checkConnection);
+    pusher.connection.bind('connected', () => setConnectionStatus('connected'));
+    pusher.connection.bind('disconnected', () => setConnectionStatus('disconnected'));
 
     const channel = pusher.subscribe(`private-chat.${conversationId}`);
 
@@ -249,9 +255,9 @@ export default function ChatWidget() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-sm leading-tight">Customer Support</h3>
-                    <div className="flex items-center space-x-1 text-xs text-emerald-200">
-                      <span className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-400' : 'bg-yellow-400'}`} />
-                      <span>{connectionStatus === 'connected' ? 'Online Support' : 'Connecting...'}</span>
+                    <div className="flex items-center space-x-1.5 text-xs text-emerald-200">
+                      <span className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' || conversationId ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                      <span>{connectionStatus === 'connected' || conversationId ? 'Online Support' : 'Connecting...'}</span>
                     </div>
                   </div>
                 </div>
