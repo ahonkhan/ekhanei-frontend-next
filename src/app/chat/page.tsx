@@ -155,10 +155,10 @@ export default function CustomerChatPage() {
   };
 
   return (
-    <div className="w-full min-h-[100dvh] sm:min-h-0 sm:py-6 sm:px-4 bg-[#efeae2] sm:bg-slate-100 flex flex-col items-center justify-center">
+    <div className="fixed inset-0 sm:static sm:inset-auto w-full h-full sm:h-auto sm:py-6 sm:px-4 bg-[#efeae2] sm:bg-slate-100 flex flex-col items-center justify-center z-50">
       
       {/* WHATSAPP CONTAINER (Full-screen on Mobile, Card Dialog on Desktop) */}
-      <div className="w-full h-[100dvh] sm:h-[650px] sm:max-w-4xl bg-[#efeae2] sm:rounded-3xl sm:shadow-2xl sm:border sm:border-slate-200 flex flex-col overflow-hidden">
+      <div className="w-full h-full sm:h-[650px] sm:max-w-4xl bg-[#efeae2] sm:rounded-3xl sm:shadow-2xl sm:border sm:border-slate-200 flex flex-col overflow-hidden">
         
         {/* WHATSAPP TOP HEADER */}
         <div className="bg-[#075e54] text-white px-3 py-3 sm:px-5 flex items-center justify-between shadow-md shrink-0">
@@ -220,7 +220,7 @@ export default function CustomerChatPage() {
         </div>
 
         {/* CHAT MESSAGES CANVAS (WhatsApp Beige/Sand Background) */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 bg-[#efeae2]">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-3 bg-[#efeae2] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-400/40 [&::-webkit-scrollbar-thumb]:rounded-full">
           
           {/* Encryption / Security Banner */}
           <div className="flex justify-center my-2">
