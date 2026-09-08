@@ -261,7 +261,6 @@ export const apiService = createApi({
         method: 'POST',
         body: { message },
       }),
-      invalidatesTags: ['Chat'],
     }),
     markChatRead: builder.mutation<any, number | string>({
       query: (conversationId) => ({

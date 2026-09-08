@@ -93,7 +93,7 @@ export default function ChatWidget() {
     channel.bind('MessageSent', (data: any) => {
       if (data.conversation_id === conversationId) {
         setMessages((prev) => {
-          if (prev.some((m) => m.id === data.id)) return prev;
+          if (prev.some((m) => Number(m.id) === Number(data.id))) return prev;
           return [...prev, data];
         });
 
@@ -159,7 +159,10 @@ export default function ChatWidget() {
     try {
       const result = await sendMessageApi({ conversationId, message: text }).unwrap();
       if (result?.data) {
-        setMessages((prev) => [...prev, result.data]);
+        setMessages((prev) => {
+          if (prev.some((m) => Number(m.id) === Number(result.data.id))) return prev;
+          return [...prev, result.data];
+        });
       }
     } catch (err) {
       console.error('Failed to send message:', err);
