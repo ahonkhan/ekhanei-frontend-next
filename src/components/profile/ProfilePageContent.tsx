@@ -33,6 +33,7 @@ import {
   Eye,
   EyeOff,
   Truck,
+  FileText,
   Clock,
   ExternalLink,
   X,
@@ -513,13 +514,20 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                               </p>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                              <Link
+                                href={`/orders/${ord.order_number || ord.id}`}
+                                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-xs border border-slate-200/80"
+                              >
+                                <FileText className="w-3.5 h-3.5 text-slate-600" />
+                                <span>Order Details</span>
+                              </Link>
                               <Link
                                 href={`/track-order?id=${ord.order_number || ord.id}`}
-                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-xs"
                               >
                                 <Truck className="w-3.5 h-3.5" />
-                                <span>Order Details & Track</span>
+                                <span>Live Track</span>
                               </Link>
                             </div>
                           </div>
@@ -1330,18 +1338,28 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
 
             {/* Modal Footer */}
             <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
-              <Link
-                href={`/track-order?id=${selectedOrder.order_number || selectedOrder.id}`}
-                onClick={() => setSelectedOrder(null)}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
-              >
-                <Truck className="w-4 h-4" />
-                <span>Open Live Tracking</span>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/orders/${selectedOrder.order_number || selectedOrder.id}`}
+                  onClick={() => setSelectedOrder(null)}
+                  className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <FileText className="w-4 h-4 text-slate-700" />
+                  <span>Full Invoice</span>
+                </Link>
+                <Link
+                  href={`/track-order?id=${selectedOrder.order_number || selectedOrder.id}`}
+                  onClick={() => setSelectedOrder(null)}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Truck className="w-4 h-4" />
+                  <span>Live Track</span>
+                </Link>
+              </div>
 
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="px-4 py-2.5 text-slate-600 hover:text-slate-900 text-xs font-extrabold cursor-pointer"
+                className="px-3 py-2 text-slate-600 hover:text-slate-900 text-xs font-extrabold cursor-pointer"
               >
                 Close
               </button>
