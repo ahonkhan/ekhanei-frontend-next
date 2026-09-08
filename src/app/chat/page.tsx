@@ -245,7 +245,12 @@ export default function CustomerChatPage() {
             </span>
           </div>
 
-          {!isAuthenticated ? (
+          {!mounted || (isAuthenticated && (isConvLoading || (conversationId && isMessagesLoading && messages.length === 0))) ? (
+            <div className="flex flex-col items-center justify-center h-64 text-slate-500 my-auto">
+              <Loader2 className="w-8 h-8 animate-spin text-emerald-700 mb-2" />
+              <span className="text-xs font-semibold text-slate-600 animate-pulse">Loading support chat...</span>
+            </div>
+          ) : !isAuthenticated ? (
             <div className="flex flex-col items-center justify-center h-64 text-center p-6 text-slate-600 bg-white/80 rounded-3xl border border-slate-200/60 my-auto shadow-xs">
               <AlertCircle className="w-12 h-12 text-amber-500 mb-2" />
               <h3 className="font-bold text-slate-800 text-base">Authentication Required</h3>
@@ -253,11 +258,6 @@ export default function CustomerChatPage() {
               <Link href="/profile" className="mt-4 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-xs">
                 Log In / Register
               </Link>
-            </div>
-          ) : isConvLoading || (conversationId && isMessagesLoading && messages.length === 0) ? (
-            <div className="flex flex-col items-center justify-center h-64 text-slate-500 my-auto">
-              <Loader2 className="w-8 h-8 animate-spin text-emerald-700 mb-2" />
-              <span className="text-xs font-semibold text-slate-600 animate-pulse">Loading messages...</span>
             </div>
           ) : isStarting ? (
             <div className="flex flex-col items-center justify-center h-64 text-slate-500">
