@@ -36,7 +36,7 @@ export default function ChatWidget() {
   const isAuthenticated = !!token;
 
   // RTK Query Hooks
-  const { data: convResponse, refetch: refetchConv } = useGetChatConversationQuery(undefined, {
+  const { data: convResponse, isLoading: isConvLoading, refetch: refetchConv } = useGetChatConversationQuery(undefined, {
     skip: !isAuthenticated,
   });
   const [startConversation, { isLoading: isStarting }] = useStartChatConversationMutation();
@@ -46,7 +46,7 @@ export default function ChatWidget() {
   const conversation = convResponse?.data;
   const conversationId = conversation?.id;
 
-  const { data: messagesResponse, refetch: refetchMessages } = useGetChatMessagesQuery(
+  const { data: messagesResponse, isLoading: isMessagesLoading, refetch: refetchMessages } = useGetChatMessagesQuery(
     { conversationId: conversationId! },
     { skip: !isAuthenticated || !conversationId }
   );
@@ -303,7 +303,12 @@ export default function ChatWidget() {
 
               {/* MESSAGES BODY */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
-                {isStarting ? (
+                {isConvLoading || (conversationId && isMessagesLoading && messages.length === 0) ? (
+                  <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-2">
+                    <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
+                    <span className="text-xs">Loading messages...</span>
+                  </div>
+                ) : isStarting ? (
                   <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-2">
                     <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
                     <span className="text-xs">Starting conversation...</span>
