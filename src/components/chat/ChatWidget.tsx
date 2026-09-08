@@ -254,11 +254,11 @@ export default function ChatWidget() {
                 <div className="flex items-center space-x-3">
                   <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center border border-emerald-400/60 shadow-xs overflow-hidden shrink-0">
                     <img
-                      src="/app-icon.png"
+                      src="/logo.png"
                       alt="Ekhanei Logo"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain p-0.5 bg-white"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/logo.png';
+                        (e.target as HTMLImageElement).src = '/app-icon.png';
                       }}
                     />
                   </div>
