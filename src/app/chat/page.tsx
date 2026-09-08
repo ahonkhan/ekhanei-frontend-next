@@ -181,8 +181,15 @@ export default function CustomerChatPage() {
 
             {/* Support Avatar */}
             <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-black text-sm border border-emerald-400 text-white shadow-xs">
-                CS
+              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-emerald-400/60 shadow-xs overflow-hidden shrink-0">
+                <img
+                  src="/app-icon.png"
+                  alt="Ekhanei Logo"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/logo.png';
+                  }}
+                />
               </div>
               <span className="w-3 h-3 bg-emerald-400 border-2 border-[#075e54] rounded-full absolute bottom-0 right-0" />
             </div>
@@ -191,7 +198,16 @@ export default function CustomerChatPage() {
             <div>
               <h1 className="font-extrabold text-sm sm:text-base leading-tight flex items-center gap-1.5">
                 <span>Ekhanei Support</span>
-                <ShieldCheck className="w-4 h-4 text-emerald-300 inline" />
+                <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 inline-block shrink-0" viewBox="0 0 24 24" fill="none" aria-label="Verified Badge">
+                  <path
+                    d="M22.5 12c0-1.58-.8-2.97-2-3.79.44-1.54.15-3.23-.87-4.25-1.02-1.02-2.71-1.31-4.25-.87-.82-1.2-2.21-2-3.79-2s-2.97.8-3.79 2c-1.54-.44-3.23-.15-4.25.87-1.02 1.02-1.31 2.71-.87 4.25-1.2.82-2 2.21-2 3.79s.8 2.97 2 3.79c-.44 1.54-.15 3.23.87 4.25 1.02 1.02 2.71 1.31 4.25.87.82 1.2 2.21 2 3.79 2s2.97-.8 3.79-2c1.54.44 3.23.15 4.25-.87-1.02-1.02-1.31-2.71.87-4.25 1.2-.82 2-2.21 2-3.79z"
+                    fill="#1D9BF0"
+                  />
+                  <path
+                    d="M10.5 16.2L6.3 12l1.4-1.4 2.8 2.8 7.2-7.2 1.4 1.4-8.6 8.6z"
+                    fill="#FFFFFF"
+                  />
+                </svg>
               </h1>
               <p className="text-[11px] text-emerald-100 font-medium">Online • 20 Min Hyperlocal Express</p>
             </div>

@@ -252,11 +252,30 @@ export default function ChatWidget() {
               {/* CHAT HEADER */}
               <div className="bg-emerald-700 text-white p-4 flex items-center justify-between shrink-0">
                 <div className="flex items-center space-x-3">
-                  <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-sm border border-emerald-500">
-                    CS
+                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center border border-emerald-400/60 shadow-xs overflow-hidden shrink-0">
+                    <img
+                      src="/app-icon.png"
+                      alt="Ekhanei Logo"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/logo.png';
+                      }}
+                    />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm leading-tight">Customer Support</h3>
+                    <h3 className="font-semibold text-sm leading-tight flex items-center gap-1.5">
+                      <span>Customer Support</span>
+                      <svg className="w-4 h-4 inline-block shrink-0" viewBox="0 0 24 24" fill="none" aria-label="Verified Badge">
+                        <path
+                          d="M22.5 12c0-1.58-.8-2.97-2-3.79.44-1.54.15-3.23-.87-4.25-1.02-1.02-2.71-1.31-4.25-.87-.82-1.2-2.21-2-3.79-2s-2.97.8-3.79 2c-1.54-.44-3.23-.15-4.25.87-1.02 1.02-1.31 2.71-.87 4.25-1.2.82-2 2.21-2 3.79s.8 2.97 2 3.79c-.44 1.54-.15 3.23.87 4.25 1.02 1.02 2.71 1.31 4.25.87.82 1.2 2.21 2 3.79 2s2.97-.8 3.79-2c1.54.44 3.23.15 4.25-.87-1.02-1.02-1.31-2.71.87-4.25 1.2-.82 2-2.21 2-3.79z"
+                          fill="#1D9BF0"
+                        />
+                        <path
+                          d="M10.5 16.2L6.3 12l1.4-1.4 2.8 2.8 7.2-7.2 1.4 1.4-8.6 8.6z"
+                          fill="#FFFFFF"
+                        />
+                      </svg>
+                    </h3>
                     <div className="flex items-center space-x-1.5 text-xs text-emerald-200">
                       <span className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' || conversationId ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
                       <span>{connectionStatus === 'connected' || conversationId ? 'Online Support' : 'Connecting...'}</span>
