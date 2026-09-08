@@ -66,7 +66,7 @@ export default function ChatWidget() {
     if (!pusherKey) return;
 
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://admin.ekhanei.bd/api/v1';
-    const authEndpoint = apiBaseUrl.replace(/\/v1\/?$/, '') + '/broadcasting/auth';
+    const authEndpoint = apiBaseUrl.replace(/\/+$/, '') + '/broadcasting/auth';
 
     const pusher = new Pusher(pusherKey, {
       cluster: pusherCluster,
