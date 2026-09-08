@@ -13,6 +13,7 @@ import {
 import { useAppSelector } from '@/store/hooks';
 
 export default function ChatWidget() {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
@@ -24,8 +25,12 @@ export default function ChatWidget() {
   const typingTimeoutRef = useRef<any>(null);
   const pusherRef = useRef<Pusher | null>(null);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Read Customer Auth Token
-  const token = useAppSelector((state) => state.auth?.token) || (typeof window !== 'undefined' ? localStorage.getItem('shym_token') : null);
+  const token = useAppSelector((state) => state.auth?.token) || (mounted && typeof window !== 'undefined' ? localStorage.getItem('shym_token') : null);
   const isAuthenticated = !!token;
 
   // RTK Query Hooks
@@ -162,6 +167,8 @@ export default function ChatWidget() {
   };
 
   const unreadCount = conversation?.unread_count || 0;
+
+  if (!mounted) return null;
 
   return (
     <>

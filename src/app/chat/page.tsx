@@ -14,6 +14,7 @@ import {
 import { useAppSelector } from '@/store/hooks';
 
 export default function CustomerChatPage() {
+  const [mounted, setMounted] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -21,7 +22,11 @@ export default function CustomerChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<any>(null);
 
-  const token = useAppSelector((state) => state.auth?.token) || (typeof window !== 'undefined' ? localStorage.getItem('shym_token') : null);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const token = useAppSelector((state) => state.auth?.token) || (mounted && typeof window !== 'undefined' ? localStorage.getItem('shym_token') : null);
   const isAuthenticated = !!token;
 
   const { data: convResponse, refetch: refetchConv } = useGetChatConversationQuery(undefined, { skip: !isAuthenticated });
