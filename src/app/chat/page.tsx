@@ -155,10 +155,10 @@ export default function CustomerChatPage() {
   };
 
   return (
-    <div className="fixed inset-0 sm:static sm:inset-auto w-full h-full sm:h-auto sm:py-6 sm:px-4 bg-[#efeae2] sm:bg-slate-100 flex flex-col items-center justify-center z-50">
+    <div className="fixed top-0 left-0 right-0 bottom-0 h-[100dvh] sm:h-auto sm:static sm:inset-auto w-full sm:py-6 sm:px-4 bg-[#f0f2f5] sm:bg-slate-100 flex flex-col items-center justify-center z-[9999]">
       
       {/* WHATSAPP CONTAINER (Full-screen on Mobile, Card Dialog on Desktop) */}
-      <div className="w-full h-full sm:h-[650px] sm:max-w-4xl bg-[#efeae2] sm:rounded-3xl sm:shadow-2xl sm:border sm:border-slate-200 flex flex-col overflow-hidden">
+      <div className="w-full h-full sm:h-[650px] sm:max-w-4xl bg-[#f0f2f5] sm:bg-[#efeae2] sm:rounded-3xl sm:shadow-2xl sm:border sm:border-slate-200 flex flex-col overflow-hidden">
         
         {/* WHATSAPP TOP HEADER */}
         <div className="bg-[#075e54] text-white px-3 py-3 sm:px-5 flex items-center justify-between shadow-md shrink-0">
