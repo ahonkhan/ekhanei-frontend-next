@@ -949,41 +949,58 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
                     </h1>
                   </div>
                   <p className="text-xs sm:text-sm font-medium text-slate-500 mt-0.5">
-                    পছন্দের কালার স্কিম, লাইট/ডার্ক মোড ও সলিড/গ্র্যাডিয়েন্ট থিম মোডাল পপআপ থেকে নির্বাচন করুন
+                    পছন্দের কালার স্কিম ও লাইট/ডার্ক মোড নির্বাচন করুন
                   </p>
                 </div>
 
-                {/* APP THEME MODAL LAUNCHER CARD */}
-                <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-6 max-w-2xl">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-theme-primary-light text-theme-primary flex items-center justify-center shrink-0 border border-theme-primary/20">
-                      <Palette className="w-7 h-7" />
-                    </div>
-                    <div>
-                      <h3 className="font-extrabold text-base sm:text-lg text-slate-900">
-                        Current Active Theme: <span className="text-theme-primary font-black">{currentTheme.name}</span>
-                      </h3>
-                      <p className="text-xs text-slate-500 font-medium mt-1">
-                        {currentTheme.description}
-                      </p>
-                    </div>
-                  </div>
+                <div className="bg-[#1b1d2e] rounded-3xl border border-[#2a2d40] p-6 sm:p-7 shadow-xl max-w-2xl">
+                  <h3 className="text-[#888c9f] font-medium text-sm mb-4 px-1">App Settings</h3>
+                  
+                  <div className="space-y-3">
+                    {/* Theme Mode */}
+                    <div className="flex items-center justify-between p-4 rounded-2xl bg-[#24273a] hover:bg-[#2a2d40] transition">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-[#2f334d] flex items-center justify-center text-[#a5a9c0] shrink-0">
+                          <Moon className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h4 className="text-white font-semibold text-base">Theme Mode</h4>
+                          <p className="text-[#a5a9c0] text-xs font-medium mt-0.5">Choose your preferred theme</p>
+                        </div>
+                      </div>
 
-                  <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-3 justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-600">Primary Color:</span>
-                      <span className="w-4 h-4 rounded-full shadow-xs border border-slate-300 inline-block" style={{ backgroundColor: currentTheme.primary }} />
-                      <span className="text-xs font-mono font-bold text-slate-800">{currentTheme.primary}</span>
+                      <div className="flex items-center bg-[#2f334d] p-1.5 rounded-xl">
+                        <button 
+                          onClick={() => setThemeMode('light')}
+                          className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${themeMode === 'light' ? 'bg-[#828df8] text-white shadow-md' : 'text-[#a5a9c0] hover:text-white'}`}
+                        >
+                          <Sun className="w-4 h-4"/>
+                        </button>
+                        <button 
+                          onClick={() => setThemeMode('dark')}
+                          className={`p-2 rounded-lg transition-all cursor-pointer flex items-center justify-center ${themeMode === 'dark' ? 'bg-[#828df8] text-white shadow-md' : 'text-[#a5a9c0] hover:text-white'}`}
+                        >
+                          <Moon className="w-4 h-4"/>
+                        </button>
+                      </div>
                     </div>
 
-                    <button
-                      type="button"
+                    {/* Color Scheme */}
+                    <div 
+                      className="flex items-center justify-between p-4 rounded-2xl bg-[#24273a] hover:bg-[#2a2d40] transition cursor-pointer"
                       onClick={() => setIsThemeModalOpen(true)}
-                      className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <Sparkles className="w-4 h-4" />
-                      <span>Open Theme Customizer Modal</span>
-                    </button>
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-[#2f334d] flex items-center justify-center text-[#a5a9c0] shrink-0">
+                          <Palette className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h4 className="text-white font-semibold text-base">Color Scheme</h4>
+                          <p className="text-[#a5a9c0] text-xs font-medium mt-0.5">{currentTheme.name}</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-[#a5a9c0]" />
+                    </div>
                   </div>
                 </div>
               </div>

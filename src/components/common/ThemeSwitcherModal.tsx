@@ -72,39 +72,7 @@ export const ThemeSwitcherModal: React.FC = () => {
             </button>
           </div>
 
-          {/* Theme Mode Toggle Pill Switch */}
-          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/40 px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-            <span className="text-xs font-extrabold text-slate-700 dark:text-slate-300">
-              Theme Mode
-            </span>
 
-            <div className="inline-flex items-center bg-slate-200/80 dark:bg-slate-700/80 rounded-full p-0.5 border border-slate-300/60 dark:border-slate-600">
-              <button
-                type="button"
-                onClick={() => setThemeMode('light')}
-                className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer ${
-                  themeMode === 'light'
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-                }`}
-              >
-                <Sun className="w-3.5 h-3.5" />
-                <span>Light</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setThemeMode('dark')}
-                className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer ${
-                  themeMode === 'dark'
-                    ? 'bg-indigo-900 text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-                }`}
-              >
-                <Moon className="w-3.5 h-3.5" />
-                <span>Dark</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Theme List matching Screenshot 3 design */}
