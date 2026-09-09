@@ -10,14 +10,15 @@ export const TrustBadges: React.FC = () => {
         {/* Card 1: Cash On Delivery */}
         <div className="text-card-foreground flex flex-col gap-6 rounded-sm py-6 shadow-sm shadow-primary/10 flex-1 h-[66px] hover:shadow-lg transition-all duration-200 bg-white border border-slate-100">
           <div className="px-6 h-full">
-            <div className="flex justify-center items-center gap-1 w-full h-full">
-              <div className="rounded-lg">
+            <div className="flex justify-center items-center gap-2 w-full h-full">
+              <div className="rounded-lg overflow-hidden flex items-center justify-center">
                 <img
                   alt="Cash On Delivery"
                   loading="lazy"
                   width="43"
                   height="42"
-                  src="https://govaly.com.bd/assets/delivery/image-1.png"
+                  className="w-[43px] h-[42px] object-contain"
+                  src="/images/cash.jpeg"
                 />
               </div>
               <span className="text-gray-800 font-medium text-[16.6px]">Cash On Delivery</span>
@@ -28,14 +29,15 @@ export const TrustBadges: React.FC = () => {
         {/* Card 2: Instant Return */}
         <div className="text-card-foreground flex flex-col gap-6 rounded-sm py-6 shadow-sm shadow-primary/10 flex-1 h-[66px] hover:shadow-lg transition-all duration-200 bg-white border border-slate-100">
           <div className="px-6 h-full">
-            <div className="flex justify-center items-center gap-1 w-full h-full">
-              <div className="rounded-lg">
+            <div className="flex justify-center items-center gap-2 w-full h-full">
+              <div className="rounded-lg overflow-hidden flex items-center justify-center">
                 <img
                   alt="Instant Return"
                   loading="lazy"
                   width="43"
                   height="42"
-                  src="https://govaly.com.bd/assets/delivery/image-2.png"
+                  className="w-[43px] h-[42px] object-contain"
+                  src="/images/return.jpeg"
                 />
               </div>
               <span className="text-gray-800 font-medium text-[16.6px]">Instant Return</span>
@@ -46,14 +48,15 @@ export const TrustBadges: React.FC = () => {
         {/* Card 3: Delivery Within 48hrs */}
         <div className="text-card-foreground flex flex-col gap-6 rounded-sm py-6 shadow-sm shadow-primary/10 flex-1 h-[66px] hover:shadow-lg transition-all duration-200 bg-white border border-slate-100">
           <div className="px-6 h-full">
-            <div className="flex justify-center items-center gap-1 w-full h-full">
-              <div className="rounded-lg">
+            <div className="flex justify-center items-center gap-2 w-full h-full">
+              <div className="rounded-lg overflow-hidden flex items-center justify-center">
                 <img
                   alt="Delivery Within"
                   loading="lazy"
                   width="43"
                   height="42"
-                  src="https://govaly.com.bd/assets/delivery/image-3.png"
+                  className="w-[43px] h-[42px] object-contain"
+                  src="/images/delivery.jpeg"
                 />
               </div>
               <span className="text-gray-800 font-medium text-[16.6px]">
@@ -66,14 +69,15 @@ export const TrustBadges: React.FC = () => {
         {/* Card 4: Best Price Deal */}
         <div className="text-card-foreground flex flex-col gap-6 rounded-sm py-6 shadow-sm shadow-primary/10 flex-1 h-[66px] hover:shadow-lg transition-all duration-200 bg-white border border-slate-100">
           <div className="px-6 h-full">
-            <div className="flex justify-center items-center gap-1 w-full h-full">
-              <div className="rounded-lg">
+            <div className="flex justify-center items-center gap-2 w-full h-full">
+              <div className="rounded-lg overflow-hidden flex items-center justify-center">
                 <img
                   alt="Best Price Deal"
                   loading="lazy"
                   width="43"
                   height="42"
-                  src="https://govaly.com.bd/assets/delivery/image-4.png"
+                  className="w-[43px] h-[42px] object-contain"
+                  src="/images/best-price.jpeg"
                 />
               </div>
               <span className="text-gray-800 font-medium text-[16.6px]">Best Price Deal</span>
@@ -92,8 +96,8 @@ export const TrustBadges: React.FC = () => {
               loading="lazy"
               width="25"
               height="26"
-              className="w-[25px] h-[26px]"
-              src="https://govaly.com.bd/assets/delivery/image-1.png"
+              className="w-[25px] h-[26px] object-contain"
+              src="/images/cash.jpeg"
             />
             <span className="text-gray-800 font-medium text-[8px] leading-tight text-center whitespace-nowrap">
               Cash On Delivery
@@ -109,8 +113,8 @@ export const TrustBadges: React.FC = () => {
               loading="lazy"
               width="25"
               height="26"
-              className="w-[25px] h-[26px]"
-              src="https://govaly.com.bd/assets/delivery/image-2.png"
+              className="w-[25px] h-[26px] object-contain"
+              src="/images/return.jpeg"
             />
             <span className="text-gray-800 font-medium text-[8px] leading-tight text-center">
               Instant Return
@@ -126,8 +130,8 @@ export const TrustBadges: React.FC = () => {
               loading="lazy"
               width="25"
               height="26"
-              className="w-[25px] h-[26px]"
-              src="https://govaly.com.bd/assets/delivery/image-3.png"
+              className="w-[25px] h-[26px] object-contain"
+              src="/images/delivery.jpeg"
             />
             <span className="text-gray-800 font-medium text-[8px] leading-tight text-center">
               Delivery Within <span className="text-theme-primary">48 hrs</span>
@@ -143,8 +147,8 @@ export const TrustBadges: React.FC = () => {
               loading="lazy"
               width="25"
               height="26"
-              className="w-[25px] h-[26px]"
-              src="https://govaly.com.bd/assets/delivery/image-4.png"
+              className="w-[25px] h-[26px] object-contain"
+              src="/images/best-price.jpeg"
             />
             <span className="text-gray-800 font-medium text-[8px] whitespace-nowrap leading-tight text-center">
               Best Price Deal
