@@ -44,11 +44,7 @@ export const Footer: React.FC = () => {
                   <div className="flex flex-col gap-1 text-left">
                     <div className="flex flex-col justify-start">
                       <p className="text-[16px] md:text-[32px] font-bold leading-none text-[#191919]">Ekhanei</p>
-                      <p className="text-[10px] md:text-[12px] leading-relaxed text-slate-600">Bangladesh's Favorite Online Fashion Mall</p>
                     </div>
-                    <p className="text-[10px] md:text-[12px] leading-none text-slate-600">
-                      <span className="font-semibold">DBID</span> - <span>751626035</span>
-                    </p>
                   </div>
                 </div>
 
@@ -93,11 +89,11 @@ export const Footer: React.FC = () => {
                 </div>
               </div>
 
-              {/* Column 2: EkhaneiPolicies */}
+              {/* Column 2: Ekhanei Policies */}
               <div className="text-[16px] mt-2 md:mt-0 md:w-fit px-3 md:px-0 text-left">
                 <div className="hidden md:block">
-                  <h3 className="font-semibold mb-3">EkhaneiPolicies</h3>
-                  <ul className="space-y-1 min-w-[230px]">
+                  <h3 className="font-semibold mb-3">Ekhanei Policies</h3>
+                  <ul className="space-y-1 min-w-[230px] text-sm">
                     <li><Link className="hover:text-theme-primary transition-colors" href="/return-refund-policy">Return & Refund Policy</Link></li>
                     <li><Link className="hover:text-theme-primary transition-colors" href="/exchange-policy">Exchange Policy</Link></li>
                     <li><Link className="hover:text-theme-primary transition-colors" href="/shipping-delivery-policy">Shipping & Delivery Policy</Link></li>
@@ -114,7 +110,7 @@ export const Footer: React.FC = () => {
                     onClick={() => toggleSection('policies')}
                     className="flex w-full justify-between items-center font-semibold text-slate-900"
                   >
-                    <span>EkhaneiPolicies</span>
+                    <span>Ekhanei Policies</span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSection === 'policies' ? 'rotate-180' : ''}`} />
                   </button>
                   {openSection === 'policies' && (
@@ -125,41 +121,6 @@ export const Footer: React.FC = () => {
                       <li><Link className="hover:text-[#d81b60]" href="/cancellation-policy">Cancellation Policy</Link></li>
                       <li><Link className="hover:text-[#d81b60]" href="/privacy-policy">Privacy Policy</Link></li>
                       <li><Link className="hover:text-[#d81b60]" href="/terms-conditions">Terms & Conditions</Link></li>
-                    </ul>
-                  )}
-                </div>
-              </div>
-
-              {/* Column 3: EkhaneiSeller */}
-              <div className="text-[16px] md:w-fit px-3 md:px-0 text-left">
-                <div className="hidden md:block">
-                  <h3 className="font-semibold mb-3">EkhaneiSeller</h3>
-                  <ul className="space-y-1 min-w-[250px]">
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/become-a-seller">Become A Seller</Link></li>
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/seller-policy">Seller Policy</Link></li>
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/product-policy">Product Policy</Link></li>
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/pickup-delivery-policy">Pickup & Delivery Policy</Link></li>
-                    <li><Link className="hover:text-[#d81b60] transition-colors" href="/seller-exchange-return-policy">Seller Exchange & Return Policy</Link></li>
-                  </ul>
-                </div>
-
-                {/* Mobile Accordion */}
-                <div className="md:hidden border-b border-slate-200 py-2">
-                  <button
-                    type="button"
-                    onClick={() => toggleSection('seller')}
-                    className="flex w-full justify-between items-center font-semibold text-slate-900"
-                  >
-                    <span>EkhaneiSeller</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${openSection === 'seller' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {openSection === 'seller' && (
-                    <ul className="mt-2 space-y-1.5 text-sm text-slate-600 pl-1">
-                      <li><Link className="hover:text-[#d81b60]" href="/become-a-seller">Become A Seller</Link></li>
-                      <li><Link className="hover:text-[#d81b60]" href="/seller-policy">Seller Policy</Link></li>
-                      <li><Link className="hover:text-[#d81b60]" href="/product-policy">Product Policy</Link></li>
-                      <li><Link className="hover:text-[#d81b60]" href="/pickup-delivery-policy">Pickup & Delivery Policy</Link></li>
-                      <li><Link className="hover:text-[#d81b60]" href="/seller-exchange-return-policy">Seller Exchange & Return Policy</Link></li>
                     </ul>
                   )}
                 </div>
