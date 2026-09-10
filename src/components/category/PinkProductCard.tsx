@@ -121,15 +121,15 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
 
           {/* Price Strip: Current Price + Strikethrough Price + (% OFF) */}
           <div className="flex items-center flex-wrap space-x-1 text-left">
-            <p className="text-theme-primary font-semibold text-[12px] md:text-[17.23px]">
+            <p className="text-emerald-600 dark:text-emerald-400 font-extrabold text-[12px] md:text-[17.23px]">
               ৳{displayPrice}
             </p>
             {hasDiscount && (
               <>
-                <p className="line-through font-normal text-[12px] md:text-[13.8px] text-gray-500">
+                <p className="line-through font-normal text-[12px] md:text-[13.8px] text-slate-400">
                   ৳{displayOldPrice}
                 </p>
-                <span className="text-[#ff9800] flex-shrink-0 text-[12px] md:text-[13.8px] font-medium">
+                <span className="text-[#ff9800] flex-shrink-0 text-[12px] md:text-[13.8px] font-semibold">
                   ({discountPercent}% OFF)
                 </span>
               </>
