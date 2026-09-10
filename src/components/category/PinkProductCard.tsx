@@ -28,17 +28,21 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
   const displayImage = (firstVar && firstVar.image) ? firstVar.image : product.image;
 
   const fallbackImg = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
-  const cardImages = [
-    getImageUrl(displayImage) || fallbackImg,
-    'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=600&q=80',
-  ];
+  
+  // Construct cardImages dynamically from product's actual galleryImages
+  const rawGallery = (product as any)?.galleryImages;
+  const galleryList = Array.isArray(rawGallery) && rawGallery.length > 0
+    ? rawGallery.map((img: string) => getImageUrl(img) || fallbackImg).filter(Boolean)
+    : [getImageUrl(displayImage) || fallbackImg];
+
+  const cardImages = galleryList.length > 0 ? galleryList : [fallbackImg];
 
   const [activeImgIdx, setActiveImgIdx] = useState(0);
   const hoverIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Slide images on mouse hover
+  // Slide images on mouse hover ONLY if multiple real images exist
   const handleMouseEnter = () => {
+    if (cardImages.length <= 1) return;
     if (hoverIntervalRef.current) clearInterval(hoverIntervalRef.current);
     hoverIntervalRef.current = setInterval(() => {
       setActiveImgIdx((prev) => (prev + 1) % cardImages.length);
@@ -78,33 +82,35 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
             style={{ objectFit: 'cover', objectPosition: 'center center' }}
           />
 
-          {/* Bottom Center Dot Pagination (EkhaneiGlassmorphism pill style) */}
-          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-1 py-0.5 rounded-full z-10 !border-none backdrop-blur-xl bg-white/30">
-            {cardImages.map((_, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setActiveImgIdx(idx);
-                }}
-                aria-label={`Go to image ${idx + 1}`}
-                className={`w-[5px] h-[5px] md:w-1.5 md:h-1.5 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer ${activeImgIdx === idx
-                    ? 'bg-theme-primary border-theme-primary shadow scale-105'
-                    : 'bg-[#C3C3C3]/70 hover:bg-black/40'
-                  }`}
-                style={{
-                  boxShadow:
-                    activeImgIdx === idx
-                      ? 'rgba(245, 110, 9, 0.18) 0px 1px 4px 0px'
-                      : 'rgba(31, 38, 135, 0.1) 0px 1px 2px 0px',
-                  transition: '0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                  backdropFilter: 'blur(3px)',
-                }}
-              />
-            ))}
-          </div>
+          {/* Bottom Center Dot Pagination - Render ONLY when multiple images exist */}
+          {cardImages.length > 1 && (
+            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-1 py-0.5 rounded-full z-10 !border-none backdrop-blur-xl bg-white/30">
+              {cardImages.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveImgIdx(idx);
+                  }}
+                  aria-label={`Go to image ${idx + 1}`}
+                  className={`w-[5px] h-[5px] md:w-1.5 md:h-1.5 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer ${activeImgIdx === idx
+                      ? 'bg-theme-primary border-theme-primary shadow scale-105'
+                      : 'bg-[#C3C3C3]/70 hover:bg-black/40'
+                    }`}
+                  style={{
+                    boxShadow:
+                      activeImgIdx === idx
+                        ? 'rgba(245, 110, 9, 0.18) 0px 1px 4px 0px'
+                        : 'rgba(31, 38, 135, 0.1) 0px 1px 2px 0px',
+                    transition: '0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                    backdropFilter: 'blur(3px)',
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 2. Content Box */}
