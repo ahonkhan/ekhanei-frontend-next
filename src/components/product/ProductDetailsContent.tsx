@@ -200,10 +200,21 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
     router.push('/checkout-flow/checkout');
   };
 
-  const discountPercent =
-    activeOldPrice && activeOldPrice > activePrice
-      ? Math.round(((activeOldPrice - activePrice) / activeOldPrice) * 100)
-      : 0;
+  const activeDiscountType = activeVariation?.discountType || product?.discountType || 'none';
+  const activeDiscountValue = activeVariation?.discountValue ?? product?.discountValue ?? 0;
+  const hasActiveDiscount = activeOldPrice > activePrice && activePrice > 0;
+
+  let activeDiscountLabel = '';
+  if (hasActiveDiscount) {
+    if (activeDiscountType === 'flat' && activeDiscountValue > 0) {
+      activeDiscountLabel = `${activeDiscountValue} Tk OFF`;
+    } else if (activeDiscountType === 'percentage' && activeDiscountValue > 0) {
+      activeDiscountLabel = `${Math.round(activeDiscountValue)}% OFF`;
+    } else {
+      const pct = Math.round(((activeOldPrice - activePrice) / activeOldPrice) * 100);
+      activeDiscountLabel = `${pct}% OFF`;
+    }
+  }
 
   // Store details object
   const storeObj = product.store || {
@@ -865,13 +876,13 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             <span className="font-black text-2xl sm:text-3xl text-theme-primary tracking-tight">
               ৳{activePrice}
             </span>
-            {discountPercent > 0 && activeOldPrice > activePrice && (
+            {hasActiveDiscount && (
               <>
                 <span className="line-through text-slate-400 text-sm sm:text-base font-bold">
                   ৳{activeOldPrice}
                 </span>
                 <span className="text-theme-secondary text-xs font-black bg-theme-secondary-light px-2 py-0.5 rounded-md border border-theme-secondary/30">
-                  ({discountPercent}% OFF)
+                  ({activeDiscountLabel})
                 </span>
               </>
             )}

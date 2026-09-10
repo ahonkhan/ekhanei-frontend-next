@@ -31,6 +31,8 @@ export interface ProductVariation {
   value?: string;
   price?: number;
   oldPrice?: number;
+  discountType?: 'none' | 'flat' | 'percentage';
+  discountValue?: number;
   stock?: number;
   image?: string;
   sku?: string;
@@ -57,6 +59,8 @@ export interface Product {
   categoryName: string;
   price: number;
   oldPrice: number;
+  discountType?: 'none' | 'flat' | 'percentage';
+  discountValue?: number;
   unit: string;
   image: string;
   galleryImages?: string[];

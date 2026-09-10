@@ -57,11 +57,19 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
     setActiveImgIdx(0);
   };
 
-  // Calculate discount percentage accurately
+  // Calculate discount label accurately (flat vs percentage)
   const hasDiscount = displayOldPrice > displayPrice && displayPrice > 0;
-  const discountPercent = hasDiscount
-    ? Math.round(((displayOldPrice - displayPrice) / displayOldPrice) * 100)
-    : 0;
+  let discountLabel = '';
+  if (hasDiscount) {
+    if (product.discountType === 'flat' && product.discountValue && product.discountValue > 0) {
+      discountLabel = `${product.discountValue} Tk OFF`;
+    } else if (product.discountType === 'percentage' && product.discountValue && product.discountValue > 0) {
+      discountLabel = `${Math.round(product.discountValue)}% OFF`;
+    } else {
+      const pct = Math.round(((displayOldPrice - displayPrice) / displayOldPrice) * 100);
+      discountLabel = `${pct}% OFF`;
+    }
+  }
 
   return (
     <Link
@@ -136,7 +144,7 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
                   ৳{displayOldPrice}
                 </p>
                 <span className="text-theme-secondary flex-shrink-0 text-[12px] md:text-[13.8px] font-bold">
-                  ({discountPercent}% OFF)
+                  ({discountLabel})
                 </span>
               </>
             )}
