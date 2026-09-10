@@ -100,7 +100,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
   // Active Price & Old Price
   const activePrice = activeVariation?.price || product?.price || 0;
-  const activeOldPrice = activeVariation?.oldPrice || product?.oldPrice || Math.round(activePrice * 1.28);
+  const activeOldPrice = activeVariation?.oldPrice || product?.oldPrice || activePrice;
 
   // Gallery Images
   const galleryImages = useMemo(() => {
@@ -203,7 +203,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
   const discountPercent =
     activeOldPrice && activeOldPrice > activePrice
       ? Math.round(((activeOldPrice - activePrice) / activeOldPrice) * 100)
-      : 28;
+      : 0;
 
   // Store details object
   const storeObj = product.store || {
@@ -218,24 +218,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
   };
 
   // Dynamic Approved Reviews List from API or Product
-  const reviewsList = reviewsData?.reviews || product?.reviews || [
-    {
-      id: 'r1',
-      name: 'Saimon Hosen Rashed',
-      size: selectedVariationVal || 'Standard',
-      date: '06-02-2026',
-      rating: 5,
-      comment: 'Dam hishabe mane onk bhalo chilo. High quality and express delivery. Very satisfied with ShymMarket!',
-    },
-    {
-      id: 'r2',
-      name: 'Eshita Wahid',
-      size: selectedVariationVal || 'Standard',
-      date: '23-11-2025',
-      rating: 5,
-      comment: 'Somoymoto delivery eseche. Quality khub e bhalo, packaging chilo chomotkar!',
-    },
-  ];
+  const reviewsList = reviewsData?.reviews || product?.reviews || [];
 
   const handleCustomerSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -794,10 +777,10 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
                 <div className="pointer-events-auto shrink-0 bg-black/60 backdrop-blur-md text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold border border-white/20 shadow-md flex items-center gap-1">
                   <span className="text-amber-400 font-extrabold flex items-center gap-0.5">
-                    {product.rating || 4.9} <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400 inline" />
+                    {product.rating && product.rating > 0 ? product.rating : '0.0'} <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400 inline" />
                   </span>
                   <span className="text-white/40">|</span>
-                  <span>{product.soldCount || 113} sold</span>
+                  <span>{product.soldCount ?? 0} sold</span>
                 </div>
 
                 <div className="pointer-events-auto flex items-center shrink-0">
@@ -857,16 +840,23 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             <div className="flex items-center gap-2 text-xs text-slate-500 font-semibold flex-wrap">
               <div className="flex items-center gap-0.5 text-amber-500">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <Star
+                    key={i}
+                    className={`w-3.5 h-3.5 ${
+                      i < Math.round(product.rating || 0)
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'fill-slate-200 text-slate-300'
+                    }`}
+                  />
                 ))}
                 <span className="text-slate-700 ml-1 font-bold">
-                  {product.rating || 4.9} ({product.reviewsCount || 5} Reviews)
+                  {product.rating && product.rating > 0 ? product.rating : '0.0'} ({reviewsList.length || product.reviewsCount || 0} Reviews)
                 </span>
               </div>
               <span className="text-slate-300">|</span>
-              <span>Sold {product.soldCount || 113}</span>
+              <span>Sold {product.soldCount ?? 0}</span>
               <span className="text-slate-300">|</span>
-              <span className="text-emerald-700 font-bold">In Stock ({product.stockQuantity || 18})</span>
+              <span className="text-emerald-700 font-bold">In Stock ({product.stockQuantity ?? 0})</span>
             </div>
           </div>
 
@@ -875,12 +865,16 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             <span className="font-black text-2xl sm:text-3xl text-theme-primary tracking-tight">
               ৳{activePrice}
             </span>
-            <span className="line-through text-slate-400 text-sm sm:text-base font-bold">
-              ৳{activeOldPrice}
-            </span>
-            <span className="text-theme-primary text-xs font-black bg-theme-primary-light px-2 py-0.5 rounded-md border border-theme-primary/30">
-              ({discountPercent}% OFF)
-            </span>
+            {discountPercent > 0 && activeOldPrice > activePrice && (
+              <>
+                <span className="line-through text-slate-400 text-sm sm:text-base font-bold">
+                  ৳{activeOldPrice}
+                </span>
+                <span className="text-theme-primary text-xs font-black bg-theme-primary-light px-2 py-0.5 rounded-md border border-theme-primary/30">
+                  ({discountPercent}% OFF)
+                </span>
+              </>
+            )}
             <span className="text-xs text-slate-400 font-bold">/ {product.unit}</span>
           </div>
 
@@ -1027,50 +1021,31 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             <div className="flex items-center justify-between gap-4">
               <div className="text-center pr-4 border-r border-slate-200">
                 <div className="text-3xl sm:text-4xl font-black text-slate-900 flex items-center justify-center gap-1">
-                  <span>{product.rating || 4.9}</span>
+                  <span>{product.rating && product.rating > 0 ? product.rating : '0.0'}</span>
                   <Star className="w-6 h-6 fill-amber-400 text-amber-400" />
                 </div>
                 <span className="text-[10px] font-bold text-slate-400 block mt-0.5">
-                  By Verified Buyers
+                  {reviewsList.length > 0 ? 'By Verified Buyers' : 'No Ratings Yet'}
                 </span>
               </div>
 
               <div className="flex-1 space-y-1 text-[11px] font-bold text-slate-600">
-                <div className="flex items-center gap-2">
-                  <span>5 ★</span>
-                  <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[85%] bg-emerald-600 rounded-full" />
-                  </div>
-                  <span className="w-4 text-right">85</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>4 ★</span>
-                  <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[15%] bg-emerald-600 rounded-full" />
-                  </div>
-                  <span className="w-4 text-right">15</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>3 ★</span>
-                  <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[0%] bg-emerald-600 rounded-full" />
-                  </div>
-                  <span className="w-4 text-right">0</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>2 ★</span>
-                  <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[0%] bg-emerald-600 rounded-full" />
-                  </div>
-                  <span className="w-4 text-right">0</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>1 ★</span>
-                  <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full w-[0%] bg-emerald-600 rounded-full" />
-                  </div>
-                  <span className="w-4 text-right">0</span>
-                </div>
+                {[5, 4, 3, 2, 1].map((starNum) => {
+                  const count = (product as any).ratingHistogram?.[starNum] ?? (product as any).ratingHistogram?.[String(starNum)] ?? reviewsList.filter((r: any) => Math.round(r.rating) === starNum).length;
+                  const pct = reviewsList.length > 0 ? Math.round((count / reviewsList.length) * 100) : 0;
+                  return (
+                    <div key={starNum} className="flex items-center gap-2">
+                      <span>{starNum} ★</span>
+                      <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-600 rounded-full transition-all duration-300"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="w-4 text-right">{count}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

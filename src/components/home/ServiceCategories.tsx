@@ -2,11 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useGetCategoriesQuery } from '@/store/services/apiService';
+import { useGetServiceCategoriesQuery } from '@/store/services/apiService';
 import { CategoryCardSkeleton, SectionTitleSkeleton } from '@/components/common/Skeletons';
 
 export const ServiceCategories: React.FC = () => {
-  const { data: categories = [], isLoading } = useGetCategoriesQuery();
+  const { data: categories = [], isLoading } = useGetServiceCategoriesQuery();
 
   if (isLoading) {
     return (

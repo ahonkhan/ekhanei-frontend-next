@@ -8,12 +8,12 @@ import { PopularStores } from '@/components/home/PopularStores';
 import { HomePageSkeleton } from '@/components/common/Skeletons';
 import {
   useGetHeroBannersQuery,
-  useGetCategoriesQuery,
+  useGetServiceCategoriesQuery,
 } from '@/store/services/apiService';
 
 export default function HomePage() {
   const { isLoading: isHeroLoading } = useGetHeroBannersQuery();
-  const { isLoading: isCategoriesLoading } = useGetCategoriesQuery();
+  const { isLoading: isCategoriesLoading } = useGetServiceCategoriesQuery();
 
   const isInitialLoading = isHeroLoading || isCategoriesLoading;
 
