@@ -114,29 +114,49 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
   return (
     <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-8 sm:space-y-12 pt-4 sm:pt-6 pb-12">
-      {/* TOP PROMO HERO BANNER WITH OVERLAPPING CENTERED FLOATING TITLE CARD */}
-      <div className="relative mb-10 sm:mb-14">
-        <section className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-6 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] relative rounded-none overflow-hidden border-b border-slate-200/80 shadow-xs aspect-[21/8] sm:aspect-[24/7] group cursor-pointer touch-active">
-          <img
-            src={getImageUrl(bannerImage)}
-            alt={title || 'Category Banner'}
-            className="w-full h-full object-cover group-hover:scale-102 transition duration-500"
-            loading="lazy"
-          />
-        </section>
-
-        {/* Floating White Title Box Overlapping Bottom Edge of Banner */}
-        <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 z-10 px-4 sm:px-6">
-          <div className="bg-white/95 backdrop-blur-md px-5 py-3.5 sm:px-8 sm:py-4 rounded-lg sm:rounded-xl shadow-lg border border-slate-100/90 w-full text-left flex items-center justify-between">
-            <h1 className="text-base sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none capitalize">
+      {/* TOP HEADER / BANNER SECTION (HIDE HERO IMAGE BANNER ON CHILD SUBCATEGORY PAGE) */}
+      {childSlug ? (
+        <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/${slug}/${subSlug}`}
+              className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95"
+              title="পিছনে যান"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Link>
+            <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight capitalize">
               {title}
             </h1>
-            <span className="text-xs sm:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              {products.length} টি পণ্য
-            </span>
+          </div>
+          <span className="text-xs sm:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200">
+            {products.length} টি পণ্য
+          </span>
+        </div>
+      ) : (
+        <div className="relative mb-10 sm:mb-14">
+          <section className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-6 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] relative rounded-none overflow-hidden border-b border-slate-200/80 shadow-xs aspect-[21/8] sm:aspect-[24/7] group cursor-pointer touch-active">
+            <img
+              src={getImageUrl(bannerImage)}
+              alt={title || 'Category Banner'}
+              className="w-full h-full object-cover group-hover:scale-102 transition duration-500"
+              loading="lazy"
+            />
+          </section>
+
+          {/* Floating White Title Box Overlapping Bottom Edge of Banner */}
+          <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 z-10 px-4 sm:px-6">
+            <div className="bg-white/95 backdrop-blur-md px-5 py-3.5 sm:px-8 sm:py-4 rounded-lg sm:rounded-xl shadow-lg border border-slate-100/90 w-full text-left flex items-center justify-between">
+              <h1 className="text-base sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none capitalize">
+                {title}
+              </h1>
+              <span className="text-xs sm:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                {products.length} টি পণ্য
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* SUB-CATEGORIES CIRCULAR CARDS SLIDER (IF AVAILABLE AND NOT ON CHILD SLUG) */}
       {!childSlug && subCategories.length > 0 && (
