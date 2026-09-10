@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Store, Product } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
+import { getImageUrl } from '@/utils/image';
 import {
   Star,
   Clock,
@@ -167,7 +168,7 @@ const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> 
           </div>
           <div className="grid grid-cols-2 gap-2 rounded-xl overflow-hidden">
             {store.gallery.slice(0, 4).map((img, i) => (
-              <img key={i} src={img} alt="Store visual" className="w-full h-24 object-cover hover:scale-105 transition duration-300 cursor-pointer" onClick={onSeeAllPhotos} />
+              <img key={i} src={getImageUrl(img)} alt="Store visual" className="w-full h-24 object-cover hover:scale-105 transition duration-300 cursor-pointer" onClick={onSeeAllPhotos} />
             ))}
           </div>
         </div>
@@ -284,7 +285,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
         {/* Full-Bleed 100% Edge-to-Edge Cover Photo */}
         <div className="relative w-full aspect-[3.2/1] sm:aspect-[3.6/1] min-h-[200px] sm:min-h-[280px] md:min-h-[360px] lg:min-h-[400px] bg-slate-900 overflow-hidden shadow-inner group">
           <img
-            src={store.coverImage}
+            src={getImageUrl(store.coverImage)}
             alt={`${store.name} Cover`}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
@@ -333,7 +334,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
             <div className="relative group">
               <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full ring-4 ring-white shadow-xl overflow-hidden border-4 border-white bg-white flex items-center justify-center transition-transform duration-300 group-hover:scale-[1.02]">
                 <img
-                  src={store.logoImage}
+                  src={getImageUrl(store.logoImage)}
                   alt={store.name}
                   className="w-full h-full object-cover"
                 />
@@ -599,7 +600,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {(store.gallery && store.gallery.length > 0 ? store.gallery : [store.coverImage, store.logoImage]).map((img, idx) => (
                 <div key={idx} className="aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100 group cursor-pointer relative">
-                  <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                  <img src={getImageUrl(img)} alt={`Gallery ${idx}`} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
                   <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
                     <Camera className="w-6 h-6" />
                   </div>
