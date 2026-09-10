@@ -9,11 +9,20 @@ export const getImageUrl = (url?: string): string => {
     return url;
   }
 
-  // If already full HTTP / HTTPS URL
+  // Get API base URL or default to production admin domain
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://admin.ekhanei.bd/api/v1';
+  const backendBase = apiBase.replace(/\/api\/v1\/?$/, '').replace(/\/api\/?$/, '');
+
+  // Handle local dev URLs (localhost:8000 or 127.0.0.1:8000) when client connects from outside
+  if (url.includes('localhost:8000') || url.includes('127.0.0.1:8000')) {
+    const relativePath = url.replace(/^https?:\/\/[^\/]+/, '');
+    const cleanPath = relativePath.startsWith('/') ? relativePath.slice(1) : relativePath;
+    const storagePath = cleanPath.startsWith('storage/') ? cleanPath : `storage/${cleanPath}`;
+    return `${backendBase}/${storagePath}`;
+  }
+
+  // If already full HTTP / HTTPS URL (e.g. Unsplash, AWS S3, Cloudfront)
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    if (url.includes('localhost:8000')) {
-      return url.replace('http://localhost:8000', 'https://admin.ekhanei.bd');
-    }
     return url;
   }
 
@@ -22,10 +31,6 @@ export const getImageUrl = (url?: string): string => {
 
   // Add storage prefix if missing
   const storagePath = cleanPath.startsWith('storage/') ? cleanPath : `storage/${cleanPath}`;
-
-  // Get API base URL or default to production admin domain
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://admin.ekhanei.bd/api/v1';
-  const backendBase = apiBase.replace(/\/api\/v1\/?$/, '').replace(/\/api\/?$/, '');
 
   return `${backendBase}/${storagePath}`;
 };

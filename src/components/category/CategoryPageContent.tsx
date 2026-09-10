@@ -70,13 +70,23 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
   const filteredProducts = React.useMemo(() => {
     if (bottomFilterTab === 'all') return products;
     return products.filter((p: any) => {
-      const subIdStr = String(p.subcategoryId || p.categoryId || '');
+      const subIdStr = String(p.subcategoryId || '');
+      const catIdStr = String(p.categoryId || '');
+      const serviceCatIdStr = String(p.serviceCategoryId || '');
       const selectedSubStr = String(bottomFilterTab);
-      if (subIdStr === selectedSubStr) return true;
 
-      const subObj = subCategories.find((s: any) => String(s.id) === selectedSubStr);
-      if (subObj && subObj.name && p.name) {
-        return p.name.toLowerCase().includes(subObj.name.toLowerCase());
+      if (subIdStr === selectedSubStr || catIdStr === selectedSubStr || serviceCatIdStr === selectedSubStr) {
+        return true;
+      }
+
+      const subObj = subCategories.find((s: any) => String(s.id) === selectedSubStr || String(s.slug) === selectedSubStr);
+      if (subObj) {
+        if (String(subObj.id) === subIdStr || String(subObj.slug) === subIdStr || String(subObj.id) === catIdStr || String(subObj.slug) === catIdStr) {
+          return true;
+        }
+        if (subObj.name && p.name) {
+          return p.name.toLowerCase().includes(subObj.name.toLowerCase());
+        }
       }
       return false;
     });
@@ -148,7 +158,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
               {subCategories.map((sub) => (
                 <Link
                   key={sub.id}
-                  href={`/${slug}/${sub.id}`}
+                  href={`/${slug}/${sub.slug || sub.id}`}
                   className="snap-start flex-shrink-0 w-[85px] sm:w-[105px] md:w-[130px] lg:w-[145px] group cursor-pointer touch-active flex flex-col items-center text-center select-none"
                 >
                   <div className="w-[85px] h-[85px] sm:w-[105px] sm:h-[105px] md:w-[130px] md:h-[130px] lg:w-[145px] lg:h-[145px] rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-100 group-hover:shadow-md transition-all duration-300 relative">
