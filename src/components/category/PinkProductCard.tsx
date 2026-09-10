@@ -14,15 +14,27 @@ interface PinkProductCardProps {
 export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSlider = false }) => {
   const widthClass = isSlider ? 'snap-start flex-shrink-0 w-[calc(50%-0.25rem)] min-w-[calc(50%-0.25rem)] sm:w-[200px] sm:min-w-[200px]' : 'w-full';
 
+  // For variable products, extract first combination details if available
+  const firstVar = (product as any)?.variations && (product as any).variations.length > 0 ? (product as any).variations[0] : null;
+
+  const displayPrice = firstVar
+    ? Number(firstVar.sale_price || firstVar.price || product.price || 0)
+    : Number(product.price || 0);
+
+  const displayOldPrice = firstVar
+    ? Number(firstVar.price || product.oldPrice || product.price || 0)
+    : Number(product.oldPrice || 0);
+
+  const displayImage = (firstVar && firstVar.image) ? firstVar.image : product.image;
+
   const fallbackImg = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
   const cardImages = [
-    getImageUrl(product.image) || fallbackImg,
+    getImageUrl(displayImage) || fallbackImg,
     'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
     'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=600&q=80',
   ];
 
   const [activeImgIdx, setActiveImgIdx] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
   const hoverIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Slide images on mouse hover
@@ -41,11 +53,11 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
     setActiveImgIdx(0);
   };
 
-  // Calculate discount percentage
-  const discountPercent =
-    product.oldPrice && product.oldPrice > product.price
-      ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
-      : 22;
+  // Calculate discount percentage accurately
+  const hasDiscount = displayOldPrice > displayPrice && displayPrice > 0;
+  const discountPercent = hasDiscount
+    ? Math.round(((displayOldPrice - displayPrice) / displayOldPrice) * 100)
+    : 0;
 
   return (
     <Link
@@ -65,8 +77,6 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
             className="object-cover object-center group-hover:scale-105 transition-transform duration-300 will-change-transform w-full h-full"
             style={{ objectFit: 'cover', objectPosition: 'center center' }}
           />
-
-
 
           {/* Bottom Center Dot Pagination (EkhaneiGlassmorphism pill style) */}
           <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-1 py-0.5 rounded-full z-10 !border-none backdrop-blur-xl bg-white/30">
@@ -97,7 +107,7 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
           </div>
         </div>
 
-        {/* 2. Content Box (px-2 mt-2 mb-2 flex flex-col justify-between w-full min-w-0) */}
+        {/* 2. Content Box */}
         <div className="px-2 mt-2 mb-2 flex flex-col justify-between w-full min-w-0 text-left">
           <div className="flex-shrink-0 mb-0.5 w-full min-w-0">
             <h3
@@ -110,16 +120,20 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
           </div>
 
           {/* Price Strip: Current Price + Strikethrough Price + (% OFF) */}
-          <div className="flex items-center flex-wrap space-x-0.5 text-left">
+          <div className="flex items-center flex-wrap space-x-1 text-left">
             <p className="text-theme-primary font-semibold text-[12px] md:text-[17.23px]">
-              ৳{product.price}
+              ৳{displayPrice}
             </p>
-            <p className="line-through font-normal text-[12px] md:text-[13.8px] text-gray-500">
-              ৳{product.oldPrice || Math.round(product.price * 1.25)}
-            </p>
-            <span className="text-[#ff9800] flex-shrink-0 text-[12px] md:text-[13.8px] font-medium">
-              ({discountPercent}% OFF)
-            </span>
+            {hasDiscount && (
+              <>
+                <p className="line-through font-normal text-[12px] md:text-[13.8px] text-gray-500">
+                  ৳{displayOldPrice}
+                </p>
+                <span className="text-[#ff9800] flex-shrink-0 text-[12px] md:text-[13.8px] font-medium">
+                  ({discountPercent}% OFF)
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>
