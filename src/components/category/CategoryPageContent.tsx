@@ -159,9 +159,9 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                 <Link
                   key={sub.id}
                   href={`/${slug}/${sub.slug || sub.id}`}
-                  className="snap-start flex-shrink-0 w-[85px] sm:w-[105px] md:w-[130px] lg:w-[145px] group cursor-pointer touch-active flex flex-col items-center text-center select-none"
+                  className="snap-start flex-shrink-0 w-[64px] sm:w-[76px] md:w-[88px] lg:w-[96px] group cursor-pointer touch-active flex flex-col items-center text-center select-none"
                 >
-                  <div className="w-[85px] h-[85px] sm:w-[105px] sm:h-[105px] md:w-[130px] md:h-[130px] lg:w-[145px] lg:h-[145px] rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-100 group-hover:shadow-md transition-all duration-300 relative">
+                  <div className="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] md:w-[88px] md:h-[88px] lg:w-[96px] lg:h-[96px] rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 group-hover:shadow-md transition-all duration-300 relative">
                     {sub.image ? (
                       <img
                         src={getImageUrl(sub.image)}
@@ -170,12 +170,12 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-full rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-extrabold text-xs">
+                      <div className="w-full h-full rounded-xl sm:rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-extrabold text-xs sm:text-sm">
                         {sub.name.slice(0, 2)}
                       </div>
                     )}
                   </div>
-                  <span className="font-bold text-[11px] sm:text-xs md:text-sm text-slate-800 group-hover:text-emerald-600 transition leading-snug mt-2 line-clamp-2 px-0.5">
+                  <span className="font-bold text-[10px] sm:text-xs text-slate-800 group-hover:text-emerald-600 transition leading-tight mt-1.5 line-clamp-2 px-0.5">
                     {sub.name}
                   </span>
                 </Link>
