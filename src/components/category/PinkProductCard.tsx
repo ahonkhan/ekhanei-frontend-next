@@ -135,7 +135,7 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
                 <p className="line-through font-normal text-[12px] md:text-[13.8px] text-slate-400">
                   ৳{displayOldPrice}
                 </p>
-                <span className="text-theme-primary flex-shrink-0 text-[12px] md:text-[13.8px] font-semibold">
+                <span className="text-theme-secondary flex-shrink-0 text-[12px] md:text-[13.8px] font-bold">
                   ({discountPercent}% OFF)
                 </span>
               </>

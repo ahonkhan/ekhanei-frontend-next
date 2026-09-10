@@ -870,7 +870,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                 <span className="line-through text-slate-400 text-sm sm:text-base font-bold">
                   ৳{activeOldPrice}
                 </span>
-                <span className="text-theme-primary text-xs font-black bg-theme-primary-light px-2 py-0.5 rounded-md border border-theme-primary/30">
+                <span className="text-theme-secondary text-xs font-black bg-theme-secondary-light px-2 py-0.5 rounded-md border border-theme-secondary/30">
                   ({discountPercent}% OFF)
                 </span>
               </>
