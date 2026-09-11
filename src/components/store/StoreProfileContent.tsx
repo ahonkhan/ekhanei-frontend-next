@@ -6,6 +6,7 @@ import { Store, Product } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { getImageUrl } from '@/utils/image';
+import { formatDeliveryTime } from '@/utils/formatDeliveryTime';
 import {
   Star,
   Clock,
@@ -370,7 +371,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
 
               <div className="flex items-center gap-1 bg-blue-50 text-blue-900 px-3 py-1.5 rounded-xl border border-blue-200/70">
                 <Clock className="w-4 h-4 text-blue-600" />
-                <span>{store.deliveryTime || '১৫-২৫ মিনিট'}</span>
+                <span>{formatDeliveryTime(store.deliveryTime)}</span>
               </div>
 
               <div className="flex items-center gap-1 bg-emerald-50 text-emerald-900 px-3 py-1.5 rounded-xl border border-emerald-200/70">

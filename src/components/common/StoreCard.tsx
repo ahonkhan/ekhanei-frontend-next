@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Store } from '@/types';
 import { Tag, Clock, Star, MapPin } from 'lucide-react';
+import { formatDeliveryTime } from '@/utils/formatDeliveryTime';
 
 interface StoreCardProps {
   store: Store;
@@ -37,7 +38,7 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) =
         {/* Delivery Time Badge */}
         <span className="absolute bottom-2.5 right-2.5 bg-slate-950/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1">
           <Clock className="w-3 h-3 text-amber-400" />
-          {store.deliveryTime || '20-30 min'}
+          {formatDeliveryTime(store.deliveryTime)}
         </span>
       </div>
 

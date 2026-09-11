@@ -1,15 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
 import { useGetProductsQuery, useGetCategoryDetailQuery, useGetServiceCategoriesQuery } from '@/store/services/apiService';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { ProductCardSkeleton } from '@/components/common/Skeletons';
-import { ChevronLeft, ChevronRight, Loader2, Star, Flame, ArrowRight } from 'lucide-react';
+import { ChevronLeft, Loader2 } from 'lucide-react';
 import { getImageUrl } from '@/utils/image';
 
 interface SubCategoryPageContentProps {
@@ -39,82 +35,95 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
   const subCategories = categoryDetail?.subCategories || [];
 
-  const [displayedCount, setDisplayedCount] = useState(12);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  // Tab State & Infinite Scroll State
+  const [selectedTab, setSelectedTab] = useState<string>('all');
+  const [displayedCount, setDisplayedCount] = useState<number>(12);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
-  // Top Rated Products
-  const topRatedProducts = products.filter(p => p.rating >= 4.7).concat(products).slice(0, 8);
+  // Filter products by selected sub-category tab
+  const filteredProducts = useMemo(() => {
+    if (selectedTab === 'all') return products;
 
-  // Top Sold Products
-  const topSoldProducts = products.slice().reverse().slice(0, 8);
+    const targetStr = String(selectedTab).toLowerCase();
 
-  // Infinite Scroll Listener for Child Page Grid
+    return products.filter((p: any) => {
+      const subIdStr = String(p.subcategoryId || p.product_subcategory_id || p.sub_category_id || '').toLowerCase();
+      const catIdStr = String(p.categoryId || p.product_category_id || p.category_id || '').toLowerCase();
+      const catSlugStr = String(p.categorySlug || '').toLowerCase();
+      const subcatSlugStr = String(p.subcategorySlug || '').toLowerCase();
+      const catNameStr = String(p.categoryName || '').toLowerCase();
+      const subcatNameStr = String(p.subcategoryName || '').toLowerCase();
+
+      if (
+        subIdStr === targetStr ||
+        catIdStr === targetStr ||
+        catSlugStr === targetStr ||
+        subcatSlugStr === targetStr
+      ) {
+        return true;
+      }
+
+      const targetSub = subCategories.find((s: any) =>
+        String(s.id).toLowerCase() === targetStr || String(s.slug).toLowerCase() === targetStr
+      );
+
+      if (targetSub) {
+        const targetSubId = String(targetSub.id || '').toLowerCase();
+        const targetSubSlug = String(targetSub.slug || '').toLowerCase();
+        const targetSubName = String(targetSub.name || '').toLowerCase();
+
+        if (
+          subIdStr === targetSubId ||
+          catIdStr === targetSubId ||
+          subIdStr === targetSubSlug ||
+          catIdStr === targetSubSlug ||
+          catSlugStr === targetSubSlug ||
+          subcatSlugStr === targetSubSlug ||
+          catNameStr === targetSubName ||
+          subcatNameStr === targetSubName
+        ) {
+          return true;
+        }
+
+        if (p.name && targetSubName && p.name.toLowerCase().includes(targetSubName)) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  }, [products, selectedTab, subCategories]);
+
+  const handleTabChange = (tabId: string) => {
+    setSelectedTab(tabId);
+    setDisplayedCount(12);
+  };
+
+  // Infinite Scroll (Load on scroll)
   useEffect(() => {
-    if (!childSlug) return;
     const handleScroll = () => {
       if (isLoadingMore) return;
       const scrollPos = window.innerHeight + window.scrollY;
       const threshold = document.documentElement.scrollHeight - 500;
 
       if (scrollPos >= threshold) {
-        if (displayedCount < products.length) {
+        if (displayedCount < filteredProducts.length) {
           setIsLoadingMore(true);
           setTimeout(() => {
-            setDisplayedCount(prev => prev + 6);
+            setDisplayedCount(prev => prev + 12);
             setIsLoadingMore(false);
-          }, 400);
+          }, 300);
         }
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isLoadingMore, displayedCount, products.length, childSlug]);
-
-  // Helper to filter products for each sub-category
-  const getSubCategoryProducts = (sub: any) => {
-    const targetIdStr = String(sub.id || '');
-    const targetSlugStr = String(sub.slug || '');
-
-    return products.filter((p: any) => {
-      const subIdStr = String(p.subcategoryId || p.product_subcategory_id || '');
-      const catIdStr = String(p.categoryId || p.product_category_id || '');
-
-      if (subIdStr === targetIdStr || subIdStr === targetSlugStr || catIdStr === targetIdStr || catIdStr === targetSlugStr) {
-        return true;
-      }
-      if (sub.name && p.name) {
-        return p.name.toLowerCase().includes(sub.name.toLowerCase());
-      }
-      return false;
-    });
-  };
-
-  // Find remaining products that don't match any defined sub-category
-  const remainingProducts = React.useMemo(() => {
-    if (subCategories.length === 0) return products;
-    return products.filter((p: any) => {
-      const subIdStr = String(p.subcategoryId || p.product_subcategory_id || '');
-      const catIdStr = String(p.categoryId || p.product_category_id || '');
-
-      const isMatched = subCategories.some((sub: any) => {
-        const targetIdStr = String(sub.id || '');
-        const targetSlugStr = String(sub.slug || '');
-        if (subIdStr === targetIdStr || subIdStr === targetSlugStr || catIdStr === targetIdStr || catIdStr === targetSlugStr) {
-          return true;
-        }
-        if (sub.name && p.name) {
-          return p.name.toLowerCase().includes(sub.name.toLowerCase());
-        }
-        return false;
-      });
-      return !isMatched;
-    });
-  }, [products, subCategories]);
+  }, [isLoadingMore, displayedCount, filteredProducts.length]);
 
   return (
-    <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-8 sm:space-y-12 pt-4 sm:pt-6 pb-12">
-      {/* TOP HEADER / BANNER SECTION (HIDE HERO IMAGE BANNER ON CHILD SUBCATEGORY PAGE) */}
+    <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-6 sm:space-y-8 pt-4 sm:pt-6 pb-12">
+      {/* TOP HEADER / BANNER SECTION */}
       {childSlug ? (
         <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -130,7 +139,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
             </h1>
           </div>
           <span className="text-xs sm:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200">
-            {products.length} টি পণ্য
+            {filteredProducts.length} টি পণ্য
           </span>
         </div>
       ) : (
@@ -151,290 +160,76 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
                 {title}
               </h1>
               <span className="text-xs sm:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                {products.length} টি পণ্য
+                {filteredProducts.length} টি পণ্য
               </span>
             </div>
           </div>
         </div>
       )}
 
-      {/* SUB-CATEGORIES CIRCULAR CARDS SLIDER (IF AVAILABLE AND NOT ON CHILD SLUG) */}
-      {!childSlug && subCategories.length > 0 && (
-        <section className="space-y-3 pt-2">
-          <div className="flex items-center gap-3">
-            <div className="w-2.5 h-6 rounded-full bg-emerald-500" />
-            <h2 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
-              সাব-ক্যাটাগরি
-            </h2>
-          </div>
-          <div className="flex gap-3 sm:gap-4 md:gap-5 overflow-x-auto no-scrollbar pb-1 pt-0.5 px-0.5 snap-x">
-            {subCategories.map((sub: any) => (
-              <Link
-                key={sub.id}
-                href={`/${slug}/${subSlug}/${sub.slug || sub.id}`}
-                className="snap-start flex-shrink-0 w-[64px] sm:w-[76px] md:w-[88px] lg:w-[96px] group cursor-pointer touch-active flex flex-col items-center text-center select-none"
-              >
-                <div className="w-[64px] h-[64px] sm:w-[76px] sm:h-[76px] md:w-[88px] md:h-[88px] lg:w-[96px] lg:h-[96px] rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 group-hover:shadow-md transition-all duration-300 relative border-2 border-transparent hover:border-emerald-400">
-                  {sub.image ? (
-                    <img
-                      src={getImageUrl(sub.image)}
-                      alt={sub.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full rounded-xl sm:rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-extrabold text-xs sm:text-sm">
-                      {sub.name.slice(0, 2)}
-                    </div>
-                  )}
-                </div>
-                <span className="font-bold text-[10px] sm:text-xs text-slate-800 group-hover:text-emerald-600 transition leading-tight mt-1.5 line-clamp-2 px-0.5">
-                  {sub.name}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* TOP RATED SECTION WITH SWIPER */}
-      {topRatedProducts.length > 0 && (
-        <section className="space-y-4 pt-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-2.5 h-7 rounded-full bg-amber-500" />
-              <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                <span>Top Rated</span>
-              </h2>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                className="tr-prev w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                className="tr-next w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <Swiper
-            modules={[Navigation]}
-            navigation={{
-              prevEl: '.tr-prev',
-              nextEl: '.tr-next',
-            }}
-            spaceBetween={8}
-            slidesPerView={2}
-            breakpoints={{
-              640: { slidesPerView: 3, spaceBetween: 12 },
-              768: { slidesPerView: 4, spaceBetween: 12 },
-              1024: { slidesPerView: 5, spaceBetween: 16 },
-              1280: { slidesPerView: 6, spaceBetween: 16 },
-            }}
-            className="w-full py-1"
+      {/* SUB-CATEGORY FILTER PILLS TAB BAR */}
+      {subCategories.length > 0 && (
+        <div className="bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl sm:rounded-full border border-slate-200/90 shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => handleTabChange('all')}
+            className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
+              selectedTab === 'all'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
+                : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
+            }`}
           >
-            {topRatedProducts.map((product, idx) => (
-              <SwiperSlide key={`tr-${product.id}-${idx}`}>
-                <PinkProductCard product={product} isSlider={false} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </section>
-      )}
-
-      {/* TOP SOLD SECTION WITH SWIPER */}
-      {topSoldProducts.length > 0 && (
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-2.5 h-7 rounded-full bg-rose-500" />
-              <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                <Flame className="w-5 h-5 text-rose-500 fill-rose-500" />
-                <span>Top Sold</span>
-              </h2>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                className="ts-prev w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                className="ts-next w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <Swiper
-            modules={[Navigation]}
-            navigation={{
-              prevEl: '.ts-prev',
-              nextEl: '.ts-next',
-            }}
-            spaceBetween={8}
-            slidesPerView={2}
-            breakpoints={{
-              640: { slidesPerView: 3, spaceBetween: 12 },
-              768: { slidesPerView: 4, spaceBetween: 12 },
-              1024: { slidesPerView: 5, spaceBetween: 16 },
-              1280: { slidesPerView: 6, spaceBetween: 16 },
-            }}
-            className="w-full py-1"
-          >
-            {topSoldProducts.map((product, idx) => (
-              <SwiperSlide key={`ts-${product.id}-${idx}`}>
-                <PinkProductCard product={product} isSlider={false} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </section>
-      )}
-
-      {/* DEDICATED SUB-CATEGORY SECTIONS WITH SLIDERS (WHEN NOT ON CHILD SLUG) */}
-      {!childSlug && subCategories.length > 0 ? (
-        <div className="space-y-10 sm:space-y-14">
-          {subCategories.map((sub: any, subIdx: number) => {
-            const subProds = getSubCategoryProducts(sub);
-            if (subProds.length === 0) return null;
-
-            const prevBtnClass = `sub-prev-${sub.id || subIdx}`;
-            const nextBtnClass = `sub-next-${sub.id || subIdx}`;
-
+            সকল পণ্য
+          </button>
+          {subCategories.map((sub: any) => {
+            const subId = sub.id || sub.slug;
+            const isSelected = selectedTab === subId || selectedTab === sub.slug;
             return (
-              <section key={sub.id || subIdx} className="space-y-4 pt-2">
-                {/* Section Header: Subcategory Title + View All Button */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-7 rounded-full bg-emerald-500" />
-                    <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">
-                      {sub.name}
-                    </h2>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Link
-                      href={`/${slug}/${subSlug}/${sub.slug || sub.id}`}
-                      className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-emerald-600 hover:text-emerald-700 hover:underline transition cursor-pointer"
-                    >
-                      <span>সবগুলো দেখুন</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-
-                    {/* Swiper Arrow Buttons */}
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        className={`${prevBtnClass} w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40`}
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-                      <button
-                        className={`${nextBtnClass} w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 flex items-center justify-center transition border border-slate-200 text-xs cursor-pointer active:scale-95 disabled:opacity-40`}
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Subcategory Product Swiper Slider */}
-                <Swiper
-                  modules={[Navigation]}
-                  navigation={{
-                    prevEl: `.${prevBtnClass}`,
-                    nextEl: `.${nextBtnClass}`,
-                  }}
-                  spaceBetween={8}
-                  slidesPerView={2}
-                  breakpoints={{
-                    640: { slidesPerView: 3, spaceBetween: 12 },
-                    768: { slidesPerView: 4, spaceBetween: 12 },
-                    1024: { slidesPerView: 5, spaceBetween: 16 },
-                    1280: { slidesPerView: 6, spaceBetween: 16 },
-                  }}
-                  className="w-full py-1"
-                >
-                  {subProds.map((product: any, pIdx: number) => (
-                    <SwiperSlide key={`subp-${product.id}-${pIdx}`}>
-                      <PinkProductCard product={product} isSlider={false} />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </section>
+              <button
+                key={subId}
+                onClick={() => handleTabChange(subId)}
+                className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
+                  isSelected
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
+                    : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
+                }`}
+              >
+                {sub.name}
+              </button>
             );
           })}
-
-          {/* Remaining Uncategorized Products Slider/Grid if any */}
-          {remainingProducts.length > 0 && (
-            <section className="space-y-4 pt-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-7 rounded-full bg-teal-500" />
-                  <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">
-                    অন্যান্য পণ্য
-                  </h2>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 md:gap-2.5">
-                {remainingProducts.map((product, idx) => (
-                  <PinkProductCard key={`rem-${product.id}-${idx}`} product={product} isSlider={false} />
-                ))}
-              </div>
-            </section>
-          )}
         </div>
-      ) : (
-        /* FULL PRODUCT GRID FOR DEDICATED CHILD SUBCATEGORY PAGE (e.g. /grocery/daily-essentials/oil) OR FALLBACK */
-        <section className="space-y-4 pt-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-2.5 h-7 rounded-full bg-emerald-500" />
-              <h2 className="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight">
-                সকল পণ্য ({products.length})
-              </h2>
-            </div>
-            <span className="text-xs font-semibold text-slate-400">
-              Showing {Math.min(displayedCount, products.length)} of {products.length} items
-            </span>
-          </div>
-
-          {isProductsLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : products.length === 0 ? (
-            <div className="py-12 text-center text-slate-500 bg-white rounded-2xl border border-slate-100 shadow-xs">
-              <p className="text-sm font-semibold">এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 md:gap-2.5">
-              {products.slice(0, displayedCount).map((product, idx) => (
-                <PinkProductCard key={`grid-${product.id}-${idx}`} product={product} isSlider={false} />
-              ))}
-            </div>
-          )}
-
-          {isLoadingMore && (
-            <div className="py-8 text-center flex justify-center">
-              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-md">
-                <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-                <span>Loading more items...</span>
-              </div>
-            </div>
-          )}
-        </section>
       )}
+
+      {/* PRODUCT GRID WITH INFINITE LOAD ON SCROLL */}
+      <section className="space-y-4 pt-2">
+        {isProductsLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="py-16 text-center text-slate-500 bg-white rounded-2xl border border-slate-100 shadow-xs">
+            <p className="text-sm sm:text-base font-semibold">এই সাব-ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 md:gap-2.5">
+            {filteredProducts.slice(0, displayedCount).map((product, idx) => (
+              <PinkProductCard key={`grid-${product.id}-${idx}`} product={product} isSlider={false} />
+            ))}
+          </div>
+        )}
+
+        {/* LOAD ON SCROLL LOADING SPINNER */}
+        {isLoadingMore && (
+          <div className="py-8 text-center flex justify-center">
+            <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-md">
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+              <span>Loading more items...</span>
+            </div>
+          </div>
+        )}
+      </section>
     </main>
   );
 };
