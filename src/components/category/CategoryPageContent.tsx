@@ -151,17 +151,17 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
       <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-8 sm:space-y-12">
 
-        {/* 1. SUB-CATEGORIES CIRCULAR / SQUARE GRID (MAX 4 PER ROW ON MOBILE) */}
+        {/* 1. SUB-CATEGORIES CIRCULAR / SQUARE GRID (MAX 4 PER ROW ON MOBILE, LARGER ON DESKTOP) */}
         {subCategories.length > 0 && (
           <section className="space-y-3">
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2.5 sm:gap-4 md:gap-5 py-0.5 px-0.5">
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-3 sm:gap-4 md:gap-6 py-0.5 px-0.5">
               {subCategories.map((sub) => (
                 <Link
                   key={sub.id}
                   href={`/${slug}/${sub.slug || sub.id}`}
                   className="group cursor-pointer touch-active flex flex-col items-center text-center select-none"
                 >
-                  <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-100 group-hover:shadow-md transition-all duration-300 relative border border-slate-100">
+                  <div className="w-full aspect-square rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-100 group-hover:shadow-md transition-all duration-300 relative border border-slate-100">
                     {sub.image ? (
                       <img
                         src={getImageUrl(sub.image)}
@@ -170,12 +170,12 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-full rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-extrabold text-xs sm:text-sm">
+                      <div className="w-full h-full rounded-2xl sm:rounded-3xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-extrabold text-xs sm:text-base">
                         {sub.name.slice(0, 2)}
                       </div>
                     )}
                   </div>
-                  <span className="font-extrabold text-[11px] sm:text-xs text-slate-800 group-hover:text-emerald-600 transition leading-tight mt-1.5 line-clamp-2 px-0.5">
+                  <span className="font-extrabold text-[11px] sm:text-xs md:text-sm text-slate-800 group-hover:text-emerald-600 transition leading-tight mt-2 line-clamp-2 px-0.5">
                     {sub.name}
                   </span>
                 </Link>
