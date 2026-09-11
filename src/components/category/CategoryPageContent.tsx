@@ -21,9 +21,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
   const brandsScrollRef = useRef<HTMLDivElement>(null);
 
-  const slides = catMeta?.heroSlides && catMeta.heroSlides.length > 0
-    ? catMeta.heroSlides
-    : ['https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80'];
+  const slides = catMeta?.heroSlides && catMeta.heroSlides.length > 0 ? catMeta.heroSlides : [];
 
   // Auto-play hero slider
   useEffect(() => {
@@ -96,58 +94,64 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
   return (
     <div className="w-full pb-12 pt-0 mt-0 space-y-6 sm:space-y-10">
-      {/* 1. TOP PROMO ADS / FULL WIDTH HERO SLIDER - EDGE TO EDGE (NO TOP GAP) */}
-      <section className="relative w-full overflow-hidden shadow-sm border-b border-slate-200/80 aspect-[21/8] sm:aspect-[25/7] md:aspect-[28/7] bg-slate-900 group rounded-none">
-        {slides.map((slideUrl, idx) => (
-          <div
-            key={idx}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${heroSlideIdx === idx ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+      {/* 1. TOP PROMO ADS / FULL WIDTH HERO SLIDER - SKELETON WHILE LOADING */}
+      {isMetaLoading ? (
+        <div className="w-full aspect-[21/8] sm:aspect-[25/7] md:aspect-[28/7] bg-slate-200 animate-pulse rounded-none" />
+      ) : slides.length > 0 ? (
+        <section className="relative w-full overflow-hidden shadow-sm border-b border-slate-200/80 aspect-[21/8] sm:aspect-[25/7] md:aspect-[28/7] bg-slate-900 group rounded-none">
+          {slides.map((slideUrl, idx) => (
+            <div
+              key={idx}
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                heroSlideIdx === idx ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
               }`}
-          >
-            <img
-              src={getImageUrl(slideUrl)}
-              alt={`Category Hero Banner ${idx + 1}`}
-              className="w-full h-full object-cover"
-              loading={idx === 0 ? 'eager' : 'lazy'}
-            />
-          </div>
-        ))}
-
-        {/* Slider Controls */}
-        {slides.length > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={() => setHeroSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)}
-              className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white/80 hover:bg-white text-slate-800 flex items-center justify-center shadow-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
-              aria-label="Previous Slide"
             >
-              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setHeroSlideIdx((prev) => (prev + 1) % slides.length)}
-              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white/80 hover:bg-white text-slate-800 flex items-center justify-center shadow-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
-              aria-label="Next Slide"
-            >
-              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-
-            {/* Slider Dots Pagination */}
-            <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/40 backdrop-blur-md">
-              {slides.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setHeroSlideIdx(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${heroSlideIdx === idx ? 'w-6 bg-emerald-400' : 'w-2 bg-white/60 hover:bg-white'
-                    }`}
-                />
-              ))}
+              <img
+                src={getImageUrl(slideUrl)}
+                alt={`Category Hero Banner ${idx + 1}`}
+                className="w-full h-full object-cover"
+                loading={idx === 0 ? 'eager' : 'lazy'}
+              />
             </div>
-          </>
-        )}
-      </section>
+          ))}
+
+          {/* Slider Controls */}
+          {slides.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => setHeroSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)}
+                className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white/80 hover:bg-white text-slate-800 flex items-center justify-center shadow-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                aria-label="Previous Slide"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setHeroSlideIdx((prev) => (prev + 1) % slides.length)}
+                className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white/80 hover:bg-white text-slate-800 flex items-center justify-center shadow-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                aria-label="Next Slide"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              {/* Slider Dots Pagination */}
+              <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/40 backdrop-blur-md">
+                {slides.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setHeroSlideIdx(idx)}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                      heroSlideIdx === idx ? 'w-6 bg-emerald-400' : 'w-2 bg-white/60 hover:bg-white'
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+      ) : null}
 
       <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-8 sm:space-y-12">
 

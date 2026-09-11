@@ -31,7 +31,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
   const parentSubObj = parentSubCategories.find((s: any) => s.id === activeSlug || s.slug === activeSlug);
 
   const title = categoryDetail?.title || parentSubObj?.name || activeSlug.replace(/-/g, ' ');
-  const bannerImage = categoryDetail?.heroSlides?.[0] || parentSubObj?.image || catInfo?.image || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80';
+  const bannerImage = categoryDetail?.heroSlides?.[0] || parentSubObj?.image || null;
 
   const subCategories = categoryDetail?.subCategories || [];
 
@@ -144,14 +144,18 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
         </div>
       ) : (
         <div className="relative mb-10 sm:mb-14">
-          <section className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-6 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] relative rounded-none overflow-hidden border-b border-slate-200/80 shadow-xs aspect-[21/8] sm:aspect-[24/7] group cursor-pointer touch-active">
-            <img
-              src={getImageUrl(bannerImage)}
-              alt={title || 'Category Banner'}
-              className="w-full h-full object-cover group-hover:scale-102 transition duration-500"
-              loading="lazy"
-            />
-          </section>
+          {isMetaLoading ? (
+            <div className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-6 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] aspect-[21/8] sm:aspect-[24/7] bg-slate-200 animate-pulse" />
+          ) : bannerImage ? (
+            <section className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-6 w-[calc(100%+2rem)] sm:w-[calc(100%+3rem)] relative rounded-none overflow-hidden border-b border-slate-200/80 shadow-xs aspect-[21/8] sm:aspect-[24/7] group cursor-pointer touch-active">
+              <img
+                src={getImageUrl(bannerImage)}
+                alt={title || 'Category Banner'}
+                className="w-full h-full object-cover group-hover:scale-102 transition duration-500"
+                loading="lazy"
+              />
+            </section>
+          ) : null}
 
           {/* Floating White Title Box Overlapping Bottom Edge of Banner */}
           <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 z-10 px-4 sm:px-6">
