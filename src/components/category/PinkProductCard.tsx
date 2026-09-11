@@ -22,7 +22,7 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
     : Number(product.price || 0);
 
   const displayOldPrice = firstVar
-    ? Number(firstVar.price || product.oldPrice || product.price || 0)
+    ? Number(firstVar.oldPrice || firstVar.price || product.oldPrice || product.price || 0)
     : Number(product.oldPrice || 0);
 
   const displayImage = (firstVar && firstVar.image) ? firstVar.image : product.image;
