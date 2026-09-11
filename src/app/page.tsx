@@ -10,6 +10,7 @@ import {
   useGetHeroBannersQuery,
   useGetServiceCategoriesQuery,
 } from '@/store/services/apiService';
+import { PromoSwiperBanner } from '@/components/home/PromoSwiperBanner';
 
 export default function HomePage() {
   const { isLoading: isHeroLoading } = useGetHeroBannersQuery();
@@ -34,6 +35,8 @@ export default function HomePage() {
         {/* TRUST BADGES & POPULAR STORES */}
         <div className="space-y-3 sm:space-y-4">
           <TrustBadges />
+          
+          <PromoSwiperBanner />
           <PopularStores />
         </div>
       </div>
