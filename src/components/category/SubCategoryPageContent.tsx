@@ -31,7 +31,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
   const parentSubObj = parentSubCategories.find((s: any) => s.id === activeSlug || s.slug === activeSlug);
 
   const title = categoryDetail?.title || parentSubObj?.name || activeSlug.replace(/-/g, ' ');
-  const bannerImage = categoryDetail?.heroSlides?.[0] || parentSubObj?.image || null;
+  const bannerImage = categoryDetail?.heroSlides?.[0] || categoryDetail?.bannerImage || categoryDetail?.banner_image || parentSubObj?.bannerImage || parentSubObj?.banner_image || parentSubObj?.image || null;
 
   const subCategories = categoryDetail?.subCategories || [];
 
