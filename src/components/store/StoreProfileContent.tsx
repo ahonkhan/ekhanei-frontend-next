@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Store, Product } from '@/types';
 import { useCart } from '@/context/CartContext';
@@ -223,9 +223,64 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
     tabsContainerRef.current.scrollLeft = tabsScrollLeft - walk;
   };
 
+  // Infinite Scroll state for "For You" section (20 products per page)
+  const [page, setPage] = useState<number>(1);
+  const [loadedProducts, setLoadedProducts] = useState<Product[]>([]);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const observerRef = useRef<HTMLDivElement | null>(null);
+
+  const { data: pageProducts, isFetching: isFetchingProducts } = useGetProductsQuery(
+    { storeId: store?.id ? String(store.id) : undefined, perPage: 20, page },
+    { skip: !store?.id }
+  );
+
+  // Append newly fetched page products to loadedProducts list
+  useEffect(() => {
+    if (pageProducts) {
+      if (pageProducts.length < 20) {
+        setHasMore(false);
+      }
+      if (pageProducts.length > 0) {
+        setLoadedProducts((prev) => {
+          const existingIds = new Set(prev.map((p) => p.id));
+          const newItems = pageProducts.filter((p) => !existingIds.has(p.id));
+          return [...prev, ...newItems];
+        });
+      }
+    }
+  }, [pageProducts]);
+
+  // Fallback if initial products prop is provided without API store.id
+  const allForYouProducts = useMemo(() => {
+    if (loadedProducts.length > 0) return loadedProducts;
+    return products;
+  }, [loadedProducts, products]);
+
+  // IntersectionObserver to detect scroll to bottom
+  useEffect(() => {
+    if (!hasMore || isFetchingProducts) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isFetchingProducts) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentEl = observerRef.current;
+    if (currentEl) observer.observe(currentEl);
+
+    return () => {
+      if (currentEl) observer.unobserve(currentEl);
+    };
+  }, [hasMore, isFetchingProducts]);
+
   // Filter products by selected tab & search query
   const filteredProducts = useMemo(() => {
-    return products.filter(product => {
+    const listToFilter = allForYouProducts.length > 0 ? allForYouProducts : products;
+    return listToFilter.filter(product => {
       // Search filter
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.categoryName?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -246,7 +301,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
 
       return matchesSearch && matchesTab && matchesSubFilter;
     });
-  }, [products, searchQuery, activeTab, selectedFilter]);
+  }, [allForYouProducts, products, searchQuery, activeTab, selectedFilter]);
 
   // Top Rated Products (fetched directly from backend API by sort_by=top_rated)
   const { data: apiTopRatedProducts } = useGetProductsQuery(
@@ -684,19 +739,32 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
                   </div>
                 )}
 
-                {/* 3. For You Section (Contains ALL Products) */}
+                {/* 3. For You Section (Paginated 20 per page, Infinite Scroll) */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
                     <h3 className="text-base sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
                       <span>For You</span>
                     </h3>
-                    <span className="text-xs text-slate-500 font-semibold">({products.length} Products)</span>
+                    <span className="text-xs text-slate-500 font-semibold">({allForYouProducts.length} Products)</span>
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2.5">
-                    {products.map((product) => (
+                    {allForYouProducts.map((product) => (
                       <PinkProductCard key={`fy-${product.id}`} product={product} />
                     ))}
+                  </div>
+
+                  {/* Infinite Scroll Sentinel & Loader */}
+                  <div ref={observerRef} className="py-6 text-center">
+                    {isFetchingProducts && (
+                      <div className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-600">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-600" />
+                        <span>Loading more products...</span>
+                      </div>
+                    )}
+                    {!hasMore && allForYouProducts.length > 0 && (
+                      <p className="text-xs text-slate-400 font-medium">You've reached the end of store products</p>
+                    )}
                   </div>
                 </div>
               </>
