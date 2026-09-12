@@ -69,45 +69,44 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
   const filteredProducts = React.useMemo(() => {
     if (bottomFilterTab === 'all') return products;
 
-    const targetStr = String(bottomFilterTab).toLowerCase();
+    const targetStr = String(bottomFilterTab).toLowerCase().trim();
 
     return products.filter((p: any) => {
-      const subIdStr = String(p.subcategoryId || p.product_subcategory_id || '').toLowerCase();
-      const catIdStr = String(p.categoryId || p.product_category_id || '').toLowerCase();
-      const serviceCatIdStr = String(p.serviceCategoryId || p.service_category_id || '').toLowerCase();
-      const subSlugStr = String(p.subcategorySlug || '').toLowerCase();
-      const catSlugStr = String(p.categorySlug || '').toLowerCase();
-      const subNameStr = String(p.subcategoryName || '').toLowerCase();
-      const catNameStr = String(p.categoryName || '').toLowerCase();
+      const subIdStr = String(p.subcategoryId || p.product_subcategory_id || p.sub_category_id || '').toLowerCase().trim();
+      const catIdStr = String(p.categoryId || p.product_category_id || p.category_id || '').toLowerCase().trim();
+      const serviceCatIdStr = String(p.serviceCategoryId || p.service_category_id || '').toLowerCase().trim();
+      const subSlugStr = String(p.subcategorySlug || '').toLowerCase().trim();
+      const catSlugStr = String(p.categorySlug || '').toLowerCase().trim();
+      const subNameStr = String(p.subcategoryName || '').toLowerCase().trim();
+      const catNameStr = String(p.categoryName || '').toLowerCase().trim();
 
       if (
-        subIdStr === targetStr ||
-        catIdStr === targetStr ||
-        serviceCatIdStr === targetStr ||
-        subSlugStr === targetStr ||
-        catSlugStr === targetStr
+        (subIdStr && subIdStr === targetStr) ||
+        (catIdStr && catIdStr === targetStr) ||
+        (serviceCatIdStr && serviceCatIdStr === targetStr) ||
+        (subSlugStr && subSlugStr === targetStr) ||
+        (catSlugStr && catSlugStr === targetStr) ||
+        (subNameStr && subNameStr === targetStr) ||
+        (catNameStr && catNameStr === targetStr)
       ) {
         return true;
       }
 
       const subObj = subCategories.find((s: any) =>
-        String(s.id).toLowerCase() === targetStr || String(s.slug).toLowerCase() === targetStr
+        (s.id && String(s.id).toLowerCase().trim() === targetStr) ||
+        (s.slug && String(s.slug).toLowerCase().trim() === targetStr) ||
+        (s.name && String(s.name).toLowerCase().trim() === targetStr)
       );
 
       if (subObj) {
-        const targetId = String(subObj.id || '').toLowerCase();
-        const targetSlug = String(subObj.slug || '').toLowerCase();
-        const targetName = String(subObj.name || '').toLowerCase();
+        const targetId = String(subObj.id || '').toLowerCase().trim();
+        const targetSlug = String(subObj.slug || '').toLowerCase().trim();
+        const targetName = String(subObj.name || '').toLowerCase().trim();
 
         if (
-          subIdStr === targetId ||
-          catIdStr === targetId ||
-          subIdStr === targetSlug ||
-          catIdStr === targetSlug ||
-          subSlugStr === targetSlug ||
-          catSlugStr === targetSlug ||
-          subNameStr === targetName ||
-          catNameStr === targetName
+          (targetId && (subIdStr === targetId || catIdStr === targetId || serviceCatIdStr === targetId)) ||
+          (targetSlug && (subIdStr === targetSlug || catIdStr === targetSlug || subSlugStr === targetSlug || catSlugStr === targetSlug)) ||
+          (targetName && (subNameStr === targetName || catNameStr === targetName))
         ) {
           return true;
         }
