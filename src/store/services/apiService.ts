@@ -110,7 +110,7 @@ export const apiService = createApi({
       query: (slug) => `/categories/${slug}`,
       transformResponse: (res: any) => res.data || null,
     }),
-    getProducts: builder.query<Product[], { categoryId?: string; subcategoryId?: string; storeId?: string; brandId?: string; search?: string; isPopular?: boolean }>({
+    getProducts: builder.query<Product[], { categoryId?: string; subcategoryId?: string; storeId?: string; brandId?: string; search?: string; isPopular?: boolean; perPage?: number }>({
       query: (params) => {
         const queryParams = new URLSearchParams();
         if (params?.categoryId) queryParams.append('category_id', params.categoryId);
@@ -119,6 +119,7 @@ export const apiService = createApi({
         if (params?.brandId) queryParams.append('brand_id', params.brandId);
         if (params?.search) queryParams.append('search', params.search);
         if (params?.isPopular) queryParams.append('is_popular', '1');
+        if (params?.perPage) queryParams.append('per_page', params.perPage.toString());
         return `/products?${queryParams.toString()}`;
       },
       transformResponse: (res: any) => res.data || [],

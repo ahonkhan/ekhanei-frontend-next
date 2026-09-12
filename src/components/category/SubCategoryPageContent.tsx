@@ -20,7 +20,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
   const { data: serviceCategories = [] } = useGetServiceCategoriesQuery();
   const { data: categoryDetail, isLoading: isMetaLoading } = useGetCategoryDetailQuery(activeSlug);
   const { data: parentDetail } = useGetCategoryDetailQuery(subSlug);
-  const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery({ categoryId: activeSlug });
+  const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery({ categoryId: activeSlug, perPage: 200 });
 
   const catInfo = serviceCategories.find(c => c.id === slug || c.slug === slug) || {
     name: slug.replace(/-/g, ' ').toUpperCase(),
@@ -185,8 +185,10 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
             সকল পণ্য
           </button>
           {subCategories.map((sub: any) => {
-            const subId = sub.id || sub.slug;
-            const isSelected = selectedTab === subId || selectedTab === sub.slug;
+            const subId = String(sub.id || sub.slug);
+            const isSelected =
+              String(selectedTab).toLowerCase() === String(sub.id).toLowerCase() ||
+              String(selectedTab).toLowerCase() === String(sub.slug).toLowerCase();
             return (
               <button
                 key={subId}

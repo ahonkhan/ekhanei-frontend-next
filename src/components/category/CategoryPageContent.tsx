@@ -12,6 +12,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
   const { data: catMeta, isLoading: isMetaLoading } = useGetCategoryDetailQuery(slug);
   const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery({
     categoryId: catMeta?.id || slug,
+    perPage: 200,
   });
 
   const [bottomFilterTab, setBottomFilterTab] = useState('all');
@@ -67,25 +68,55 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
   const filteredProducts = React.useMemo(() => {
     if (bottomFilterTab === 'all') return products;
-    return products.filter((p: any) => {
-      const subIdStr = String(p.subcategoryId || '');
-      const catIdStr = String(p.categoryId || '');
-      const serviceCatIdStr = String(p.serviceCategoryId || '');
-      const selectedSubStr = String(bottomFilterTab);
 
-      if (subIdStr === selectedSubStr || catIdStr === selectedSubStr || serviceCatIdStr === selectedSubStr) {
+    const targetStr = String(bottomFilterTab).toLowerCase();
+
+    return products.filter((p: any) => {
+      const subIdStr = String(p.subcategoryId || p.product_subcategory_id || '').toLowerCase();
+      const catIdStr = String(p.categoryId || p.product_category_id || '').toLowerCase();
+      const serviceCatIdStr = String(p.serviceCategoryId || p.service_category_id || '').toLowerCase();
+      const subSlugStr = String(p.subcategorySlug || '').toLowerCase();
+      const catSlugStr = String(p.categorySlug || '').toLowerCase();
+      const subNameStr = String(p.subcategoryName || '').toLowerCase();
+      const catNameStr = String(p.categoryName || '').toLowerCase();
+
+      if (
+        subIdStr === targetStr ||
+        catIdStr === targetStr ||
+        serviceCatIdStr === targetStr ||
+        subSlugStr === targetStr ||
+        catSlugStr === targetStr
+      ) {
         return true;
       }
 
-      const subObj = subCategories.find((s: any) => String(s.id) === selectedSubStr || String(s.slug) === selectedSubStr);
+      const subObj = subCategories.find((s: any) =>
+        String(s.id).toLowerCase() === targetStr || String(s.slug).toLowerCase() === targetStr
+      );
+
       if (subObj) {
-        if (String(subObj.id) === subIdStr || String(subObj.slug) === subIdStr || String(subObj.id) === catIdStr || String(subObj.slug) === catIdStr) {
+        const targetId = String(subObj.id || '').toLowerCase();
+        const targetSlug = String(subObj.slug || '').toLowerCase();
+        const targetName = String(subObj.name || '').toLowerCase();
+
+        if (
+          subIdStr === targetId ||
+          catIdStr === targetId ||
+          subIdStr === targetSlug ||
+          catIdStr === targetSlug ||
+          subSlugStr === targetSlug ||
+          catSlugStr === targetSlug ||
+          subNameStr === targetName ||
+          catNameStr === targetName
+        ) {
           return true;
         }
-        if (subObj.name && p.name) {
-          return p.name.toLowerCase().includes(subObj.name.toLowerCase());
+
+        if (p.name && targetName && p.name.toLowerCase().includes(targetName)) {
+          return true;
         }
       }
+
       return false;
     });
   }, [products, bottomFilterTab, subCategories]);
@@ -309,24 +340,35 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
           {subCategories.length > 0 && (
             <div className="bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl sm:rounded-full border border-slate-200/90 shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
               <button
-                onClick={() => setBottomFilterTab('all')}
-                className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${bottomFilterTab === 'all'
+                onClick={() => {
+                  setBottomFilterTab('all');
+                  setDisplayedCount(12);
+                }}
+                className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
+                  bottomFilterTab === 'all'
                     ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
                     : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
-                  }`}
+                }`}
               >
                 সকল পণ্য
               </button>
               {subCategories.map((sub) => {
-                const isSelected = sub.id === bottomFilterTab;
+                const subId = String(sub.id || sub.slug);
+                const isSelected =
+                  String(bottomFilterTab).toLowerCase() === String(sub.id).toLowerCase() ||
+                  String(bottomFilterTab).toLowerCase() === String(sub.slug).toLowerCase();
                 return (
                   <button
-                    key={sub.id}
-                    onClick={() => setBottomFilterTab(sub.id)}
-                    className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${isSelected
+                    key={sub.id || sub.slug}
+                    onClick={() => {
+                      setBottomFilterTab(subId);
+                      setDisplayedCount(12);
+                    }}
+                    className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
+                      isSelected
                         ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
                         : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
-                      }`}
+                    }`}
                   >
                     {sub.name}
                   </button>
