@@ -86,19 +86,24 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
   // Infinite Scroll - fetches next page from server
   useEffect(() => {
-    const handleScroll = () => {
+    const checkAndLoadMore = () => {
       if (isFetching || !hasMore) return;
       const scrollPos = window.innerHeight + window.scrollY;
-      const threshold = document.documentElement.scrollHeight - 500;
+      const threshold = document.documentElement.scrollHeight - 700;
 
       if (scrollPos >= threshold) {
         setPage((prev) => prev + 1);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isFetching, hasMore]);
+    window.addEventListener('scroll', checkAndLoadMore);
+
+    if (!isFetching && hasMore) {
+      checkAndLoadMore();
+    }
+
+    return () => window.removeEventListener('scroll', checkAndLoadMore);
+  }, [isFetching, hasMore, accumulatedProducts.length]);
 
   return (
     <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-6 sm:space-y-8 pt-4 sm:pt-6 pb-12">

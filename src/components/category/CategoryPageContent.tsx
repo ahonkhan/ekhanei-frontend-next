@@ -82,19 +82,24 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
   // Infinite Scroll Listener - triggers backend API for next page
   useEffect(() => {
-    const handleScroll = () => {
+    const checkAndLoadMore = () => {
       if (isFetching || !hasMore) return;
       const scrollPos = window.innerHeight + window.scrollY;
-      const threshold = document.documentElement.scrollHeight - 500;
+      const threshold = document.documentElement.scrollHeight - 700;
 
       if (scrollPos >= threshold) {
         setPage((prev) => prev + 1);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isFetching, hasMore]);
+    window.addEventListener('scroll', checkAndLoadMore);
+
+    if (!isFetching && hasMore) {
+      checkAndLoadMore();
+    }
+
+    return () => window.removeEventListener('scroll', checkAndLoadMore);
+  }, [isFetching, hasMore, accumulatedProducts.length]);
 
   const subCategories = catMeta?.subCategories || [];
   const promoAds = catMeta?.promoAds || [];
