@@ -106,8 +106,12 @@ export const apiService = createApi({
       query: () => '/categories',
       transformResponse: (res: any) => res.data || [],
     }),
-    getCategoryDetail: builder.query<CategoryDetailMeta, string>({
-      query: (slug) => `/categories/${slug}`,
+    getCategoryDetail: builder.query<CategoryDetailMeta, { slug: string; type?: string } | string>({
+      query: (arg) => {
+        const slug = typeof arg === 'string' ? arg : arg.slug;
+        const typeParam = typeof arg === 'object' && arg.type ? `?type=${arg.type}` : '';
+        return `/categories/${slug}${typeParam}`;
+      },
       transformResponse: (res: any) => res.data || null,
     }),
     getProducts: builder.query<Product[], { categoryId?: string; subcategoryId?: string; storeId?: string; brandId?: string; search?: string; isPopular?: boolean; perPage?: number; page?: number; sortBy?: string }>({

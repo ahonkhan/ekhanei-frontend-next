@@ -18,7 +18,10 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
   const activeSlug = childSlug || subSlug;
 
   const { data: serviceCategories = [] } = useGetServiceCategoriesQuery();
-  const { data: categoryDetail, isLoading: isMetaLoading } = useGetCategoryDetailQuery(activeSlug);
+  const { data: categoryDetail, isLoading: isMetaLoading } = useGetCategoryDetailQuery({
+    slug: activeSlug,
+    type: childSlug ? 'subcategory' : 'product_category'
+  });
   const { data: parentDetail } = useGetCategoryDetailQuery(subSlug);
   const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery({ categoryId: activeSlug, perPage: 200 });
 
