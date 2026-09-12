@@ -10,13 +10,26 @@ import { getImageUrl } from '@/utils/image';
 
 export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
   const { data: catMeta, isLoading: isMetaLoading } = useGetCategoryDetailQuery(slug);
-  const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery({
-    categoryId: catMeta?.id || slug,
-    perPage: 200,
-  });
-
   const [bottomFilterTab, setBottomFilterTab] = useState('all');
-  const [displayedCount, setDisplayedCount] = useState(12);
+  const [displayedCount, setDisplayedCount] = useState(48);
+
+  const queryParams = React.useMemo(() => {
+    if (bottomFilterTab !== 'all') {
+      const isNumeric = /^\d+$/.test(bottomFilterTab);
+      return {
+        categoryId: bottomFilterTab,
+        serviceCategorySlug: slug,
+        perPage: 200,
+      };
+    }
+    return {
+      categoryId: catMeta?.id || slug,
+      serviceCategorySlug: slug,
+      perPage: 200,
+    };
+  }, [bottomFilterTab, catMeta?.id, slug]);
+
+  const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery(queryParams);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [heroSlideIdx, setHeroSlideIdx] = useState(0);
 
@@ -341,7 +354,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
               <button
                 onClick={() => {
                   setBottomFilterTab('all');
-                  setDisplayedCount(12);
+                  setDisplayedCount(48);
                 }}
                 className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
                   bottomFilterTab === 'all'
@@ -361,7 +374,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                     key={sub.id || sub.slug}
                     onClick={() => {
                       setBottomFilterTab(subId);
-                      setDisplayedCount(12);
+                      setDisplayedCount(48);
                     }}
                     className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
                       isSelected

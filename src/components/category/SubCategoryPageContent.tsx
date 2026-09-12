@@ -23,7 +23,6 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
     type: childSlug ? 'subcategory' : 'product_category'
   });
   const { data: parentDetail } = useGetCategoryDetailQuery(subSlug);
-  const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery({ categoryId: activeSlug, perPage: 200 });
 
   const catInfo = serviceCategories.find(c => c.id === slug || c.slug === slug) || {
     name: slug.replace(/-/g, ' ').toUpperCase(),
@@ -38,10 +37,24 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
   const subCategories = categoryDetail?.subCategories || [];
 
-  // Tab State & Infinite Scroll State
   const [selectedTab, setSelectedTab] = useState<string>('all');
-  const [displayedCount, setDisplayedCount] = useState<number>(12);
+  const [displayedCount, setDisplayedCount] = useState<number>(48);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+
+  const queryParams = useMemo(() => {
+    if (selectedTab !== 'all') {
+      const isNumeric = /^\d+$/.test(selectedTab);
+      return {
+        subcategoryId: isNumeric ? selectedTab : undefined,
+        subcategorySlug: !isNumeric ? selectedTab : undefined,
+        categoryId: activeSlug,
+        perPage: 200,
+      };
+    }
+    return { categoryId: activeSlug, perPage: 200 };
+  }, [selectedTab, activeSlug]);
+
+  const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery(queryParams);
 
   // Filter products by selected sub-category tab
   const filteredProducts = useMemo(() => {
