@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useGetProductsQuery, useGetCategoryDetailQuery, useGetServiceCategoriesQuery } from '@/store/services/apiService';
+import { useGetPaginatedProductsQuery, useGetCategoryDetailQuery, useGetServiceCategoriesQuery } from '@/store/services/apiService';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { ProductCardSkeleton } from '@/components/common/Skeletons';
 import { ChevronLeft, Loader2 } from 'lucide-react';
@@ -38,8 +38,8 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
   const subCategories = categoryDetail?.subCategories || [];
 
   const [selectedTab, setSelectedTab] = useState<string>('all');
-  const [displayedCount, setDisplayedCount] = useState<number>(48);
-  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const [accumulatedProducts, setAccumulatedProducts] = useState<any[]>([]);
 
   const queryParams = useMemo(() => {
     if (selectedTab !== 'all') {
@@ -48,98 +48,57 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
         subcategoryId: isNumeric ? selectedTab : undefined,
         subcategorySlug: !isNumeric ? selectedTab : undefined,
         categoryId: activeSlug,
-        perPage: 200,
+        page,
+        perPage: 20,
       };
     }
-    return { categoryId: activeSlug, perPage: 200 };
+    return { categoryId: activeSlug, page, perPage: 20 };
+  }, [selectedTab, activeSlug, page]);
+
+  const { data: paginatedResult, isLoading: isProductsLoading, isFetching } = useGetPaginatedProductsQuery(queryParams);
+
+  useEffect(() => {
+    setPage(1);
+    setAccumulatedProducts([]);
   }, [selectedTab, activeSlug]);
 
-  const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery(queryParams);
-
-  // Filter products by selected sub-category tab
-  const filteredProducts = useMemo(() => {
-    if (selectedTab === 'all') return products;
-
-    const targetStr = String(selectedTab).toLowerCase().trim();
-
-    const matches = products.filter((p: any) => {
-      const subIdStr = String(p.subcategoryId || p.product_subcategory_id || p.sub_category_id || '').toLowerCase().trim();
-      const catIdStr = String(p.categoryId || p.product_category_id || p.category_id || '').toLowerCase().trim();
-      const serviceCatIdStr = String(p.serviceCategoryId || p.service_category_id || '').toLowerCase().trim();
-      const catSlugStr = String(p.categorySlug || '').toLowerCase().trim();
-      const subcatSlugStr = String(p.subcategorySlug || '').toLowerCase().trim();
-      const catNameStr = String(p.categoryName || '').toLowerCase().trim();
-      const subcatNameStr = String(p.subcategoryName || '').toLowerCase().trim();
-
-      if (
-        (subIdStr && subIdStr === targetStr) ||
-        (catIdStr && catIdStr === targetStr) ||
-        (serviceCatIdStr && serviceCatIdStr === targetStr) ||
-        (catSlugStr && catSlugStr === targetStr) ||
-        (subcatSlugStr && subcatSlugStr === targetStr) ||
-        (catNameStr && catNameStr === targetStr) ||
-        (subcatNameStr && subcatNameStr === targetStr)
-      ) {
-        return true;
+  useEffect(() => {
+    if (paginatedResult?.data) {
+      if (page === 1) {
+        setAccumulatedProducts(paginatedResult.data);
+      } else {
+        setAccumulatedProducts((prev) => {
+          const existingIds = new Set(prev.map((p) => p.id));
+          const newItems = paginatedResult.data.filter((p: any) => !existingIds.has(p.id));
+          return [...prev, ...newItems];
+        });
       }
+    }
+  }, [paginatedResult, page]);
 
-      const targetSub = subCategories.find((s: any) =>
-        (s.id && String(s.id).toLowerCase().trim() === targetStr) ||
-        (s.slug && String(s.slug).toLowerCase().trim() === targetStr) ||
-        (s.name && String(s.name).toLowerCase().trim() === targetStr)
-      );
-
-      if (targetSub) {
-        const targetSubId = String(targetSub.id || '').toLowerCase().trim();
-        const targetSubSlug = String(targetSub.slug || '').toLowerCase().trim();
-        const targetSubName = String(targetSub.name || '').toLowerCase().trim();
-
-        if (
-          (targetSubId && (subIdStr === targetSubId || catIdStr === targetSubId || serviceCatIdStr === targetSubId)) ||
-          (targetSubSlug && (subIdStr === targetSubSlug || catIdStr === targetSubSlug || subcatSlugStr === targetSubSlug || catSlugStr === targetSubSlug)) ||
-          (targetSubName && subcatNameStr && (subcatNameStr === targetSubName || subcatNameStr.includes(targetSubName) || targetSubName.includes(subcatNameStr))) ||
-          (targetSubName && catNameStr && catNameStr === targetSubName)
-        ) {
-          return true;
-        }
-
-        if (p.name && targetSubName && p.name.toLowerCase().includes(targetSubName)) {
-          return true;
-        }
-      }
-
-      return false;
-    });
-
-    return matches.length > 0 ? matches : products;
-  }, [products, selectedTab, subCategories]);
+  const meta = paginatedResult?.meta;
+  const hasMore = meta ? meta.current_page < meta.last_page : false;
+  const totalCount = meta?.total || accumulatedProducts.length;
 
   const handleTabChange = (tabId: string) => {
     setSelectedTab(tabId);
-    setDisplayedCount(12);
   };
 
-  // Infinite Scroll (Load on scroll)
+  // Infinite Scroll - fetches next page from server
   useEffect(() => {
     const handleScroll = () => {
-      if (isLoadingMore) return;
+      if (isFetching || !hasMore) return;
       const scrollPos = window.innerHeight + window.scrollY;
       const threshold = document.documentElement.scrollHeight - 500;
 
       if (scrollPos >= threshold) {
-        if (displayedCount < filteredProducts.length) {
-          setIsLoadingMore(true);
-          setTimeout(() => {
-            setDisplayedCount(prev => prev + 12);
-            setIsLoadingMore(false);
-          }, 300);
-        }
+        setPage((prev) => prev + 1);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isLoadingMore, displayedCount, filteredProducts.length]);
+  }, [isFetching, hasMore]);
 
   return (
     <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-6 sm:space-y-8 pt-4 sm:pt-6 pb-12">
@@ -159,7 +118,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
             </h1>
           </div>
           <span className="text-xs sm:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200">
-            {filteredProducts.length} টি পণ্য
+            {totalCount} টি পণ্য
           </span>
         </div>
       ) : (
@@ -184,7 +143,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
                 {title}
               </h1>
               <span className="text-xs sm:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                {filteredProducts.length} টি পণ্য
+                {totalCount} টি পণ্য
               </span>
             </div>
           </div>
@@ -228,30 +187,30 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
       {/* PRODUCT GRID WITH INFINITE LOAD ON SCROLL */}
       <section className="space-y-4 pt-2">
-        {isProductsLoading ? (
+        {isProductsLoading && page === 1 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))}
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : accumulatedProducts.length === 0 ? (
           <div className="py-16 text-center text-slate-500 bg-white rounded-2xl border border-slate-100 shadow-xs">
             <p className="text-sm sm:text-base font-semibold">এই সাব-ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1.5 md:gap-2.5">
-            {filteredProducts.slice(0, displayedCount).map((product, idx) => (
+            {accumulatedProducts.map((product, idx) => (
               <PinkProductCard key={`grid-${product.id}-${idx}`} product={product} isSlider={false} />
             ))}
           </div>
         )}
 
         {/* LOAD ON SCROLL LOADING SPINNER */}
-        {isLoadingMore && (
+        {isFetching && page > 1 && (
           <div className="py-8 text-center flex justify-center">
             <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-md">
               <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-              <span>Loading more items...</span>
+              <span>Loading more items from server...</span>
             </div>
           </div>
         )}

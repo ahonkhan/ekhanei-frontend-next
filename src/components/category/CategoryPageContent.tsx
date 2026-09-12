@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useGetCategoryDetailQuery, useGetProductsQuery } from '@/store/services/apiService';
+import { useGetCategoryDetailQuery, useGetPaginatedProductsQuery } from '@/store/services/apiService';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { ProductCardSkeleton } from '@/components/common/Skeletons';
 import { Loader2, ChevronLeft, ChevronRight, X } from 'lucide-react';
@@ -11,31 +11,58 @@ import { getImageUrl } from '@/utils/image';
 export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
   const { data: catMeta, isLoading: isMetaLoading } = useGetCategoryDetailQuery(slug);
   const [bottomFilterTab, setBottomFilterTab] = useState('all');
-  const [displayedCount, setDisplayedCount] = useState(48);
+  const [page, setPage] = useState(1);
+  const [accumulatedProducts, setAccumulatedProducts] = useState<any[]>([]);
 
   const queryParams = React.useMemo(() => {
     if (bottomFilterTab !== 'all') {
       const isNumeric = /^\d+$/.test(bottomFilterTab);
       return {
-        categoryId: bottomFilterTab,
+        subcategoryId: isNumeric ? bottomFilterTab : undefined,
+        subcategorySlug: !isNumeric ? bottomFilterTab : undefined,
         serviceCategorySlug: slug,
-        perPage: 200,
+        page,
+        perPage: 20,
       };
     }
     return {
       categoryId: catMeta?.id || slug,
       serviceCategorySlug: slug,
-      perPage: 200,
+      page,
+      perPage: 20,
     };
-  }, [bottomFilterTab, catMeta?.id, slug]);
+  }, [bottomFilterTab, catMeta?.id, slug, page]);
 
-  const { data: products = [], isLoading: isProductsLoading } = useGetProductsQuery(queryParams);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const { data: paginatedResult, isLoading: isProductsLoading, isFetching } = useGetPaginatedProductsQuery(queryParams);
+
   const [heroSlideIdx, setHeroSlideIdx] = useState(0);
-
   const brandsScrollRef = useRef<HTMLDivElement>(null);
 
   const slides = catMeta?.heroSlides && catMeta.heroSlides.length > 0 ? catMeta.heroSlides : [];
+
+  // Reset pagination state when tab or slug changes
+  useEffect(() => {
+    setPage(1);
+    setAccumulatedProducts([]);
+  }, [bottomFilterTab, slug]);
+
+  // Accumulate paginated product data from backend API
+  useEffect(() => {
+    if (paginatedResult?.data) {
+      if (page === 1) {
+        setAccumulatedProducts(paginatedResult.data);
+      } else {
+        setAccumulatedProducts((prev) => {
+          const existingIds = new Set(prev.map((p) => p.id));
+          const newItems = paginatedResult.data.filter((p: any) => !existingIds.has(p.id));
+          return [...prev, ...newItems];
+        });
+      }
+    }
+  }, [paginatedResult, page]);
+
+  const meta = paginatedResult?.meta;
+  const hasMore = meta ? meta.current_page < meta.last_page : false;
 
   // Auto-play hero slider
   useEffect(() => {
@@ -53,86 +80,25 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
     }
   };
 
-  // Infinite Scroll Listener
+  // Infinite Scroll Listener - triggers backend API for next page
   useEffect(() => {
     const handleScroll = () => {
-      if (isLoadingMore) return;
+      if (isFetching || !hasMore) return;
       const scrollPos = window.innerHeight + window.scrollY;
       const threshold = document.documentElement.scrollHeight - 500;
 
       if (scrollPos >= threshold) {
-        if (displayedCount < products.length) {
-          setIsLoadingMore(true);
-          setTimeout(() => {
-            setDisplayedCount((prev) => prev + 6);
-            setIsLoadingMore(false);
-          }, 400);
-        }
+        setPage((prev) => prev + 1);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isLoadingMore, displayedCount, products]);
+  }, [isFetching, hasMore]);
 
   const subCategories = catMeta?.subCategories || [];
   const promoAds = catMeta?.promoAds || [];
   const brands = catMeta?.brands || [];
-
-  const filteredProducts = React.useMemo(() => {
-    if (bottomFilterTab === 'all') return products;
-
-    const targetStr = String(bottomFilterTab).toLowerCase().trim();
-
-    return products.filter((p: any) => {
-      const subIdStr = String(p.subcategoryId || p.product_subcategory_id || p.sub_category_id || '').toLowerCase().trim();
-      const catIdStr = String(p.categoryId || p.product_category_id || p.category_id || '').toLowerCase().trim();
-      const serviceCatIdStr = String(p.serviceCategoryId || p.service_category_id || '').toLowerCase().trim();
-      const subSlugStr = String(p.subcategorySlug || '').toLowerCase().trim();
-      const catSlugStr = String(p.categorySlug || '').toLowerCase().trim();
-      const subNameStr = String(p.subcategoryName || '').toLowerCase().trim();
-      const catNameStr = String(p.categoryName || '').toLowerCase().trim();
-
-      if (
-        (subIdStr && subIdStr === targetStr) ||
-        (catIdStr && catIdStr === targetStr) ||
-        (serviceCatIdStr && serviceCatIdStr === targetStr) ||
-        (subSlugStr && subSlugStr === targetStr) ||
-        (catSlugStr && catSlugStr === targetStr) ||
-        (subNameStr && subNameStr === targetStr) ||
-        (catNameStr && catNameStr === targetStr)
-      ) {
-        return true;
-      }
-
-      const subObj = subCategories.find((s: any) =>
-        (s.id && String(s.id).toLowerCase().trim() === targetStr) ||
-        (s.slug && String(s.slug).toLowerCase().trim() === targetStr) ||
-        (s.name && String(s.name).toLowerCase().trim() === targetStr)
-      );
-
-      if (subObj) {
-        const targetId = String(subObj.id || '').toLowerCase().trim();
-        const targetSlug = String(subObj.slug || '').toLowerCase().trim();
-        const targetName = String(subObj.name || '').toLowerCase().trim();
-
-        if (
-          (targetId && (subIdStr === targetId || catIdStr === targetId || serviceCatIdStr === targetId)) ||
-          (targetSlug && (subIdStr === targetSlug || catIdStr === targetSlug || subSlugStr === targetSlug || catSlugStr === targetSlug)) ||
-          (targetName && (subNameStr === targetName || catNameStr === targetName))
-        ) {
-          return true;
-        }
-
-        if (p.name && targetName && p.name.toLowerCase().includes(targetName)) {
-          return true;
-        }
-      }
-
-      return false;
-    });
-  }, [products, bottomFilterTab, subCategories]);
-
   const specialOffers = catMeta?.specialOffers || [];
 
   return (
@@ -198,7 +164,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
       <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-8 sm:space-y-12">
 
-        {/* 1. SUB-CATEGORIES CIRCULAR / SQUARE GRID (MAX 4 PER ROW ON MOBILE, LARGER ON DESKTOP) */}
+        {/* 1. SUB-CATEGORIES CIRCULAR / SQUARE GRID */}
         {subCategories.length > 0 && (
           <section className="space-y-3">
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-3 sm:gap-4 md:gap-6 py-0.5 px-0.5">
@@ -231,7 +197,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
           </section>
         )}
 
-        {/* 2. PROMO ADS (2 ITEMS PER ROW, BELOW SUB-CATEGORIES & ABOVE SPECIAL OFFERS) */}
+        {/* 2. PROMO ADS */}
         {promoAds.length > 0 ? (
           <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {promoAds.slice(0, 4).map((ad: any, idx: number) => (
@@ -262,7 +228,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
           </section>
         ) : null}
 
-        {/* 3. SPECIAL OFFERS / DISCOUNT CARDS GRID (COMPACT SMALL CARDS) */}
+        {/* 3. SPECIAL OFFERS / DISCOUNT CARDS GRID */}
         {specialOffers.length > 0 ? (
           <section className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {specialOffers.slice(0, 6).map((offer, idx) => (
@@ -352,10 +318,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
           {subCategories.length > 0 && (
             <div className="bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl sm:rounded-full border border-slate-200/90 shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
               <button
-                onClick={() => {
-                  setBottomFilterTab('all');
-                  setDisplayedCount(48);
-                }}
+                onClick={() => setBottomFilterTab('all')}
                 className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
                   bottomFilterTab === 'all'
                     ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
@@ -372,10 +335,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                 return (
                   <button
                     key={sub.id || sub.slug}
-                    onClick={() => {
-                      setBottomFilterTab(subId);
-                      setDisplayedCount(48);
-                    }}
+                    onClick={() => setBottomFilterTab(subId)}
                     className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
                       isSelected
                         ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
@@ -390,29 +350,29 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
           )}
 
           {/* Product Grid / Skeleton */}
-          {isProductsLoading ? (
+          {isProductsLoading && page === 1 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {Array.from({ length: 6 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />
               ))}
             </div>
-          ) : filteredProducts.length === 0 ? (
+          ) : accumulatedProducts.length === 0 ? (
             <div className="py-12 text-center text-slate-500 bg-white rounded-2xl border border-slate-100 shadow-xs">
               <p className="text-sm font-semibold">এই সাব-ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 sm:gap-1">
-              {filteredProducts.slice(0, displayedCount).map((product) => (
-                <PinkProductCard key={product.id} product={product} isSlider={false} />
+              {accumulatedProducts.map((product, idx) => (
+                <PinkProductCard key={`cat-grid-${product.id}-${idx}`} product={product} isSlider={false} />
               ))}
             </div>
           )}
 
-          {isLoadingMore && (
+          {isFetching && page > 1 && (
             <div className="py-8 text-center flex justify-center">
               <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-md">
                 <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-                <span>Loading more items...</span>
+                <span>Loading more items from server...</span>
               </div>
             </div>
           )}

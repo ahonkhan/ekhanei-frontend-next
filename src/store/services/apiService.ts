@@ -134,10 +134,33 @@ export const apiService = createApi({
       },
       transformResponse: (res: any) => res.data || [],
     }),
+    getPaginatedProducts: builder.query<{ data: Product[]; meta: { current_page: number; last_page: number; total: number } }, { categoryId?: string; serviceCategoryId?: string; serviceCategorySlug?: string; productCategoryId?: string; subcategoryId?: string; subcategorySlug?: string; storeId?: string; brandId?: string; search?: string; isPopular?: boolean; perPage?: number; page?: number; sortBy?: string }>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params?.serviceCategoryId) queryParams.append('service_category_id', params.serviceCategoryId);
+        if (params?.serviceCategorySlug) queryParams.append('service_category_slug', params.serviceCategorySlug);
+        if (params?.productCategoryId) queryParams.append('product_category_id', params.productCategoryId);
+        if (params?.categoryId) queryParams.append('category_id', params.categoryId);
+        if (params?.subcategoryId) queryParams.append('subcategory_id', params.subcategoryId);
+        if (params?.subcategorySlug) queryParams.append('subcategory_slug', params.subcategorySlug);
+        if (params?.storeId) queryParams.append('store_id', params.storeId);
+        if (params?.brandId) queryParams.append('brand_id', params.brandId);
+        if (params?.search) queryParams.append('search', params.search);
+        if (params?.isPopular) queryParams.append('is_popular', '1');
+        if (params?.perPage) queryParams.append('per_page', params.perPage.toString());
+        if (params?.page) queryParams.append('page', params.page.toString());
+        if (params?.sortBy) queryParams.append('sort_by', params.sortBy);
+        return `/products?${queryParams.toString()}`;
+      },
+      transformResponse: (res: any) => ({
+        data: res.data || [],
+        meta: res.meta || { current_page: 1, last_page: 1, total: 0 },
+      }),
+    }),
     getProductsByServiceCategory: builder.query<Product[], string | { idOrSlug: string; perPage?: number }>({
       query: (arg) => {
         const idOrSlug = typeof arg === 'string' ? arg : arg.idOrSlug;
-        const perPage = typeof arg === 'object' && arg.perPage ? arg.perPage : 200;
+        const perPage = typeof arg === 'object' && arg.perPage ? arg.perPage : 500;
         const paramName = /^\d+$/.test(idOrSlug) ? 'service_category_id' : 'service_category_slug';
         return `/products?${paramName}=${idOrSlug}&per_page=${perPage}`;
       },
@@ -146,7 +169,7 @@ export const apiService = createApi({
     getProductsByProductCategory: builder.query<Product[], string | { idOrSlug: string; perPage?: number }>({
       query: (arg) => {
         const idOrSlug = typeof arg === 'string' ? arg : arg.idOrSlug;
-        const perPage = typeof arg === 'object' && arg.perPage ? arg.perPage : 200;
+        const perPage = typeof arg === 'object' && arg.perPage ? arg.perPage : 500;
         const paramName = /^\d+$/.test(idOrSlug) ? 'product_category_id' : 'category_slug';
         return `/products?${paramName}=${idOrSlug}&per_page=${perPage}`;
       },
@@ -155,7 +178,7 @@ export const apiService = createApi({
     getProductsBySubCategory: builder.query<Product[], string | { idOrSlug: string; perPage?: number }>({
       query: (arg) => {
         const idOrSlug = typeof arg === 'string' ? arg : arg.idOrSlug;
-        const perPage = typeof arg === 'object' && arg.perPage ? arg.perPage : 200;
+        const perPage = typeof arg === 'object' && arg.perPage ? arg.perPage : 500;
         const paramName = /^\d+$/.test(idOrSlug) ? 'subcategory_id' : 'subcategory_slug';
         return `/products?${paramName}=${idOrSlug}&per_page=${perPage}`;
       },
@@ -326,6 +349,7 @@ export const {
   useGetCategoriesQuery,
   useGetCategoryDetailQuery,
   useGetProductsQuery,
+  useGetPaginatedProductsQuery,
   useGetProductsByServiceCategoryQuery,
   useGetProductsByProductCategoryQuery,
   useGetProductsBySubCategoryQuery,
