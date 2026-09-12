@@ -81,7 +81,8 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
         if (
           (targetSubId && (subIdStr === targetSubId || catIdStr === targetSubId || serviceCatIdStr === targetSubId)) ||
           (targetSubSlug && (subIdStr === targetSubSlug || catIdStr === targetSubSlug || subcatSlugStr === targetSubSlug || catSlugStr === targetSubSlug)) ||
-          (targetSubName && (subcatNameStr === targetSubName || catNameStr === targetSubName))
+          (targetSubName && subcatNameStr && (subcatNameStr === targetSubName || subcatNameStr.includes(targetSubName) || targetSubName.includes(subcatNameStr))) ||
+          (targetSubName && catNameStr && catNameStr === targetSubName)
         ) {
           return true;
         }
