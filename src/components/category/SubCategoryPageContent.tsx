@@ -49,7 +49,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
     const targetStr = String(selectedTab).toLowerCase().trim();
 
-    return products.filter((p: any) => {
+    const matches = products.filter((p: any) => {
       const subIdStr = String(p.subcategoryId || p.product_subcategory_id || p.sub_category_id || '').toLowerCase().trim();
       const catIdStr = String(p.categoryId || p.product_category_id || p.category_id || '').toLowerCase().trim();
       const serviceCatIdStr = String(p.serviceCategoryId || p.service_category_id || '').toLowerCase().trim();
@@ -97,6 +97,8 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
       return false;
     });
+
+    return matches.length > 0 ? matches : products;
   }, [products, selectedTab, subCategories]);
 
   const handleTabChange = (tabId: string) => {
