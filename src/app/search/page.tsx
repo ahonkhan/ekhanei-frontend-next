@@ -10,17 +10,62 @@ import { SlidersHorizontal, ChevronDown, ArrowUpDown, Filter, X, Check, Search }
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
-  const query = searchParams.get('q') || '';
+  const rawQuery = searchParams.get('q') || '';
+  const categoryIdParam = searchParams.get('categoryId') || searchParams.get('category_id') || searchParams.get('category') || '';
+  const categoryNameParam = searchParams.get('categoryName') || searchParams.get('category_name') || '';
   const brandId = searchParams.get('brandId') || searchParams.get('brand_id') || '';
+
+  const { data: categories = [] } = useGetCategoriesQuery();
+
+  const categoriesList = useMemo(() => {
+    if (categories.length > 0) {
+      return categories.map((c) => ({
+        id: String((c as any).id || c.slug),
+        label: c.title || (c as any).name,
+        slug: (c as any).slug || String((c as any).id),
+      }));
+    }
+    return [
+      { id: 'fashion', label: 'Fashion & Clothing', slug: 'fashion' },
+      { id: 'fresh-fish', label: 'Fish & Seafood', slug: 'fresh-fish' },
+      { id: 'grocery', label: 'Grocery & Staples', slug: 'grocery' },
+      { id: 'pharmacy', label: 'Medicine & Pharmacy', slug: 'pharmacy' },
+      { id: 'gadget-electronics', label: 'Gadget & Electronics', slug: 'gadget-electronics' },
+    ];
+  }, [categories]);
+
+  const matchedCategory = useMemo(() => {
+    if (!categoryIdParam) return null;
+    return categoriesList.find(
+      (c) =>
+        String(c.id).toLowerCase() === categoryIdParam.toLowerCase() ||
+        (c.slug && c.slug.toLowerCase() === categoryIdParam.toLowerCase())
+    );
+  }, [categoryIdParam, categoriesList]);
+
+  const isCategorySearch = useMemo(() => {
+    if (!categoryIdParam) return false;
+    if (!rawQuery.trim()) return true;
+    if (matchedCategory && (matchedCategory.label.toLowerCase() === rawQuery.trim().toLowerCase() || String(matchedCategory.id) === categoryIdParam)) return true;
+    if (categoryNameParam && categoryNameParam.toLowerCase() === rawQuery.trim().toLowerCase()) return true;
+    return false;
+  }, [categoryIdParam, rawQuery, matchedCategory, categoryNameParam]);
+
+  const displayQuery = useMemo(() => {
+    if (rawQuery.trim()) return rawQuery.trim();
+    if (matchedCategory) return matchedCategory.label;
+    if (categoryNameParam.trim()) return categoryNameParam.trim();
+    return 'Products';
+  }, [rawQuery, matchedCategory, categoryNameParam]);
 
   const { data: apiProducts = [], isLoading } = useGetProductsQuery(
     {
-      search: query.trim() || undefined,
+      search: !isCategorySearch && rawQuery.trim() ? rawQuery.trim() : undefined,
+      categoryId: categoryIdParam.trim() || undefined,
       brandId: brandId.trim() || undefined,
     },
     { skip: false }
   );
-  const { data: categories = [] } = useGetCategoriesQuery();
 
   // Mobile Drawers State
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -33,18 +78,17 @@ function SearchResultsContent() {
   const [priceRange, setPriceRange] = useState<number>(20000);
   const [sortBy, setSortBy] = useState<string>('recommended');
 
-  const categoriesList = useMemo(() => {
-    if (categories.length > 0) {
-      return categories.map((c) => ({ id: (c as any).id || c.slug, label: c.title || (c as any).name }));
+  // Auto select category checkbox if categoryIdParam is provided
+  React.useEffect(() => {
+    if (categoryIdParam) {
+      const match = categoriesList.find(
+        (c) => String(c.id).toLowerCase() === categoryIdParam.toLowerCase() || (c.slug && c.slug.toLowerCase() === categoryIdParam.toLowerCase())
+      );
+      const targetId = match ? match.id : categoryIdParam;
+      setSelectedCategories((prev) => (prev.includes(targetId) ? prev : [...prev, targetId]));
     }
-    return [
-      { id: 'fashion', label: 'Fashion & Clothing' },
-      { id: 'fresh-fish', label: 'Fish & Seafood' },
-      { id: 'grocery', label: 'Grocery & Staples' },
-      { id: 'pharmacy', label: 'Medicine & Pharmacy' },
-      { id: 'gadget-electronics', label: 'Gadget & Electronics' },
-    ];
-  }, [categories]);
+  }, [categoryIdParam, categoriesList]);
+
 
   const brandsList = useMemo(() => {
     const map = new Map<string, string>();
@@ -144,7 +188,7 @@ function SearchResultsContent() {
           </Link>
           <span>/</span>
           <span className="text-slate-800 font-semibold truncate">
-            Search Results for "{query}"
+            Search Results for "{displayQuery}"
           </span>
         </div>
 
@@ -266,7 +310,7 @@ function SearchResultsContent() {
             <div className="hidden md:flex flex-row items-center justify-between gap-3 mb-4">
               <div>
                 <h1 className="text-base font-bold text-slate-900 capitalize">
-                  {query}
+                  {displayQuery}
                 </h1>
                 <p className="text-xs text-slate-500 font-medium">
                   {filteredProducts.length} results
@@ -295,7 +339,7 @@ function SearchResultsContent() {
 
             {/* Mobile Header Results Count Title */}
             <div className="md:hidden px-1 mb-2">
-              <span className="text-sm font-bold text-slate-900 capitalize">{query}</span>
+              <span className="text-sm font-bold text-slate-900 capitalize">{displayQuery}</span>
               <span className="text-xs text-slate-500 font-medium ml-2">({filteredProducts.length} results)</span>
             </div>
 
@@ -311,7 +355,7 @@ function SearchResultsContent() {
                 <div className="w-12 h-12 rounded-full bg-pink-50 text-[#d81b60] flex items-center justify-center mx-auto">
                   <Search className="w-6 h-6" />
                 </div>
-                <h4 className="font-bold text-slate-900 text-sm">"{query}" এর জন্য কোনো পণ্য পাওয়া যায়নি</h4>
+                <h4 className="font-bold text-slate-900 text-sm">"{displayQuery}" এর জন্য কোনো পণ্য পাওয়া যায়নি</h4>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">অন্য কোনো প্রোডাক্ট বা ক্যাটাগরির নাম লিখে অনুসন্ধান করার চেষ্টা করুন।</p>
                 <button
                   onClick={clearFilters}

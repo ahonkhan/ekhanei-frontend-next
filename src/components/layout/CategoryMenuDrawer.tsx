@@ -93,7 +93,7 @@ const CategoryAccordionItem: React.FC<{
         <div className="bg-slate-50/90 p-2.5 border-t border-slate-100 space-y-1 text-xs font-semibold text-slate-700">
           {/* See All */}
           <Link
-            href={catUrl}
+            href={`/search?q=${encodeURIComponent(cat.name)}&categoryId=${encodeURIComponent(cat.id || catSlug)}`}
             onClick={onClose}
             className="flex items-center justify-between text-theme-primary hover:text-theme-primary-hover font-black italic py-1.5 px-3 rounded-lg hover:bg-slate-100 transition"
           >
@@ -226,9 +226,19 @@ export const CategoryMenuDrawer: React.FC<CategoryMenuDrawerProps> = ({ isOpen, 
           <div className="flex-1 p-3 space-y-1.5">
 
 
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 block">
-              All Categories ({filteredCategories.length})
-            </span>
+            <div className="flex items-center justify-between px-2 pb-1">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
+                All Categories ({filteredCategories.length})
+              </span>
+              <Link
+                href="/search"
+                onClick={onClose}
+                className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-0.5"
+              >
+                <span>See All</span>
+                <ChevronRight className="w-3 h-3" />
+              </Link>
+            </div>
 
             {isCategoriesLoading ? (
               <div className="py-8 text-center space-y-2">

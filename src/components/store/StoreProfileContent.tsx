@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { Store, Product } from '@/types';
 import { useCart } from '@/context/CartContext';
+import { useGetProductsQuery } from '@/store/services/apiService';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { getImageUrl } from '@/utils/image';
 import { formatDeliveryTime } from '@/utils/formatDeliveryTime';
@@ -247,6 +248,38 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
     });
   }, [products, searchQuery, activeTab, selectedFilter]);
 
+  // Top Rated Products (fetched directly from backend API by sort_by=top_rated)
+  const { data: apiTopRatedProducts } = useGetProductsQuery(
+    { storeId: store?.id ? String(store.id) : undefined, sortBy: 'top_rated', perPage: 8 },
+    { skip: !store?.id }
+  );
+
+  // Top Sold Products (fetched directly from backend API by sort_by=top_sold)
+  const { data: apiTopSoldProducts } = useGetProductsQuery(
+    { storeId: store?.id ? String(store.id) : undefined, sortBy: 'top_sold', perPage: 8 },
+    { skip: !store?.id }
+  );
+
+  const topRatedProducts = useMemo(() => {
+    if (apiTopRatedProducts && apiTopRatedProducts.length > 0) {
+      return apiTopRatedProducts;
+    }
+    return [...products]
+      .sort((a, b) => (b.rating || 5) - (a.rating || 5))
+      .slice(0, 8);
+  }, [apiTopRatedProducts, products]);
+
+  const topSoldProducts = useMemo(() => {
+    if (apiTopSoldProducts && apiTopSoldProducts.length > 0) {
+      return apiTopSoldProducts;
+    }
+    const popular = products.filter((p) => p.isPopular);
+    if (popular.length >= 3) return popular.slice(0, 8);
+    return [...products]
+      .sort((a, b) => (b.reviewsCount || 0) - (a.reviewsCount || 0))
+      .slice(0, 8);
+  }, [apiTopSoldProducts, products]);
+
   // Handle Share Copy
   const handleCopyLink = () => {
     if (typeof window !== 'undefined') {
@@ -400,13 +433,25 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
             }`}
           >
               
-              {/* Category Tabs */}
-              {store.storeCategories && store.storeCategories.length > 0 ? (
-                store.storeCategories.map(cat => (
+              {/* Primary Products Tab */}
+              <button
+                onClick={() => setActiveTab('all')}
+                className={`px-4 py-3 border-b-2 whitespace-nowrap transition-colors flex items-center gap-1.5 font-bold ${
+                  activeTab === 'all'
+                    ? 'border-emerald-600 text-emerald-600 font-extrabold'
+                    : 'border-transparent hover:text-slate-900'
+                }`}
+              >
+                <span>Products</span>
+              </button>
+
+              {/* Sub-category Tabs (if available) */}
+              {store.storeCategories && store.storeCategories.length > 0 &&
+                store.storeCategories.map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() => setActiveTab(cat.id)}
-                    className={`px-4 py-3 border-b-2 whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+                    className={`px-3 py-3 border-b-2 whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                       activeTab === cat.id
                         ? 'border-emerald-600 text-emerald-600 font-extrabold'
                         : 'border-transparent hover:text-slate-900 hover:border-slate-300'
@@ -415,20 +460,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
                     <span>{cat.name}</span>
                   </button>
                 ))
-              ) : (
-                <>
-                  <button
-                    onClick={() => setActiveTab('all')}
-                    className={`px-4 py-3 border-b-2 whitespace-nowrap transition-colors ${
-                      activeTab === 'all'
-                        ? 'border-emerald-600 text-emerald-600 font-extrabold'
-                        : 'border-transparent hover:text-slate-900'
-                    }`}
-                  >
-                    All Products
-                  </button>
-                </>
-              )}
+              }
 
               {/* Divider */}
               <div className="h-5 w-px bg-slate-200 mx-1 shrink-0" />
@@ -611,33 +643,89 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
           </div>
         )}
 
-        {/* VIEW 4: PRODUCTS LIST / GRID (CLEAN FULL-WIDTH GRID USING PinkProductCard) */}
+        {/* VIEW 4: PRODUCTS LIST & SECTIONS (TOP RATED, TOP SOLD, FOR YOU MATCHING IMAGE 1) */}
         {activeTab !== 'about' && activeTab !== 'reviews' && activeTab !== 'photos' && (
-          <div className="space-y-4">
+          <div className="space-y-8">
+            {activeTab === 'all' && !searchQuery.trim() ? (
+              <>
+                {/* 1. Top Rated Section */}
+                {topRatedProducts.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                      <h3 className="text-base sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        <span>Top Rated</span>
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-2 touch-pan-x">
+                      {topRatedProducts.map((product) => (
+                        <div key={`tr-${product.id}`} className="w-[160px] sm:w-[210px] shrink-0">
+                          <PinkProductCard product={product} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {/* Product Grid using PinkProductCard (Clean 2 to 4 column responsive layout) */}
-            {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2.5">
-                {filteredProducts.map(product => (
-                  <PinkProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-                  <Search className="w-6 h-6" />
+                {/* 2. Top Sold Section */}
+                {topSoldProducts.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                      <h3 className="text-base sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        <span>Top Sold</span>
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-2 touch-pan-x">
+                      {topSoldProducts.map((product) => (
+                        <div key={`ts-${product.id}`} className="w-[160px] sm:w-[210px] shrink-0">
+                          <PinkProductCard product={product} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. For You Section (Contains ALL Products) */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                    <h3 className="text-base sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                      <span>For You</span>
+                    </h3>
+                    <span className="text-xs text-slate-500 font-semibold">({products.length} Products)</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2.5">
+                    {products.map((product) => (
+                      <PinkProductCard key={`fy-${product.id}`} product={product} />
+                    ))}
+                  </div>
                 </div>
-                <h4 className="font-bold text-slate-900 text-sm">No items found matching your criteria</h4>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">Try clearing search filters or switching categories.</p>
-                <button
-                  onClick={() => { setSearchQuery(''); setActiveTab('all'); setSelectedFilter('all'); }}
-                  className="text-xs font-bold text-emerald-600 hover:underline pt-1 inline-block"
-                >
-                  Reset All Filters
-                </button>
+              </>
+            ) : (
+              /* Filtered / Category-specific / Search view */
+              <div>
+                {filteredProducts.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2.5">
+                    {filteredProducts.map((product) => (
+                      <PinkProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                      <Search className="w-6 h-6" />
+                    </div>
+                    <h4 className="font-bold text-slate-900 text-sm">No items found matching your criteria</h4>
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto">Try clearing search filters or switching categories.</p>
+                    <button
+                      onClick={() => { setSearchQuery(''); setActiveTab('all'); setSelectedFilter('all'); }}
+                      className="text-xs font-bold text-emerald-600 hover:underline pt-1 inline-block"
+                    >
+                      Reset All Filters
+                    </button>
+                  </div>
+                )}
               </div>
             )}
-
           </div>
         )}
 

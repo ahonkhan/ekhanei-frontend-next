@@ -685,6 +685,25 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                 <p className="text-xs text-slate-700 font-medium leading-relaxed">
                   {rev.comment}
                 </p>
+                {rev.images && Array.isArray(rev.images) && rev.images.length > 0 && (
+                  <div className="flex items-center gap-2 pt-1 flex-wrap">
+                    {rev.images.map((imgUrl: string, imgIdx: number) => (
+                      <a
+                        key={imgIdx}
+                        href={imgUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 hover:border-emerald-500 transition shadow-2xs group"
+                      >
+                        <img
+                          src={imgUrl}
+                          alt={`Review photo ${imgIdx + 1}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             ))
           )}

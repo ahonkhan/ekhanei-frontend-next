@@ -110,7 +110,7 @@ export const apiService = createApi({
       query: (slug) => `/categories/${slug}`,
       transformResponse: (res: any) => res.data || null,
     }),
-    getProducts: builder.query<Product[], { categoryId?: string; subcategoryId?: string; storeId?: string; brandId?: string; search?: string; isPopular?: boolean; perPage?: number }>({
+    getProducts: builder.query<Product[], { categoryId?: string; subcategoryId?: string; storeId?: string; brandId?: string; search?: string; isPopular?: boolean; perPage?: number; sortBy?: string }>({
       query: (params) => {
         const queryParams = new URLSearchParams();
         if (params?.categoryId) queryParams.append('category_id', params.categoryId);
@@ -120,6 +120,7 @@ export const apiService = createApi({
         if (params?.search) queryParams.append('search', params.search);
         if (params?.isPopular) queryParams.append('is_popular', '1');
         if (params?.perPage) queryParams.append('per_page', params.perPage.toString());
+        if (params?.sortBy) queryParams.append('sort_by', params.sortBy);
         return `/products?${queryParams.toString()}`;
       },
       transformResponse: (res: any) => res.data || [],
@@ -157,11 +158,11 @@ export const apiService = createApi({
       query: (productId) => `/products/${productId}/reviews`,
       providesTags: ['Reviews'],
     }),
-    submitProductReview: builder.mutation<any, { productId: string; rating: number; comment: string; customerName?: string; variantName?: string }>({
-      query: ({ productId, rating, comment, customerName, variantName }) => ({
+    submitProductReview: builder.mutation<any, { productId: string; rating: number; comment: string; customerName?: string; variantName?: string; orderId?: string; images?: string[] }>({
+      query: ({ productId, rating, comment, customerName, variantName, orderId, images }) => ({
         url: `/products/${productId}/reviews`,
         method: 'POST',
-        body: { rating, comment, customer_name: customerName, variant_name: variantName },
+        body: { rating, comment, customer_name: customerName, variant_name: variantName, order_id: orderId, images },
       }),
       invalidatesTags: ['Reviews'],
     }),

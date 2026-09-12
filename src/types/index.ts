@@ -168,12 +168,16 @@ export interface SubCategory {
   id: string;
   name: string;
   image?: string;
+  bannerImage?: string | null;
+  banner_image?: string | null;
   slug?: string;
 }
 
 export interface CategoryDetailMeta {
   id?: string;
   title: string;
+  bannerImage?: string | null;
+  banner_image?: string | null;
   heroSlides: string[];
   subCategories: SubCategory[];
   promoAds?: SpecialOffer[];

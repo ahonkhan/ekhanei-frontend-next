@@ -18,6 +18,16 @@ export type ThemeStyle = 'gradient' | 'solid';
 
 export const THEME_PRESETS: ThemePreset[] = [
   {
+    id: 'ekhanei-classic',
+    name: 'Ekhanei Classic',
+    nameBn: 'এখানেই ক্লাসিক',
+    description: 'শ্যামনগর সিগনেচার অরেঞ্জ ও গ্রিন শেড।',
+    primary: '#F56E09',
+    secondary: '#00A651',
+    gradient: 'linear-gradient(135deg, #F56E09 0%, #00A651 100%)',
+    previewColors: ['#F56E09', '#00A651'],
+  },
+  {
     id: 'shadcn-violet',
     name: 'Shadcn Violet',
     nameBn: 'স্যাদসিএন ভায়োলেট',
@@ -76,16 +86,6 @@ export const THEME_PRESETS: ThemePreset[] = [
     secondary: '#6366F1',
     gradient: 'linear-gradient(135deg, #1E1B4B 0%, #3730A3 100%)',
     previewColors: ['#1E1B4B', '#3730A3'],
-  },
-  {
-    id: 'ekhanei-classic',
-    name: 'Ekhanei Classic',
-    nameBn: 'এখানেই ক্লাসিক',
-    description: 'শ্যামনগর সিগনেচার অরেঞ্জ ও গ্রিন শেড।',
-    primary: '#F56E09',
-    secondary: '#00A651',
-    gradient: 'linear-gradient(135deg, #F56E09 0%, #00A651 100%)',
-    previewColors: ['#F56E09', '#00A651'],
   },
   {
     id: 'royal-ocean',

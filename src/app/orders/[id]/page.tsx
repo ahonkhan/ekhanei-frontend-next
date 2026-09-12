@@ -15,8 +15,10 @@ import {
   CheckCircle2, 
   Clock, 
   FileText,
-  CreditCard
+  CreditCard,
+  Star
 } from 'lucide-react';
+import { WriteReviewModal } from '@/components/product/WriteReviewModal';
 import { useGetUserOrderDetailQuery, useTrackOrderQuery } from '@/store/services/apiService';
 import { useAppSelector } from '@/store/hooks';
 
@@ -37,6 +39,7 @@ export default function OrderDetailsPage() {
 
   const isLoading = isUserOrderLoading || isPublicTrackLoading;
   const order = userOrderData || publicTrackData;
+  const [reviewTarget, setReviewTarget] = React.useState<{ productId: string; productName: string; productImage?: string; orderId?: string } | null>(null);
 
   if (isLoading) {
     return (
@@ -228,9 +231,26 @@ export default function OrderDetailsPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-extrabold text-xs sm:text-sm text-slate-900">
+                  <span className="font-extrabold text-xs sm:text-sm text-slate-900 block">
                     ৳{itemTotal.toLocaleString()}
                   </span>
+                  {(orderStatus === 'completed' || orderStatus === 'delivered') && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReviewTarget({
+                          productId: String(item.product_id || item.id),
+                          productName: item.product_name || item.name,
+                          productImage: item.image,
+                          orderId: String(order?.id || orderIdParam),
+                        })
+                      }
+                      className="mt-1.5 px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 text-[11px] font-extrabold rounded-lg transition inline-flex items-center gap-1 cursor-pointer border border-amber-200 shadow-2xs"
+                    >
+                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                      <span>Add Review</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -259,6 +279,17 @@ export default function OrderDetailsPage() {
           </div>
         </div>
       </div>
+
+      {reviewTarget && (
+        <WriteReviewModal
+          isOpen={Boolean(reviewTarget)}
+          onClose={() => setReviewTarget(null)}
+          productId={reviewTarget.productId}
+          productName={reviewTarget.productName}
+          productImage={reviewTarget.productImage}
+          orderId={reviewTarget.orderId}
+        />
+      )}
 
     </main>
   );
