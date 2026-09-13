@@ -104,7 +104,7 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
     <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-6 sm:space-y-8 pt-4 sm:pt-6 pb-12">
       {/* TOP HEADER / BANNER SECTION */}
       {childSlug ? (
-        <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center justify-between mb-4">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center mb-4">
           <div className="flex items-center gap-3">
             <Link
               href={`/${slug}/${subSlug}`}
@@ -117,9 +117,6 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
               {title}
             </h1>
           </div>
-          <span className="text-xs sm:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200">
-            {totalCount} টি পণ্য
-          </span>
         </div>
       ) : (
         <div className="relative mb-10 sm:mb-14">
@@ -138,13 +135,10 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
           {/* Floating White Title Box Overlapping Bottom Edge of Banner */}
           <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 z-10 px-4 sm:px-6">
-            <div className="bg-white/95 backdrop-blur-md px-5 py-3.5 sm:px-8 sm:py-4 rounded-lg sm:rounded-xl shadow-lg border border-slate-100/90 w-full text-left flex items-center justify-between">
+            <div className="bg-white/95 backdrop-blur-md px-5 py-3.5 sm:px-8 sm:py-4 rounded-lg sm:rounded-xl shadow-lg border border-slate-100/90 w-full text-left">
               <h1 className="text-base sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none capitalize">
                 {title}
               </h1>
-              <span className="text-xs sm:text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                {totalCount} টি পণ্য
-              </span>
             </div>
           </div>
         </div>
