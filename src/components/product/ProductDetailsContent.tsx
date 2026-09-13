@@ -44,6 +44,7 @@ import {
   CheckCircle2,
   Sparkles,
   ChevronRight,
+  ChevronDown,
   MessageSquare,
   Clock,
   Check,
@@ -312,6 +313,84 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
     }
   };
 
+  // Expandable Description Box with Gradient Overlay & See More Button
+  const ExpandableDescriptionBox: React.FC<{
+    description?: string;
+    shortDescription?: string;
+    productName: string;
+  }> = ({ description, shortDescription, productName }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const contentRef = React.useRef<HTMLDivElement>(null);
+    const [shouldShowToggle, setShouldShowToggle] = useState(false);
+
+    const htmlContent = description || `<p>The premium <strong>${productName}</strong> offers high quality, durability, and comfort. Carefully curated for daily usage with 100% freshness & satisfaction guarantee.</p>`;
+
+    useEffect(() => {
+      if (contentRef.current) {
+        if (contentRef.current.scrollHeight > 160) {
+          setShouldShowToggle(true);
+        } else {
+          setShouldShowToggle(false);
+        }
+      }
+    }, [htmlContent]);
+
+    return (
+      <div className="bg-pink-50/30 border border-pink-200/80 rounded-2xl p-4 sm:p-5 text-xs sm:text-sm text-slate-700 leading-relaxed shadow-xs relative transition-all">
+        {shortDescription && (
+          <p className="font-bold text-slate-900 text-sm border-b border-pink-200/60 pb-2 mb-3">
+            {shortDescription}
+          </p>
+        )}
+
+        {/* Description Content Box */}
+        <div className="relative">
+          <div
+            ref={contentRef}
+            className={`transition-all duration-500 ease-in-out text-slate-700 leading-relaxed text-xs sm:text-sm prose prose-slate max-w-none prose-p:my-1.5 prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 prose-li:my-0.5 prose-strong:text-slate-900 font-medium ${
+              !isExpanded && shouldShowToggle ? 'max-h-[160px] overflow-hidden' : ''
+            }`}
+            dangerouslySetInnerHTML={{ __html: htmlContent }}
+          />
+
+          {/* Bottom Shadow / Gradient Fade (only visible when collapsed) */}
+          {!isExpanded && shouldShowToggle && (
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-pink-50 via-pink-50/80 to-transparent pointer-events-none rounded-b-2xl" />
+          )}
+        </div>
+
+        {/* Centered Pill Button */}
+        {shouldShowToggle && (
+          <div className={`flex justify-center ${!isExpanded ? 'relative -mt-4 z-10' : 'mt-4'}`}>
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="bg-pink-600 hover:bg-pink-700 text-white font-bold px-6 py-1.5 rounded-full text-xs sm:text-sm shadow-md transition-all transform hover:scale-105 cursor-pointer flex items-center gap-1.5"
+            >
+              <span>{isExpanded ? 'See Less' : 'See More'}</span>
+              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
+        )}
+
+        <ul className="space-y-1.5 font-semibold text-slate-800 pt-4 mt-3 border-t border-pink-200/60">
+          <li className="flex items-center gap-1.5 text-emerald-700">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <span>100% Genuine Quality Guaranteed</span>
+          </li>
+          <li className="flex items-center gap-1.5 text-emerald-700">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <span>Express 20-30 Min Hyperlocal Delivery</span>
+          </li>
+          <li className="flex items-center gap-1.5 text-emerald-700">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <span>Cash on Delivery & Easy 3 Days Return</span>
+          </li>
+        </ul>
+      </div>
+    );
+  };
+
   // Helper component to render Description & Reviews Tabs
   const renderDescriptionAndReviewsTab = () => (
     <div className="space-y-3 pt-2">
@@ -342,32 +421,11 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
       {/* Tab Content: Description */}
       {activeTab === 'description' && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-4.5 space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed shadow-xs">
-          {product.shortDescription && (
-            <p className="font-bold text-slate-900 text-sm border-b border-slate-100 pb-2">
-              {product.shortDescription}
-            </p>
-          )}
-
-          <p className="text-slate-600 leading-relaxed whitespace-pre-line">
-            {product.description || `The premium ${product.name} offers high quality, durability, and comfort. Carefully curated for daily usage with 100% freshness & satisfaction guarantee.`}
-          </p>
-
-          <ul className="space-y-1.5 font-semibold text-slate-800 pt-1">
-            <li className="flex items-center gap-1.5 text-emerald-700">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>100% Genuine Quality Guaranteed</span>
-            </li>
-            <li className="flex items-center gap-1.5 text-emerald-700">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Express 20-30 Min Hyperlocal Delivery</span>
-            </li>
-            <li className="flex items-center gap-1.5 text-emerald-700">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Cash on Delivery & Easy 3 Days Return</span>
-            </li>
-          </ul>
-        </div>
+        <ExpandableDescriptionBox
+          description={product.description}
+          shortDescription={product.shortDescription}
+          productName={product.name}
+        />
       )}
 
       {/* Tab Content: Product Reviews */}
