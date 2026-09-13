@@ -57,6 +57,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
   const [heroSlideIdx, setHeroSlideIdx] = useState(0);
   const brandsScrollRef = useRef<HTMLDivElement>(null);
+  const subCatTabsScrollRef = useRef<HTMLDivElement>(null);
 
   const slides = catMeta?.heroSlides && catMeta.heroSlides.length > 0 ? catMeta.heroSlides : [];
 
@@ -332,36 +333,45 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
         {/* PRODUCTS GRID SECTION */}
         <section className="space-y-6">
-          {/* Subcategory Tabs */}
+          {/* Subcategory Filter Tabs - Fully Responsive Horizontal Scroll */}
           {subCategories.length > 0 && (
-            <div className="bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl sm:rounded-full border border-slate-200/90 shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-              <button
-                onClick={() => setBottomFilterTab('all')}
-                className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${bottomFilterTab === 'all'
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
-                    : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
-                  }`}
+            <div className="relative w-full">
+              <div
+                ref={subCatTabsScrollRef}
+                className="w-full overflow-x-auto no-scrollbar scroll-smooth py-2 px-2 sm:px-3 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-2xs flex items-center gap-1.5 sm:gap-2 select-none touch-pan-x"
               >
-                সকল পণ্য
-              </button>
-              {subCategories.map((sub) => {
-                const subId = String(sub.id || sub.slug);
-                const isSelected =
-                  String(bottomFilterTab).toLowerCase() === String(sub.id).toLowerCase() ||
-                  String(bottomFilterTab).toLowerCase() === String(sub.slug).toLowerCase();
-                return (
-                  <button
-                    key={sub.id || sub.slug}
-                    onClick={() => setBottomFilterTab(subId)}
-                    className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${isSelected
-                        ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
-                        : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
+                <button
+                  type="button"
+                  onClick={() => setBottomFilterTab('all')}
+                  className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold transition-all duration-200 select-none cursor-pointer whitespace-nowrap ${
+                    bottomFilterTab === 'all'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 scale-[1.02]'
+                      : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80 bg-slate-50/80 sm:bg-transparent'
+                  }`}
+                >
+                  সকল পণ্য
+                </button>
+                {subCategories.map((sub) => {
+                  const subId = String(sub.id || sub.slug);
+                  const isSelected =
+                    String(bottomFilterTab).toLowerCase() === String(sub.id).toLowerCase() ||
+                    String(bottomFilterTab).toLowerCase() === String(sub.slug).toLowerCase();
+                  return (
+                    <button
+                      key={sub.id || sub.slug}
+                      type="button"
+                      onClick={() => setBottomFilterTab(subId)}
+                      className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold transition-all duration-200 select-none cursor-pointer whitespace-nowrap ${
+                        isSelected
+                          ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 scale-[1.02]'
+                          : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80 bg-slate-50/80 sm:bg-transparent'
                       }`}
-                  >
-                    {sub.name}
-                  </button>
-                );
-              })}
+                    >
+                      {sub.name}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 

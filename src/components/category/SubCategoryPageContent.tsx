@@ -150,39 +150,6 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
         </div>
       )}
 
-      {/* SUB-CATEGORY FILTER PILLS TAB BAR */}
-      {subCategories.length > 0 && (
-        <div className="bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl sm:rounded-full border border-slate-200/90 shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-          <button
-            onClick={() => handleTabChange('all')}
-            className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${selectedTab === 'all'
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
-                : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
-              }`}
-          >
-            সকল পণ্য
-          </button>
-          {subCategories.map((sub: any) => {
-            const subId = String(sub.id || sub.slug);
-            const isSelected =
-              String(selectedTab).toLowerCase() === String(sub.id).toLowerCase() ||
-              String(selectedTab).toLowerCase() === String(sub.slug).toLowerCase();
-            return (
-              <button
-                key={subId}
-                onClick={() => handleTabChange(subId)}
-                className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${isSelected
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
-                    : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
-                  }`}
-              >
-                {sub.name}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
       {/* PRODUCT GRID WITH INFINITE LOAD ON SCROLL */}
       <section className="space-y-4 pt-2">
         {isProductsLoading && page === 1 ? (
