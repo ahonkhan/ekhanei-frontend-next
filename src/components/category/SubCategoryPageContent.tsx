@@ -86,24 +86,19 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
 
   // Infinite Scroll - fetches next page from server
   useEffect(() => {
-    const checkAndLoadMore = () => {
+    const handleScroll = () => {
       if (isFetching || !hasMore) return;
       const scrollPos = window.innerHeight + window.scrollY;
-      const threshold = document.documentElement.scrollHeight - 700;
+      const threshold = document.documentElement.scrollHeight - 500;
 
       if (scrollPos >= threshold) {
         setPage((prev) => prev + 1);
       }
     };
 
-    window.addEventListener('scroll', checkAndLoadMore);
-
-    if (!isFetching && hasMore) {
-      checkAndLoadMore();
-    }
-
-    return () => window.removeEventListener('scroll', checkAndLoadMore);
-  }, [isFetching, hasMore, accumulatedProducts.length]);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isFetching, hasMore]);
 
   return (
     <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-6 sm:space-y-8 pt-4 sm:pt-6 pb-12">
@@ -160,11 +155,10 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
         <div className="bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl sm:rounded-full border border-slate-200/90 shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           <button
             onClick={() => handleTabChange('all')}
-            className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
-              selectedTab === 'all'
+            className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${selectedTab === 'all'
                 ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
                 : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
-            }`}
+              }`}
           >
             সকল পণ্য
           </button>
@@ -177,11 +171,10 @@ export const SubCategoryPageContent: React.FC<SubCategoryPageContentProps> = ({ 
               <button
                 key={subId}
                 onClick={() => handleTabChange(subId)}
-                className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
-                  isSelected
+                className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${isSelected
                     ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
                     : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
-                }`}
+                  }`}
               >
                 {sub.name}
               </button>

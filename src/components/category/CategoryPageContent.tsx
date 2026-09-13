@@ -15,23 +15,43 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
   const [accumulatedProducts, setAccumulatedProducts] = useState<any[]>([]);
 
   const queryParams = React.useMemo(() => {
-    if (bottomFilterTab !== 'all') {
-      const isNumeric = /^\d+$/.test(bottomFilterTab);
+    const isServiceCat = catMeta ? catMeta.type === 'service_category' : true;
+    const isNumeric = /^\d+$/.test(bottomFilterTab);
+
+    if (isServiceCat) {
+      if (bottomFilterTab !== 'all') {
+        return {
+          serviceCategorySlug: slug,
+          categoryId: isNumeric ? bottomFilterTab : undefined,
+          productCategoryId: isNumeric ? bottomFilterTab : undefined,
+          page,
+          perPage: 20,
+        };
+      }
       return {
-        subcategoryId: isNumeric ? bottomFilterTab : undefined,
-        subcategorySlug: !isNumeric ? bottomFilterTab : undefined,
         serviceCategorySlug: slug,
         page,
         perPage: 20,
       };
+    } else {
+      if (bottomFilterTab !== 'all') {
+        return {
+          categoryId: catMeta?.id || slug,
+          productCategoryId: catMeta?.id || slug,
+          subcategoryId: isNumeric ? bottomFilterTab : undefined,
+          subcategorySlug: !isNumeric ? bottomFilterTab : undefined,
+          page,
+          perPage: 20,
+        };
+      }
+      return {
+        categoryId: catMeta?.id || slug,
+        productCategoryId: catMeta?.id || slug,
+        page,
+        perPage: 20,
+      };
     }
-    return {
-      categoryId: catMeta?.id || slug,
-      serviceCategorySlug: slug,
-      page,
-      perPage: 20,
-    };
-  }, [bottomFilterTab, catMeta?.id, slug, page]);
+  }, [bottomFilterTab, catMeta, slug, page]);
 
   const { data: paginatedResult, isLoading: isProductsLoading, isFetching } = useGetPaginatedProductsQuery(queryParams);
 
@@ -82,24 +102,19 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
   // Infinite Scroll Listener - triggers backend API for next page
   useEffect(() => {
-    const checkAndLoadMore = () => {
+    const handleScroll = () => {
       if (isFetching || !hasMore) return;
       const scrollPos = window.innerHeight + window.scrollY;
-      const threshold = document.documentElement.scrollHeight - 700;
+      const threshold = document.documentElement.scrollHeight - 500;
 
       if (scrollPos >= threshold) {
         setPage((prev) => prev + 1);
       }
     };
 
-    window.addEventListener('scroll', checkAndLoadMore);
-
-    if (!isFetching && hasMore) {
-      checkAndLoadMore();
-    }
-
-    return () => window.removeEventListener('scroll', checkAndLoadMore);
-  }, [isFetching, hasMore, accumulatedProducts.length]);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isFetching, hasMore]);
 
   const subCategories = catMeta?.subCategories || [];
   const promoAds = catMeta?.promoAds || [];
@@ -116,9 +131,8 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
           {slides.map((slideUrl, idx) => (
             <div
               key={idx}
-              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                heroSlideIdx === idx ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
-              }`}
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${heroSlideIdx === idx ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+                }`}
             >
               <img
                 src={getImageUrl(slideUrl)}
@@ -156,9 +170,8 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                     key={idx}
                     type="button"
                     onClick={() => setHeroSlideIdx(idx)}
-                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                      heroSlideIdx === idx ? 'w-6 bg-emerald-400' : 'w-2 bg-white/60 hover:bg-white'
-                    }`}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${heroSlideIdx === idx ? 'w-6 bg-emerald-400' : 'w-2 bg-white/60 hover:bg-white'
+                      }`}
                   />
                 ))}
               </div>
@@ -324,11 +337,10 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
             <div className="bg-white/95 backdrop-blur-md p-1.5 sm:p-2 rounded-2xl sm:rounded-full border border-slate-200/90 shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setBottomFilterTab('all')}
-                className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
-                  bottomFilterTab === 'all'
+                className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${bottomFilterTab === 'all'
                     ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
                     : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
-                }`}
+                  }`}
               >
                 সকল পণ্য
               </button>
@@ -341,11 +353,10 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                   <button
                     key={sub.id || sub.slug}
                     onClick={() => setBottomFilterTab(subId)}
-                    className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${
-                      isSelected
+                    className={`flex-shrink-0 px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-extrabold transition-all duration-300 select-none cursor-pointer ${isSelected
                         ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 transform scale-[1.02]'
                         : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80'
-                    }`}
+                      }`}
                   >
                     {sub.name}
                   </button>

@@ -175,6 +175,7 @@ export interface SubCategory {
 
 export interface CategoryDetailMeta {
   id?: string;
+  type?: string;
   title: string;
   bannerImage?: string | null;
   banner_image?: string | null;
