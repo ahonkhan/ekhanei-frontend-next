@@ -9,7 +9,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { useNotification } from '@/context/NotificationContext';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
-import { useGetProfileQuery } from '@/store/services/apiService';
+import { useGetProfileQuery, useGetSiteSettingsQuery } from '@/store/services/apiService';
 import { SearchInput } from '@/components/common/SearchInput';
 import { CategoryMenuDrawer } from '@/components/layout/CategoryMenuDrawer';
 import { Menu, ShoppingCart, ChevronDown, MapPin, User as UserIcon, Palette, Bell } from 'lucide-react';
@@ -21,10 +21,13 @@ export const Header: React.FC = () => {
   const { selectedLocation, selectGPSLocation, openLocationDrawer } = useLocation();
   const { toggleThemeModal, currentTheme } = useTheme();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const { data: siteSettings } = useGetSiteSettingsQuery();
   const pathname = usePathname();
   const isHomePage = pathname === '/';
   const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const headerLogoUrl = siteSettings?.header_logo || siteSettings?.site_logo;
 
   // Global Profile Fetch
   const { data: profileApiData, isLoading: isProfileLoading } = useGetProfileQuery(undefined, {
@@ -82,11 +85,11 @@ export const Header: React.FC = () => {
             />
             <Link href="/">
               <img
-                alt="Logo"
+                alt={siteSettings?.site_name || "Logo"}
                 width="130"
                 height="33"
-                className="w-22.5 h-5.75 md:w-32.5 md:h-8.25 object-contain brightness-0 invert"
-                src="/logo.png"
+                className={`w-22.5 h-5.75 md:w-32.5 md:h-8.25 object-contain ${!headerLogoUrl ? 'brightness-0 invert' : ''}`}
+                src={headerLogoUrl || "/logo.png"}
               />
             </Link>
 

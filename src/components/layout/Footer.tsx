@@ -23,6 +23,9 @@ export const Footer: React.FC = () => {
     setOpenSection(openSection === section ? null : section);
   };
 
+  const footerLogoUrl = siteSettings?.footer_logo || siteSettings?.site_logo;
+  const siteName = siteSettings?.site_name || 'Ekhanei';
+
   const facebookUrl = siteSettings?.facebook_url || 'https://www.facebook.com/govaly.shop';
   const instagramUrl = siteSettings?.instagram_url || 'https://www.instagram.com/govalyshopping';
   const tiktokUrl = siteSettings?.tiktok_url || 'https://www.tiktok.com/@govalyshopping';
@@ -49,20 +52,33 @@ export const Footer: React.FC = () => {
 
               {/* Column 1: Logo & App Download Links */}
               <div className="md:col-span-1">
-                <div className="flex items-center gap-2">
-                  <img
-                    alt="App Icon"
-                    loading="lazy"
-                    width="80"
-                    height="80"
-                    className="w-13 h-13 md:w-17 md:h-17 rounded-xl object-contain"
-                    src="/app-icon.png"
-                  />
-                  <div className="flex flex-col gap-1 text-left">
-                    <div className="flex flex-col justify-start">
-                      <p className="text-[16px] md:text-[32px] font-bold leading-none text-[#191919]">Ekhanei</p>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-3">
+                  {footerLogoUrl ? (
+                    <img
+                      alt={siteName}
+                      loading="lazy"
+                      width="180"
+                      height="60"
+                      className="max-h-14 md:max-h-16 w-auto object-contain"
+                      src={footerLogoUrl}
+                    />
+                  ) : (
+                    <>
+                      <img
+                        alt="App Icon"
+                        loading="lazy"
+                        width="80"
+                        height="80"
+                        className="w-13 h-13 md:w-17 md:h-17 rounded-xl object-contain"
+                        src="/app-icon.png"
+                      />
+                      <div className="flex flex-col gap-1 text-left">
+                        <div className="flex flex-col justify-start">
+                          <p className="text-[16px] md:text-[32px] font-bold leading-none text-[#191919]">{siteName}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="flex py-4 flex-col gap-2 text-left">
