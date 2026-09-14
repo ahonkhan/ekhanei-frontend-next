@@ -235,23 +235,32 @@ export const LiveRiderMap: React.FC<LiveRiderMapProps> = ({
         {/* Interactive Google Map container */}
         <div ref={mapRef} className={`w-full h-full ${!mapLoaded ? 'hidden' : 'block'}`} />
 
-        {/* Fallback Google Maps Embed if JS API is loading or domain restricted */}
+        {/* Fallback OpenStreetMap if Google JS SDK fails or API key is not activated */}
         {(!mapLoaded || mapError) && (
           <div className="w-full h-full relative">
             <iframe
-              title="Google Maps Live Delivery Location"
+              title="Live Delivery Location Map"
               width="100%"
               height="100%"
               style={{ border: 0 }}
               loading="lazy"
-              allowFullScreen
-              src={`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${riderLat},${riderLng}&zoom=15`}
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${
+                Math.min(Number(riderLng), Number(customerLng)) - 0.015
+              },${
+                Math.min(Number(riderLat), Number(customerLat)) - 0.015
+              },${
+                Math.max(Number(riderLng), Number(customerLng)) + 0.015
+              },${
+                Math.max(Number(riderLat), Number(customerLat)) + 0.015
+              }&layer=mapnik&marker=${riderLat},${riderLng}`}
             />
 
             {/* Floating Live Telemetry Badge over Embed */}
-            <div className="absolute top-3 left-3 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-xs flex items-center gap-2 text-white">
+            <div className="absolute top-3 left-3 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-xs flex items-center gap-2 text-white shadow-lg">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span className="font-extrabold text-[11px] text-emerald-400">Rider GPS: {Number(riderLat).toFixed(4)}, {Number(riderLng).toFixed(4)}</span>
+              <span className="font-extrabold text-[11px] text-emerald-400">
+                Live Rider GPS: {Number(riderLat).toFixed(4)}, {Number(riderLng).toFixed(4)}
+              </span>
             </div>
           </div>
         )}
