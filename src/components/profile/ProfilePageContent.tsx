@@ -15,6 +15,7 @@ import {
 } from '@/store/services/apiService';
 import { useCart } from '@/context/CartContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useNotification } from '@/context/NotificationContext';
 import {
   ShoppingBag,
   Gift,
@@ -89,6 +90,7 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
     setThemeStyle,
     setIsThemeModalOpen,
   } = useTheme();
+  const { openNotificationDrawer, unreadCount } = useNotification();
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
   const [mounted, setMounted] = useState(false);
@@ -375,8 +377,18 @@ export const ProfilePageContent: React.FC<ProfilePageContentProps> = ({ initialT
 
                 {/* Bell Action Button */}
                 <div className="flex items-center gap-2">
-                  <button className="w-9 h-9 rounded-full bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 flex items-center justify-center transition border border-slate-200 flex-shrink-0 cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={openNotificationDrawer}
+                    className="relative w-9 h-9 rounded-full bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 flex items-center justify-center transition border border-slate-200 flex-shrink-0 cursor-pointer"
+                    title="Notifications"
+                  >
                     <Bell className="w-4 h-4" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-black flex items-center justify-center border-2 border-white shadow-2xs animate-pulse">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
                   </button>
                 </div>
               </div>

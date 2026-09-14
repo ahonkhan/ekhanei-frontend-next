@@ -189,3 +189,14 @@ export interface CategoryDetailMeta {
 export interface CartItem extends Product {
   quantity: number;
 }
+
+export interface NotificationItem {
+  id: number | string;
+  title: string;
+  body: string;
+  image?: string | null;
+  type?: 'general' | 'promo' | 'order' | 'custom' | string;
+  data?: any;
+  read?: boolean;
+  created_at: string;
+}

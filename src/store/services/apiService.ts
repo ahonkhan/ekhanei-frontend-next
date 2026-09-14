@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://admin.ekhanei.b
 
 export const apiService = createApi({
   reducerPath: 'api',
-  tagTypes: ['User', 'Orders', 'Reviews', 'Chat'],
+  tagTypes: ['User', 'Orders', 'Reviews', 'Chat', 'Notifications'],
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
     prepareHeaders: (headers, { getState }: any) => {
@@ -330,6 +330,26 @@ export const apiService = createApi({
       }),
       invalidatesTags: ['Chat'],
     }),
+
+    // Notifications Endpoints
+    getNotifications: builder.query<any, { page?: number } | void>({
+      query: (params) => {
+        const page = params?.page || 1;
+        return `/notifications?page=${page}`;
+      },
+      providesTags: ['Notifications'],
+    }),
+    markNotificationAsRead: builder.mutation<any, { id?: number | string | 'all' } | void>({
+      query: (arg) => {
+        const id = arg?.id;
+        const url = id && id !== 'all' ? `/notifications/${id}/read` : `/notifications/read-all`;
+        return {
+          url,
+          method: 'POST',
+        };
+      },
+      invalidatesTags: ['Notifications'],
+    }),
   }),
 });
 
@@ -375,4 +395,6 @@ export const {
   useGetChatMessagesQuery,
   useSendChatMessageMutation,
   useMarkChatReadMutation,
+  useGetNotificationsQuery,
+  useMarkNotificationAsReadMutation,
 } = apiService;

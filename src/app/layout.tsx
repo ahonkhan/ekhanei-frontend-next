@@ -14,6 +14,8 @@ import ChatWidget from "@/components/chat/ChatWidget";
 
 import { Suspense } from "react";
 import { StoreProvider } from "@/store/provider";
+import { NotificationProvider } from "@/context/NotificationContext";
+import { NotificationDrawer } from "@/components/layout/NotificationDrawer";
 import { OAuthCallbackHandler } from "@/components/auth/OAuthCallbackHandler";
 import { DisableContextMenu } from "@/components/common/DisableContextMenu";
 import { FacebookPixel } from "@/components/analytics/FacebookPixel";
@@ -45,26 +47,29 @@ export default function RootLayout({
       <body className="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col pb-16 md:pb-0">
         <DisableContextMenu />
         <StoreProvider>
-          <Suspense fallback={null}>
-            <FacebookPixel />
-          </Suspense>
-          <ThemeProvider>
+          <NotificationProvider>
             <Suspense fallback={null}>
-              <OAuthCallbackHandler />
+              <FacebookPixel />
             </Suspense>
-            <LocationProvider>
-              <CartProvider>
-                <Header />
-                <div className="flex-1">{children}</div>
-                <Footer />
-                <LocationDrawer />
-                <LocationBlockModal />
-                <CartDrawer />
-                <ThemeSwitcherModal />
-                <ChatWidget />
-              </CartProvider>
-            </LocationProvider>
-          </ThemeProvider>
+            <ThemeProvider>
+              <Suspense fallback={null}>
+                <OAuthCallbackHandler />
+              </Suspense>
+              <LocationProvider>
+                <CartProvider>
+                  <Header />
+                  <div className="flex-1">{children}</div>
+                  <Footer />
+                  <LocationDrawer />
+                  <LocationBlockModal />
+                  <CartDrawer />
+                  <ThemeSwitcherModal />
+                  <NotificationDrawer />
+                  <ChatWidget />
+                </CartProvider>
+              </LocationProvider>
+            </ThemeProvider>
+          </NotificationProvider>
         </StoreProvider>
       </body>
     </html>

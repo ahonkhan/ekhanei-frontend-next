@@ -6,16 +6,18 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useLocation } from '@/context/LocationContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useNotification } from '@/context/NotificationContext';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
 import { useGetProfileQuery } from '@/store/services/apiService';
 import { SearchInput } from '@/components/common/SearchInput';
 import { CategoryMenuDrawer } from '@/components/layout/CategoryMenuDrawer';
-import { Menu, ShoppingCart, ChevronDown, MapPin, User as UserIcon, Palette } from 'lucide-react';
+import { Menu, ShoppingCart, ChevronDown, MapPin, User as UserIcon, Palette, Bell } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const { totalItemsCount, setIsCartOpen, openAuthModal } = useCart();
+  const { openNotificationDrawer, unreadCount } = useNotification();
   const { selectedLocation, selectGPSLocation, openLocationDrawer } = useLocation();
   const { toggleThemeModal, currentTheme } = useTheme();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -146,6 +148,26 @@ export const Header: React.FC = () => {
                 )}
               </div>
               <span className="text-[11px]">Cart</span>
+            </button>
+
+            <div className="h-9 border-l border-white/40" />
+
+            {/* Notification Bell Button */}
+            <button
+              type="button"
+              onClick={openNotificationDrawer}
+              className="shrink-0 text-sm font-medium rounded hover:scale-105 transition-transform duration-200 text-white h-8 px-3 py-2 flex flex-col items-center justify-center cursor-pointer gap-0 relative"
+              title="Notifications"
+            >
+              <div className="relative">
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute flex items-center justify-center -top-2.5 -right-3 h-4.5 w-4.5 rounded-full bg-red-500 text-white text-[10px] font-black shadow-xs animate-pulse">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[11px]">Alerts</span>
             </button>
 
             <div className="h-9 border-l border-white/40" />
