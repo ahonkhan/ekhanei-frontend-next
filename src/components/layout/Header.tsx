@@ -112,7 +112,24 @@ export const Header: React.FC = () => {
             <div className="flex-1" />
           )}
 
-          {/* Right: Actions */}
+          {/* Mobile Notification Bell Action */}
+          <div className="flex md:hidden items-center gap-2 shrink-0 ml-2">
+            <button
+              type="button"
+              onClick={openNotificationDrawer}
+              className="relative w-8.5 h-8.5 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition border border-white/30 cursor-pointer shadow-xs active:scale-95"
+              title="Notifications"
+            >
+              <Bell className="w-4.5 h-4.5 text-white" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-red-500 text-white text-[9.5px] font-black flex items-center justify-center border-2 border-white shadow-2xs animate-pulse">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Right: Desktop Actions */}
           <div className="min-w-fit hidden gap-3 md:flex justify-between items-center">
 
             {/* Download App Tooltip */}
