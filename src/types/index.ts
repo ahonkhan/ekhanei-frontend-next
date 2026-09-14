@@ -128,6 +128,8 @@ export interface Store {
   totalOrders?: string;
   followersCount?: string;
   verified?: boolean;
+  latitude?: number;
+  longitude?: number;
   minOrder?: number;
   deliveryFee?: number;
   storeCategories?: StoreCategoryTab[];

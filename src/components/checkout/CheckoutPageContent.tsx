@@ -22,7 +22,7 @@ import { useCart } from '@/context/CartContext';
 import { useLocation } from '@/context/LocationContext';
 import { StepProgressBar } from './StepProgressBar';
 
-import { useCreateOrderMutation, useSaveIncompleteOrderMutation, useGetProfileQuery, useApplyCouponMutation } from '@/store/services/apiService';
+import { useCreateOrderMutation, useSaveIncompleteOrderMutation, useGetProfileQuery, useApplyCouponMutation, useGetStoreByIdQuery } from '@/store/services/apiService';
 import { useAppSelector } from '@/store/hooks';
 import { trackInitiateCheckout, trackPurchase } from '@/utils/facebookPixel';
 
@@ -124,16 +124,29 @@ export default function CheckoutPageContent() {
   const productTotal = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const totalSelectedQuantity = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  // Per KM Delivery Charge (৳5 per KM, Minimum ৳15)
+  // Fetch store coordinates dynamically from API for the selected store
+  const firstStoreId = selectedItems[0]?.storeId || selectedItems[0]?.store?.id;
+  const { data: storeDetails } = useGetStoreByIdQuery(
+    { id: firstStoreId || '', lat: selectedLocation.lat ?? userCoords?.lat, lng: selectedLocation.lng ?? userCoords?.lng },
+    { skip: !firstStoreId }
+  );
+
   const hubLat = 25.7439;
   const hubLng = 89.2752;
   const userLat = selectedLocation.lat ?? userCoords?.lat ?? hubLat;
   const userLng = selectedLocation.lng ?? userCoords?.lng ?? hubLng;
 
+  const storeLat = storeDetails?.latitude ?? selectedItems[0]?.store?.latitude ?? (firstStoreId ? null : hubLat);
+  const storeLng = storeDetails?.longitude ?? selectedItems[0]?.store?.longitude ?? (firstStoreId ? null : hubLng);
+
   const distanceKm = useMemo(() => {
+    if (storeLat !== null && storeLat !== undefined && storeLng !== null && storeLng !== undefined) {
+      const dist = calculateDistanceKm(storeLat, storeLng, userLat, userLng);
+      return dist <= 0 ? 1.0 : dist;
+    }
     const dist = calculateDistanceKm(hubLat, hubLng, userLat, userLng);
     return dist <= 0 ? 3.0 : dist;
-  }, [userLat, userLng]);
+  }, [storeLat, storeLng, userLat, userLng]);
 
   const deliveryCharge = useMemo(() => {
     return Math.max(15, Math.ceil(distanceKm * 5));

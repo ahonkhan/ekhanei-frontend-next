@@ -350,6 +350,14 @@ export const apiService = createApi({
       },
       invalidatesTags: ['Notifications'],
     }),
+    getPolicies: builder.query<any[], void>({
+      query: () => '/policies',
+      transformResponse: (res: any) => res.data || [],
+    }),
+    getPolicyBySlug: builder.query<any, string>({
+      query: (slug) => `/policies/${slug}`,
+      transformResponse: (res: any) => res.data || null,
+    }),
   }),
 });
 
@@ -397,4 +405,6 @@ export const {
   useMarkChatReadMutation,
   useGetNotificationsQuery,
   useMarkNotificationAsReadMutation,
+  useGetPoliciesQuery,
+  useGetPolicyBySlugQuery,
 } = apiService;

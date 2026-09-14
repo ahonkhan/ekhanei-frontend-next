@@ -2,7 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { policiesData, Policy } from '@/data/policiesData';
+import { policiesData, Policy, PolicySection } from '@/data/policiesData';
+import { useGetPolicyBySlugQuery, useGetPoliciesQuery } from '@/store/services/apiService';
 import { 
   Shield, 
   FileText, 
@@ -61,19 +62,27 @@ const iconMap: Record<string, React.ElementType> = {
   'repeat': Repeat,
 };
 
-export const PolicyPageContent: React.FC<{ policy: Policy }> = ({ policy }) => {
+export const PolicyPageContent: React.FC<{ policy: Policy }> = ({ policy: initialPolicy }) => {
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Fetch live policy details & active policy list from backend API
+  const { data: apiPolicy } = useGetPolicyBySlugQuery(initialPolicy.id);
+  const { data: apiPoliciesList } = useGetPoliciesQuery();
+
+  const policy = apiPolicy || initialPolicy;
+  const sidebarPolicies: Policy[] = (apiPoliciesList && apiPoliciesList.length > 0) ? apiPoliciesList : policiesData;
 
   const IconComponent = iconMap[policy.icon] || FileText;
 
   // Filter sections by search term if user types in search
   const filteredSections = useMemo(() => {
+    if (!policy.sections || !Array.isArray(policy.sections)) return [];
     if (!searchTerm.trim()) return policy.sections;
     const term = searchTerm.toLowerCase();
     return policy.sections.filter(
-      (sec) =>
-        sec.title.toLowerCase().includes(term) ||
-        sec.content.some((c) => c.toLowerCase().includes(term))
+      (sec: PolicySection) =>
+        (sec.title && sec.title.toLowerCase().includes(term)) ||
+        (sec.content && Array.isArray(sec.content) && sec.content.some((c: string) => c.toLowerCase().includes(term)))
     );
   }, [policy.sections, searchTerm]);
 
@@ -145,67 +154,49 @@ export const PolicyPageContent: React.FC<{ policy: Policy }> = ({ policy }) => {
 
               {/* Mobile Horizontal Scrollable Pills */}
               <div className="flex lg:hidden overflow-x-auto gap-2 no-scrollbar pb-2">
-                {policiesData
-                  .filter((p) => [
-                    'return-refund-policy',
-                    'exchange-policy',
-                    'shipping-delivery-policy',
-                    'cancellation-policy',
-                    'privacy-policy',
-                    'terms-conditions'
-                  ].includes(p.id))
-                  .map((p) => {
-                    const isActive = p.id === policy.id;
-                    const PIcon = iconMap[p.icon] || FileText;
-                    return (
-                      <Link
-                        key={p.id}
-                        href={`/${p.id}`}
-                        className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          isActive
-                            ? 'bg-emerald-600 text-white shadow-sm'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        }`}
-                      >
-                        <PIcon className="w-3.5 h-3.5" />
-                        <span>{p.title}</span>
-                      </Link>
-                    );
-                  })}
+                {sidebarPolicies.map((p) => {
+                  const isActive = p.id === policy.id;
+                  const PIcon = iconMap[p.icon] || FileText;
+                  return (
+                    <Link
+                      key={p.id}
+                      href={`/${p.id}`}
+                      className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                        isActive
+                          ? 'bg-emerald-600 text-white shadow-sm'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      <PIcon className="w-3.5 h-3.5" />
+                      <span>{p.title}</span>
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* Desktop Vertical Menu */}
               <nav className="hidden lg:flex flex-col gap-1 max-h-[calc(100vh-180px)] overflow-y-auto pr-1 no-scrollbar">
-                {policiesData
-                  .filter((p) => [
-                    'return-refund-policy',
-                    'exchange-policy',
-                    'shipping-delivery-policy',
-                    'cancellation-policy',
-                    'privacy-policy',
-                    'terms-conditions'
-                  ].includes(p.id))
-                  .map((p) => {
-                    const isActive = p.id === policy.id;
-                    const PIcon = iconMap[p.icon] || FileText;
-                    return (
-                      <Link
-                        key={p.id}
-                        href={`/${p.id}`}
-                        className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
-                          isActive
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs font-bold'
-                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 truncate">
-                          <PIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-emerald-600' : 'text-slate-400'}`} />
-                          <span className="truncate">{p.title}</span>
-                        </div>
-                        {isActive && <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 ml-1" />}
-                      </Link>
-                    );
-                  })}
+                {sidebarPolicies.map((p) => {
+                  const isActive = p.id === policy.id;
+                  const PIcon = iconMap[p.icon] || FileText;
+                  return (
+                    <Link
+                      key={p.id}
+                      href={`/${p.id}`}
+                      className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                        isActive
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs font-bold'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 truncate">
+                        <PIcon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-emerald-600' : 'text-slate-400'}`} />
+                        <span className="truncate">{p.title}</span>
+                      </div>
+                      {isActive && <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 ml-1" />}
+                    </Link>
+                  );
+                })}
               </nav>
             </div>
           </aside>
@@ -221,7 +212,7 @@ export const PolicyPageContent: React.FC<{ policy: Policy }> = ({ policy }) => {
                     <Shield className="w-5 h-5 text-emerald-600" />
                     <span>Policy Overview</span>
                   </div>
-                  {policy.intro.map((text, idx) => (
+                  {policy.intro.map((text: string, idx: number) => (
                     <p key={idx} className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
                       {text}
                     </p>
@@ -243,7 +234,7 @@ export const PolicyPageContent: React.FC<{ policy: Policy }> = ({ policy }) => {
                 </div>
               ) : (
                 <div className="space-y-8 divide-y divide-slate-100">
-                  {filteredSections.map((sec, idx) => (
+                  {filteredSections.map((sec: PolicySection, idx: number) => (
                     <div key={sec.index || idx} className={`${idx !== 0 ? 'pt-8' : ''} space-y-4`}>
                       <div className="flex items-start gap-3">
                         <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-mono font-extrabold text-xs flex-shrink-0 mt-0.5">
@@ -255,7 +246,7 @@ export const PolicyPageContent: React.FC<{ policy: Policy }> = ({ policy }) => {
                       </div>
 
                       <div className="space-y-2.5 pl-0 sm:pl-10">
-                        {sec.content.map((paragraph, pIdx) => {
+                        {sec.content.map((paragraph: string, pIdx: number) => {
                           const isBullet = paragraph.trim().startsWith('•');
                           if (isBullet) {
                             return (

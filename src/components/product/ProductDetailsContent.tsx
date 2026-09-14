@@ -195,10 +195,10 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
       price: activePrice,
     });
     if (!isAuthenticated) {
-      openAuthModal('/checkout-flow/checkout');
+      openAuthModal('/checkout-flow/cart');
       return;
     }
-    router.push('/checkout-flow/checkout');
+    router.push('/checkout-flow/cart');
   };
 
   const activeDiscountType = activeVariation?.discountType || product?.discountType || 'none';
