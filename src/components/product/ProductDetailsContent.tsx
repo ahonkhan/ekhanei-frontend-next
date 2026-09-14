@@ -33,6 +33,7 @@ import {
   Plus,
   Minus,
   Share2,
+  Copy,
   ShieldCheck,
   Truck,
   RotateCcw,
@@ -75,6 +76,39 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
   }, [categoryProducts, product?.id]);
 
   const [isQuickCheckoutOpen, setIsQuickCheckoutOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const handleCopyLink = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
+
+  const handleShareFacebook = () => {
+    if (typeof window !== 'undefined') {
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+    }
+  };
+
+  const handleShareWhatsapp = () => {
+    if (typeof window !== 'undefined') {
+      const url = encodeURIComponent(window.location.href);
+      const text = encodeURIComponent(`Check out ${product?.name || ''} on Ekhanei! `);
+      window.open(`https://api.whatsapp.com/send?text=${text}${url}`, '_blank');
+    }
+  };
+
+  const handleShareTelegram = () => {
+    if (typeof window !== 'undefined') {
+      const url = encodeURIComponent(window.location.href);
+      const text = encodeURIComponent(product?.name || '');
+      window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
+    }
+  };
 
   // Dynamic Variation Attributes & Variations Selection
   const variationAttributes = useMemo(() => {
@@ -919,8 +953,12 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
               <h1 className="text-base sm:text-2xl font-extrabold text-slate-900 leading-tight tracking-tight">
                 {product.name}
               </h1>
-              <button className="p-1.5 rounded-full hover:bg-slate-100 text-slate-700 transition shrink-0 cursor-pointer" title="Share">
-                <Share2 className="w-5 h-5" />
+              <button
+                onClick={() => setIsShareModalOpen(true)}
+                className="p-1.5 sm:p-2 rounded-full hover:bg-slate-100 text-slate-700 transition shrink-0 cursor-pointer active:scale-95"
+                title="Share"
+              >
+                <Share2 className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
@@ -1302,6 +1340,87 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
           Buy Now
         </button>
       </div>
+
+      {/* SHARE POPUP MODAL (Matching requested design) */}
+      {isShareModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          {/* Backdrop Click to Close */}
+          <div className="absolute inset-0" onClick={() => setIsShareModalOpen(false)} />
+
+          <div className="relative z-10 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl max-w-[340px] w-full text-center space-y-4 transform transition-all scale-100 border border-slate-100">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsShareModalOpen(false)}
+              className="absolute top-3.5 right-3.5 p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+              title="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Title / Toast Notice */}
+            {copiedLink ? (
+              <p className="text-xs font-bold text-emerald-600 animate-pulse pt-2">
+                ✓ Link copied to clipboard!
+              </p>
+            ) : (
+              <p className="text-xs font-semibold text-slate-400 pt-2">
+                Share this product
+              </p>
+            )}
+
+            {/* 4 Share Icons Row */}
+            <div className="flex items-center justify-center gap-3.5 sm:gap-4 pt-1 pb-2">
+
+              {/* 1. Copy Link Button */}
+              <button
+                onClick={handleCopyLink}
+                className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl border-2 border-slate-900 flex items-center justify-center text-slate-900 hover:bg-slate-100 transition active:scale-95 cursor-pointer shadow-xs"
+                title="Copy Link"
+              >
+                {copiedLink ? (
+                  <Check className="w-5 h-5 text-emerald-600" />
+                ) : (
+                  <Copy className="w-5 h-5" />
+                )}
+              </button>
+
+              {/* 2. Facebook Button */}
+              <button
+                onClick={handleShareFacebook}
+                className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:scale-105 transition active:scale-95 cursor-pointer shadow-md"
+                title="Share on Facebook"
+              >
+                <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              </button>
+
+              {/* 3. WhatsApp Button */}
+              <button
+                onClick={handleShareWhatsapp}
+                className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:scale-105 transition active:scale-95 cursor-pointer shadow-md"
+                title="Share on WhatsApp"
+              >
+                <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l.199.317-1.127 4.12 4.225-1.108.246.138z"/>
+                </svg>
+              </button>
+
+              {/* 4. Telegram Button */}
+              <button
+                onClick={handleShareTelegram}
+                className="w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-[#0088cc] text-white flex items-center justify-center hover:scale-105 transition active:scale-95 cursor-pointer shadow-md"
+                title="Share on Telegram"
+              >
+                <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.562 8.161c-.18.717-.962 4.084-1.362 5.411-.168.56-.459.747-.743.765-.618.04-1.087-.417-1.688-.81-.94-.616-1.472-1.002-2.383-1.602-1.053-.694-.37-1.076.23-1.701.157-.163 2.89-2.649 2.943-2.877.007-.028.013-.134-.05-.192-.062-.058-.155-.038-.223-.023-.096.022-1.637 1.042-4.622 3.056-.437.301-.832.448-1.187.44-.39-.009-1.141-.221-1.7-.403-.686-.223-1.232-.341-1.184-.719.025-.197.3-.399.824-.606 3.232-1.407 5.389-2.336 6.471-2.787 3.084-1.288 3.725-1.512 4.143-1.52.092-.002.298.021.431.13.112.092.143.218.158.307.015.09.034.296.019.458z"/>
+                </svg>
+              </button>
+
+            </div>
+          </div>
+        </div>
+      )}
 
     </main>
   );
