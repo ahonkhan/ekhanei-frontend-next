@@ -62,9 +62,15 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
-  const deliveryFee = 30;
+  const activeUser = profileApiData?.user || user;
+  const userDiscountPercentage = Number((activeUser as any)?.discount_percentage || 0);
+  const isFreeDelivery = Boolean((activeUser as any)?.is_free_delivery);
+
+  const deliveryFee = isFreeDelivery ? 0 : 30;
   const productSubtotal = product.price * quantity;
-  const totalCost = productSubtotal + deliveryFee - discountAmount;
+  const customerDiscount = userDiscountPercentage > 0 ? Math.round(productSubtotal * (userDiscountPercentage / 100)) : 0;
+  const totalDiscount = discountAmount + customerDiscount;
+  const totalCost = Math.max(0, productSubtotal + deliveryFee - totalDiscount);
 
   const handleApplyCoupon = () => {
     if (couponCode.trim().toUpperCase() === 'SHYAM10' || couponCode.trim().toUpperCase() === 'WELCOME50') {
@@ -398,13 +404,26 @@ export const QuickCheckoutModal: React.FC<QuickCheckoutModalProps> = ({
                 <span>Product Subtotal</span>
                 <span className="font-bold text-slate-900">TK {productSubtotal}</span>
               </div>
-              <div className="flex justify-between text-slate-600">
-                <span>Express Delivery Fee</span>
-                <span className="font-bold text-slate-900">TK {deliveryFee}</span>
+              <div className="flex justify-between items-center text-slate-600">
+                <span className="flex items-center gap-1">
+                  Express Delivery Fee
+                  {isFreeDelivery && (
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">Free</span>
+                  )}
+                </span>
+                <span className="font-bold text-slate-900">
+                  {isFreeDelivery ? <span><s className="text-slate-400 font-normal mr-1">TK 30</s>TK 0</span> : `TK ${deliveryFee}`}
+                </span>
               </div>
+              {customerDiscount > 0 && (
+                <div className="flex justify-between text-purple-700 font-bold bg-purple-50 p-2 rounded-lg">
+                  <span>Customer Perk ({userDiscountPercentage}% Off)</span>
+                  <span>- TK {customerDiscount}</span>
+                </div>
+              )}
               {discountAmount > 0 && (
                 <div className="flex justify-between text-theme-primary font-bold">
-                  <span>Discount</span>
+                  <span>Coupon Discount</span>
                   <span>- TK {discountAmount}</span>
                 </div>
               )}

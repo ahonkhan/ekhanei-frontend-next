@@ -87,6 +87,11 @@ export interface Product {
   variations?: ProductVariation[];
   variationAttributes?: VariationAttribute[];
   reviews?: ProductReview[];
+  isTimeRestricted?: boolean;
+  availableStartTime?: string;
+  availableEndTime?: string;
+  isAvailableNow?: boolean;
+  formattedAvailabilityTime?: string;
 }
 
 export interface StoreCategoryTab {
@@ -124,6 +129,12 @@ export interface Store {
   phone?: string;
   email?: string;
   openingHours?: string;
+  openingDays?: string;
+  openingStartTime?: string;
+  openingEndTime?: string;
+  isTimeRestricted?: boolean;
+  isOpenNow?: boolean;
+  formattedSchedule?: string;
   joinedDate?: string;
   totalOrders?: string;
   followersCount?: string;

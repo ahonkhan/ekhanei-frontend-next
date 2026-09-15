@@ -148,13 +148,23 @@ export default function CheckoutPageContent() {
     return dist <= 0 ? 3.0 : dist;
   }, [storeLat, storeLng, userLat, userLng]);
 
+  const activeUser = profileApiData?.user || user;
+  const userDiscountPercentage = Number((activeUser as any)?.discount_percentage || 0);
+  const isFreeDelivery = Boolean((activeUser as any)?.is_free_delivery);
+
   const deliveryCharge = useMemo(() => {
+    if (isFreeDelivery) return 0;
     return Math.max(15, Math.ceil(distanceKm * 5));
-  }, [distanceKm]);
+  }, [distanceKm, isFreeDelivery]);
 
+  const customerDiscount = useMemo(() => {
+    if (userDiscountPercentage > 0 && productTotal > 0) {
+      return Math.round(productTotal * (userDiscountPercentage / 100));
+    }
+    return 0;
+  }, [productTotal, userDiscountPercentage]);
 
-
-  const discount = appliedCoupon ? appliedCoupon.discount_amount : 0;
+  const discount = (appliedCoupon ? appliedCoupon.discount_amount : 0) + customerDiscount;
   const totalPayable = Math.max(0, productTotal + deliveryCharge - discount);
 
   // Check if any selected item in cart requires advance payment
@@ -901,16 +911,35 @@ export default function CheckoutPageContent() {
                   <span className="text-slate-500">Product Price</span>
                   <span className="font-bold text-slate-800">৳{productTotal.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">
-                    Delivery Charge ({distanceKm} km @ ৳5/km)
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 flex items-center gap-1.5">
+                    Delivery Charge ({distanceKm} km)
+                    {isFreeDelivery && (
+                      <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
+                        🎉 Free Delivery
+                      </span>
+                    )}
                   </span>
-                  <span className="font-bold text-slate-800">৳{deliveryCharge}</span>
+                  <span className="font-bold text-slate-800">
+                    {isFreeDelivery ? (
+                      <span><s className="text-slate-400 font-normal mr-1">৳{Math.max(15, Math.ceil(distanceKm * 5))}</s>৳0</span>
+                    ) : (
+                      `৳${deliveryCharge}`
+                    )}
+                  </span>
                 </div>
-                {discount > 0 && (
+                {customerDiscount > 0 && (
+                  <div className="flex justify-between items-center text-purple-700 bg-purple-50 p-2 rounded-lg border border-purple-100">
+                    <span className="font-bold text-xs flex items-center gap-1">
+                      🏷️ Account Perk ({userDiscountPercentage}% Discount)
+                    </span>
+                    <span className="font-black text-sm">-৳{customerDiscount}</span>
+                  </div>
+                )}
+                {appliedCoupon && appliedCoupon.discount_amount > 0 && (
                   <div className="flex justify-between text-emerald-600">
                     <span className="font-semibold">Coupon Discount</span>
-                    <span className="font-bold">-৳{discount}</span>
+                    <span className="font-bold">-৳{appliedCoupon.discount_amount}</span>
                   </div>
                 )}
               </div>

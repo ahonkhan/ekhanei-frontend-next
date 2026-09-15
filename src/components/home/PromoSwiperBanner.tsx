@@ -4,13 +4,15 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+import { useGetPromoBannersQuery } from '@/store/services/apiService';
+
 interface PromoBanner {
   id: string;
   image: string;
   link: string;
 }
 
-const PROMO_BANNERS: PromoBanner[] = [
+const DEFAULT_PROMO_BANNERS: PromoBanner[] = [
   {
     id: 'promo-1',
     image: 'https://d62ipmwrm4ymk.cloudfront.net/home_hero_banner/8ef18da1-57f4-4e3b-a11a-a7962913dde3.jpeg',
@@ -36,6 +38,16 @@ const EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
 const DURATION = 850;
 
 export const PromoSwiperBanner: React.FC = () => {
+  const { data: apiPromoBanners } = useGetPromoBannersQuery();
+
+  const bannersList: PromoBanner[] = (apiPromoBanners && apiPromoBanners.length > 0)
+    ? apiPromoBanners.map((b: any) => ({
+        id: String(b.id),
+        image: b.image,
+        link: b.link || b.url || '#',
+      }))
+    : DEFAULT_PROMO_BANNERS;
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [phase, setPhase] = useState<'idle' | 'animating'>('idle');
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
@@ -43,14 +55,14 @@ export const PromoSwiperBanner: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
   const touchStartX = useRef(0);
 
-  const len = PROMO_BANNERS.length;
+  const len = bannersList.length;
 
   // Render 4 slots for continuous sliding loop: [prev, current, next, next+1]
   const slides = [
-    PROMO_BANNERS[(currentIndex - 1 + len) % len],
-    PROMO_BANNERS[currentIndex],
-    PROMO_BANNERS[(currentIndex + 1) % len],
-    PROMO_BANNERS[(currentIndex + 2) % len],
+    bannersList[(currentIndex - 1 + len) % len],
+    bannersList[currentIndex % len],
+    bannersList[(currentIndex + 1) % len],
+    bannersList[(currentIndex + 2) % len],
   ];
 
   const transition = skipTransition

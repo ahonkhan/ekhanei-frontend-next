@@ -984,8 +984,20 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
               <span className="text-slate-300">|</span>
               <span>Sold {product.soldCount ?? 0}</span>
               <span className="text-slate-300">|</span>
-              <span className="text-emerald-700 font-bold">In Stock ({product.stockQuantity ?? 0})</span>
+              {product.isTimeRestricted && product.isAvailableNow === false ? (
+                <span className="text-rose-600 font-extrabold bg-rose-50 px-2.5 py-0.5 rounded-md border border-rose-200">
+                  Not Available
+                </span>
+              ) : (
+                <span className="text-emerald-700 font-bold">In Stock ({product.stockQuantity ?? 0})</span>
+              )}
             </div>
+            {product.isTimeRestricted && product.isAvailableNow === false && (
+              <p className="text-xs text-rose-700 font-bold pt-1 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-rose-600" />
+                <span>Available: {product.formattedAvailabilityTime || 'Scheduled Hours'}</span>
+              </p>
+            )}
           </div>
 
           {/* 2. Price Strip */}
@@ -1067,23 +1079,44 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
           </div>
 
           {/* 5. Action Buttons Row */}
-          <div className="flex items-center gap-2 sm:gap-3 pt-2 w-full">
-            <button
-              onClick={() => addItem({ ...product, price: activePrice })}
-              className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover active:scale-98 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
-            >
-              <ShoppingCart className="w-4 h-4" />
-              <span>Add to Cart</span>
-            </button>
+          {product.isTimeRestricted && product.isAvailableNow === false ? (
+            <div className="w-full space-y-2 pt-2">
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-900 text-xs font-bold flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                <div>
+                  <span className="block font-black text-rose-700">Not Available Currently</span>
+                  <span className="text-slate-600 font-medium">Available during: <strong>{product.formattedAvailabilityTime || 'Scheduled Hours'}</strong></span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 sm:gap-3 pt-1 w-full opacity-60">
+                <button
+                  disabled
+                  className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-slate-300 text-slate-700 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-not-allowed"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>Not Available</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 sm:gap-3 pt-2 w-full">
+              <button
+                onClick={() => addItem({ ...product, price: activePrice })}
+                className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-theme-primary hover:bg-theme-primary-hover active:scale-98 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span>Add to Cart</span>
+              </button>
 
-            <button
-              onClick={handleBuyNow}
-              className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-theme-secondary hover:bg-theme-secondary-hover active:scale-98 text-white font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Buy Now</span>
-            </button>
-          </div>
+              <button
+                onClick={handleBuyNow}
+                className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-theme-secondary hover:bg-theme-secondary-hover active:scale-98 text-white font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                <span>Buy Now</span>
+              </button>
+            </div>
+          )}
 
           {/* 6. Delivery Guarantees & DYNAMIC STORE CARD BOX */}
           <div className="flex flex-row items-center justify-between gap-2 p-3 sm:p-4 rounded-2xl bg-emerald-50/40 border border-emerald-100 text-xs font-semibold text-slate-700">

@@ -88,7 +88,7 @@ export const Header: React.FC = () => {
                 alt={siteSettings?.site_name || "Logo"}
                 width="130"
                 height="33"
-                className={`w-22.5 h-5.75 md:w-32.5 md:h-8.25 object-contain ${!headerLogoUrl ? 'brightness-0 invert' : ''}`}
+                className="w-22.5 h-5.75 md:w-32.5 md:h-8.25 object-contain"
                 src={headerLogoUrl || "/logo.png"}
               />
             </Link>

@@ -46,6 +46,8 @@ interface StoreProfileContentProps {
 
 // Reusable Store Intro Widget Component (Matching Facebook Profile Intro Box)
 const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> = ({ store, onSeeAllPhotos }) => {
+  const isStoreOpen = store.isOpenNow !== false;
+
   return (
     <div className="space-y-4">
       {/* Store Intro Card */}
@@ -58,15 +60,29 @@ const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> 
         <div className="space-y-3.5 text-xs sm:text-sm text-slate-700">
           {/* Status & Hours */}
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${isStoreOpen ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
               <Clock className="w-4 h-4" />
             </div>
             <div>
-              <span className="font-bold text-slate-900 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Open Now
-              </span>
-              <p className="text-slate-500 text-xs mt-0.5">{store.openingHours || 'Open Daily • 10:30 AM – 11:30 PM'}</p>
+              {isStoreOpen ? (
+                <>
+                  <span className="font-bold text-emerald-700 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Open Now
+                  </span>
+                  <p className="text-slate-500 text-xs mt-0.5">{store.formattedSchedule || store.openingHours || 'Open Daily'}</p>
+                </>
+              ) : (
+                <>
+                  <span className="font-bold text-rose-600 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-rose-500" />
+                    Closed
+                  </span>
+                  <p className="text-slate-700 text-xs font-bold mt-0.5">
+                    Open: {store.formattedSchedule || store.openingHours || '10:00 AM'}
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
@@ -77,7 +93,7 @@ const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> 
             </div>
             <div>
               <span className="font-bold text-slate-900">Store Address</span>
-              <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">{store.address || 'Plot #14, Station Road, Rangpur Sadar, Rangpur'}</p>
+              <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">{store.address || 'Address Not Specified'}</p>
             </div>
           </div>
 
@@ -102,7 +118,7 @@ const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> 
             <div>
               <span className="font-bold text-slate-900">Delivery Details</span>
               <p className="text-slate-500 text-xs mt-0.5">
-                Fee: ৳{store.deliveryFee ?? 30} • Min Order: ৳{store.minOrder ?? 150}
+                Fee: ৳{store.deliveryFee ?? 0} • Min Order: ৳{store.minOrder ?? 0}
               </p>
             </div>
           </div>
@@ -605,15 +621,21 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
               </div>
 
               <div className="space-y-3 pt-4 border-t border-slate-100">
-                <h4 className="font-bold text-sm text-slate-900">Operating Schedule</h4>
+                <h4 className="font-bold text-sm text-slate-900">Operating Schedule & Status</h4>
                 <div className="text-xs text-slate-600 space-y-1.5">
                   <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span>Saturday – Thursday</span>
-                    <span className="font-bold text-slate-900">{store.openingHours || '10:00 AM – 11:00 PM'}</span>
+                    <span>Store Status</span>
+                    <span className={`font-bold ${store.isOpenNow !== false ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {store.isOpenNow !== false ? 'Open Now' : 'Closed Currently'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-100">
+                    <span>Opening Days</span>
+                    <span className="font-bold text-slate-900">{store.openingDays || 'Everyday'}</span>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span>Friday</span>
-                    <span className="font-bold text-slate-900">02:00 PM – 11:30 PM</span>
+                    <span>Operating Hours</span>
+                    <span className="font-bold text-slate-900">{store.formattedSchedule || store.openingHours || '10:00 AM – 11:00 PM'}</span>
                   </div>
                 </div>
               </div>
