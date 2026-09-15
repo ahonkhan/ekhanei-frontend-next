@@ -130,7 +130,20 @@ const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> 
             </div>
             <div>
               <span className="font-bold text-slate-900">Verified Partner</span>
-              <p className="text-slate-500 text-xs mt-0.5">{store.joinedDate || 'Member since Jan 2021'}</p>
+              <p className="text-slate-500 text-xs mt-0.5">
+                {(() => {
+                  if (store.joinedDate) return store.joinedDate;
+                  const rawDate = store.createdAt || store.created_at;
+                  if (rawDate) {
+                    const d = new Date(rawDate);
+                    if (!isNaN(d.getTime())) {
+                      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                      return `Member since ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+                    }
+                  }
+                  return 'Verified Partner Store';
+                })()}
+              </p>
             </div>
           </div>
         </div>
@@ -155,21 +168,6 @@ const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> 
             )}
           </div>
         )}
-      </div>
-
-      {/* Special Store Offer Card */}
-      <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-4 text-white shadow-md space-y-2 relative overflow-hidden">
-        <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-white/10 blur-xl pointer-events-none" />
-        <div className="flex items-center gap-2 text-amber-300 font-extrabold text-xs uppercase tracking-wider">
-          <Sparkles className="w-4 h-4" />
-          <span>Exclusive Deal</span>
-        </div>
-        <h4 className="font-extrabold text-base leading-tight">
-          {store.offer || '20% Instant Discount'}
-        </h4>
-        <p className="text-xs text-emerald-100 leading-relaxed">
-          Use code <span className="font-mono font-bold text-white bg-white/20 px-1.5 py-0.5 rounded">EKHANE20</span> at checkout to get flat discount!
-        </p>
       </div>
 
       {/* Mini Photo Preview Widget */}

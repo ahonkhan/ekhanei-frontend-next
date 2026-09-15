@@ -136,6 +136,8 @@ export interface Store {
   isOpenNow?: boolean;
   formattedSchedule?: string;
   joinedDate?: string;
+  createdAt?: string;
+  created_at?: string;
   totalOrders?: string;
   followersCount?: string;
   verified?: boolean;
