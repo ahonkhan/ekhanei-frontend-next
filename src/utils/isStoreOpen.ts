@@ -73,3 +73,27 @@ export function isStoreOpenNow(store?: Partial<Store> | null): boolean {
   // Fallback to store.isOpenNow if provided by API, otherwise default to true
   return store.isOpenNow !== undefined ? store.isOpenNow : true;
 }
+
+/**
+ * Gets the next available opening time string for a closed store.
+ * e.g. "10:00 AM" or extracted start time from schedule.
+ */
+export function getAvailableAtTime(store?: Partial<Store> | null): string {
+  if (!store) return '10:00 AM';
+
+  if (store.openingStartTime) {
+    return store.openingStartTime;
+  }
+
+  const scheduleStr = store.formattedSchedule || store.openingHours;
+  if (scheduleStr) {
+    const rangeMatch = scheduleStr.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
+    if (rangeMatch) {
+      return rangeMatch[1];
+    }
+    return scheduleStr;
+  }
+
+  return '10:00 AM';
+}
+

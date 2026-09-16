@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Store } from '@/types';
 import { Tag, Clock, Star, MapPin } from 'lucide-react';
 import { formatDeliveryTime } from '@/utils/formatDeliveryTime';
-import { isStoreOpenNow } from '@/utils/isStoreOpen';
+import { isStoreOpenNow, getAvailableAtTime } from '@/utils/isStoreOpen';
 
 interface StoreCardProps {
   store: Store;
@@ -15,6 +15,7 @@ interface StoreCardProps {
 export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) => {
   const widthClass = isGrid ? 'w-full' : 'snap-start flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[340px]';
   const isOpen = isStoreOpenNow(store);
+  const availableTime = getAvailableAtTime(store);
 
   return (
     <Link
@@ -26,29 +27,43 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) =
         <img
           src={store.coverImage || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80'}
           alt={store.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className={`w-full h-full object-cover transition-transform duration-500 ${
+            isOpen ? 'group-hover:scale-105' : 'grayscale-[20%]'
+          }`}
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-slate-950/10" />
 
+        {/* Closed Dark Overlay with Centered Closed Badge & Available At */}
+        {!isOpen && (
+          <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-3 text-center transition-all duration-300">
+            <span className="bg-rose-600 text-white font-black text-xs sm:text-sm px-3.5 py-1 rounded-full shadow-lg border border-rose-400/40 flex items-center gap-1.5 uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              Closed
+            </span>
+            <span className="mt-1.5 text-white/95 font-bold text-[11px] sm:text-xs bg-black/50 px-2.5 py-1 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-xs">
+              <Clock className="w-3 h-3 text-amber-400 shrink-0" />
+              <span>Available at <span className="text-amber-300 font-extrabold">{availableTime}</span></span>
+            </span>
+          </div>
+        )}
+
         {/* Offer Tag */}
-        <span className="absolute top-2.5 left-2.5 bg-theme-secondary text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">
+        <span className="absolute top-2.5 left-2.5 bg-theme-secondary text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1 z-20">
           <Tag className="w-3 h-3" />
           {store.offer || 'Special Offer'}
         </span>
 
-        {/* Open / Closed Badge (top-right) */}
-        <span
-          className={`absolute top-2.5 right-2.5 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1.5 ${
-            isOpen ? 'bg-emerald-600/90 backdrop-blur-sm' : 'bg-rose-600/90 backdrop-blur-sm'
-          }`}
-        >
-          <span className={`w-1.5 h-1.5 rounded-full bg-white ${isOpen ? 'animate-pulse' : 'opacity-60'}`} />
-          {isOpen ? 'Open' : 'Closed'}
-        </span>
+        {/* Open Badge (top-right when open) */}
+        {isOpen && (
+          <span className="absolute top-2.5 right-2.5 bg-emerald-600/90 backdrop-blur-sm text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1.5 z-20">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+            Open
+          </span>
+        )}
 
         {/* Delivery Time Badge */}
-        <span className="absolute bottom-2.5 right-2.5 bg-slate-950/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1">
+        <span className="absolute bottom-2.5 right-2.5 bg-slate-950/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1 z-20">
           <Clock className="w-3 h-3 text-amber-400" />
           {formatDeliveryTime(store.deliveryTime)}
         </span>
