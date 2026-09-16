@@ -18,6 +18,7 @@ import {
 } from '@/store/services/apiService';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { QuickCheckoutModal } from '@/components/product/QuickCheckoutModal';
+import { isStoreOpenNow } from '@/utils/isStoreOpen';
 import { useCart } from '@/context/CartContext';
 import { useAppSelector } from '@/store/hooks';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -1151,12 +1152,15 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                   <span className="text-[11px] sm:text-xs font-extrabold tracking-tight">Shop</span>
                 </div>
                 {/* Open / Closed indicator */}
-                {storeObj.isOpenNow !== undefined && (
-                  <span className={`flex items-center gap-1 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${storeObj.isOpenNow ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${storeObj.isOpenNow ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`} />
-                    {storeObj.isOpenNow ? 'Open' : 'Closed'}
-                  </span>
-                )}
+                {(() => {
+                  const isOpen = isStoreOpenNow(storeObj);
+                  return (
+                    <span className={`flex items-center gap-1 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${isOpen ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`} />
+                      {isOpen ? 'Open' : 'Closed'}
+                    </span>
+                  );
+                })()}
               </div>
 
               <div className="flex items-center gap-1.5 min-w-0">

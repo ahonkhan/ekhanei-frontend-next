@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Store } from '@/types';
 import { Tag, Clock, Star, MapPin } from 'lucide-react';
 import { formatDeliveryTime } from '@/utils/formatDeliveryTime';
+import { isStoreOpenNow } from '@/utils/isStoreOpen';
 
 interface StoreCardProps {
   store: Store;
@@ -13,7 +14,7 @@ interface StoreCardProps {
 
 export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) => {
   const widthClass = isGrid ? 'w-full' : 'snap-start flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[340px]';
-  const isOpen = store.isOpenNow !== false; // default open if undefined
+  const isOpen = isStoreOpenNow(store);
 
   return (
     <Link

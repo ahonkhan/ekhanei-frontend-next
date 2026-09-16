@@ -8,6 +8,7 @@ import { useGetProductsQuery } from '@/store/services/apiService';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
 import { getImageUrl } from '@/utils/image';
 import { formatDeliveryTime } from '@/utils/formatDeliveryTime';
+import { isStoreOpenNow } from '@/utils/isStoreOpen';
 import {
   Star,
   Clock,
@@ -46,7 +47,7 @@ interface StoreProfileContentProps {
 
 // Reusable Store Intro Widget Component (Matching Facebook Profile Intro Box)
 const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> = ({ store, onSeeAllPhotos }) => {
-  const isStoreOpen = store.isOpenNow !== false;
+  const isStoreOpen = isStoreOpenNow(store);
 
   return (
     <div className="space-y-4">
@@ -623,8 +624,8 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
                 <div className="text-xs text-slate-600 space-y-1.5">
                   <div className="flex justify-between py-1 border-b border-slate-100">
                     <span>Store Status</span>
-                    <span className={`font-bold ${store.isOpenNow !== false ? 'text-emerald-600' : 'text-rose-600'}`}>
-                      {store.isOpenNow !== false ? 'Open Now' : 'Closed Currently'}
+                    <span className={`font-bold ${isStoreOpenNow(store) ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {isStoreOpenNow(store) ? 'Open Now' : 'Closed Currently'}
                     </span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-slate-100">
