@@ -263,6 +263,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
     deliveryTime: '২০-৩০ মিনিট',
     address: 'Rangpur Sadar',
     verified: true,
+    isOpenNow: true,
   };
 
   // Dynamic Approved Reviews List from API or Product
