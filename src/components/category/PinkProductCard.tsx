@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Product } from '@/types';
-import { Heart } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { getImageUrl } from '@/utils/image';
 
 interface PinkProductCardProps {
@@ -71,6 +71,9 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
     }
   }
 
+  // Availability check
+  const isUnavailable = product.isTimeRestricted && product.isAvailableNow === false;
+
   return (
     <Link
       href={`/product/${product.id}`}
@@ -86,9 +89,27 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
             src={cardImages[activeImgIdx]}
             alt="EkhaneiProduct"
             loading="eager"
-            className="object-cover object-center group-hover:scale-105 transition-transform duration-300 will-change-transform w-full h-full"
+            className={`object-cover object-center group-hover:scale-105 transition-transform duration-300 will-change-transform w-full h-full ${isUnavailable ? 'opacity-60' : ''}`}
             style={{ objectFit: 'cover', objectPosition: 'center center' }}
           />
+
+          {/* Not Available Overlay */}
+          {isUnavailable && (
+            <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
+              <div className="bg-rose-600/95 backdrop-blur-sm text-white px-2.5 py-1.5 rounded-lg shadow-lg flex flex-col items-center gap-0.5 text-center">
+                <span className="text-[10px] font-extrabold flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Not Available
+                </span>
+                {product.formattedAvailabilityTime && (
+                  <span className="text-[9px] font-semibold opacity-90 leading-tight">
+                    {product.formattedAvailabilityTime}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
 
           {/* Bottom Center Dot Pagination - Render ONLY when multiple images exist */}
           {cardImages.length > 1 && (
@@ -149,8 +170,17 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
               </>
             )}
           </div>
+
+          {/* Availability indicator (shown only when time-restricted and unavailable) */}
+          {isUnavailable && product.formattedAvailabilityTime && (
+            <p className="text-[10px] text-rose-600 font-bold mt-0.5 flex items-center gap-1 truncate">
+              <Clock className="w-2.5 h-2.5 flex-shrink-0" />
+              {product.formattedAvailabilityTime}
+            </p>
+          )}
         </div>
       </div>
     </Link>
   );
 };
+

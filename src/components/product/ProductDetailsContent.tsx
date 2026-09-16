@@ -1144,9 +1144,18 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
               href={storeObj.id ? `/store/${storeObj.id}` : '#'}
               className="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-xs flex flex-col gap-1 shrink-0 hover:border-emerald-400 transition cursor-pointer group max-w-[150px] sm:max-w-[200px]"
             >
-              <div className="flex items-center gap-1 text-pink-600">
-                <StoreIcon className="w-3.5 h-3.5 text-pink-600 shrink-0" />
-                <span className="text-[11px] sm:text-xs font-extrabold tracking-tight">Shop</span>
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex items-center gap-1 text-pink-600">
+                  <StoreIcon className="w-3.5 h-3.5 text-pink-600 shrink-0" />
+                  <span className="text-[11px] sm:text-xs font-extrabold tracking-tight">Shop</span>
+                </div>
+                {/* Open / Closed indicator */}
+                {storeObj.isOpenNow !== undefined && (
+                  <span className={`flex items-center gap-1 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${storeObj.isOpenNow ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${storeObj.isOpenNow ? 'bg-emerald-500 animate-pulse' : 'bg-rose-400'}`} />
+                    {storeObj.isOpenNow ? 'Open' : 'Closed'}
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center gap-1.5 min-w-0">
@@ -1173,6 +1182,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                 </div>
               </div>
             </Link>
+
           </div>
 
           {/* 7. Rating & Reviews Breakdown (Histogram Chart) */}

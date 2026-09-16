@@ -13,6 +13,7 @@ interface StoreCardProps {
 
 export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) => {
   const widthClass = isGrid ? 'w-full' : 'snap-start flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[340px]';
+  const isOpen = store.isOpenNow !== false; // default open if undefined
 
   return (
     <Link
@@ -33,6 +34,16 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) =
         <span className="absolute top-2.5 left-2.5 bg-theme-secondary text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">
           <Tag className="w-3 h-3" />
           {store.offer || 'Special Offer'}
+        </span>
+
+        {/* Open / Closed Badge (top-right) */}
+        <span
+          className={`absolute top-2.5 right-2.5 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1.5 ${
+            isOpen ? 'bg-emerald-600/90 backdrop-blur-sm' : 'bg-rose-600/90 backdrop-blur-sm'
+          }`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full bg-white ${isOpen ? 'animate-pulse' : 'opacity-60'}`} />
+          {isOpen ? 'Open' : 'Closed'}
         </span>
 
         {/* Delivery Time Badge */}
