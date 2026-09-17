@@ -923,22 +923,19 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
               {/* Not Available Overlay on Main Product Image */}
               {isUnavailable && (
-                <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center p-2 z-20 pointer-events-none">
-                  <div className="bg-rose-600/95 backdrop-blur-xs text-white px-4 py-2.5 rounded-2xl shadow-xl flex flex-col items-center justify-center text-center max-w-[85%]">
-                    <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-white flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 flex-shrink-0" />
-                      NOT AVAILABLE
-                    </span>
+                <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center p-3 text-center transition-all duration-300 pointer-events-none">
+                  <span className="bg-rose-600 text-white font-black text-xs sm:text-sm px-3.5 py-1 rounded-full shadow-lg border border-rose-400/40 flex items-center gap-1.5 uppercase tracking-wider">
+                    <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                    Closed
+                  </span>
+                  <span className="mt-1.5 text-white/95 font-bold text-[11px] sm:text-xs bg-black/50 px-2.5 py-1 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-xs">
+                    <Clock className="w-3 h-3 text-amber-400 shrink-0" />
                     {availableAtTime ? (
-                      <span className="text-xs font-bold text-rose-100 mt-1 leading-tight">
-                        Available at {availableAtTime}
-                      </span>
+                      <span>Available at <span className="text-amber-300 font-extrabold">{availableAtTime}</span></span>
                     ) : (
-                      <span className="text-xs font-medium text-rose-100 mt-1 leading-tight">
-                        Currently Closed
-                      </span>
+                      <span>Currently Closed</span>
                     )}
-                  </div>
+                  </span>
                 </div>
               )}
 

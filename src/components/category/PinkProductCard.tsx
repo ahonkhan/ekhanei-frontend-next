@@ -113,24 +113,21 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
             style={{ objectFit: 'cover', objectPosition: 'center center' }}
           />
 
-          {/* Not Available Overlay */}
+          {/* Closed Dark Overlay with Centered Closed Badge & Available At */}
           {isUnavailable && (
-            <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center p-2 z-10">
-              <div className="bg-rose-600/95 backdrop-blur-xs text-white px-3 py-1.5 rounded-xl shadow-lg flex flex-col items-center justify-center text-center max-w-[92%]">
-                <span className="text-[11px] font-black uppercase tracking-wider text-white flex items-center gap-1">
-                  <Clock className="w-3 h-3 flex-shrink-0" />
-                  Not Available
-                </span>
+            <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-2 text-center transition-all duration-300">
+              <span className="bg-rose-600 text-white font-black text-[11px] sm:text-xs px-3 py-1 rounded-full shadow-lg border border-rose-400/40 flex items-center gap-1.5 uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white animate-pulse" />
+                Closed
+              </span>
+              <span className="mt-1.5 text-white/95 font-bold text-[10px] sm:text-[11px] bg-black/50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-xs">
+                <Clock className="w-3 h-3 text-amber-400 shrink-0" />
                 {availableAtTime ? (
-                  <span className="text-[10px] font-bold text-rose-100 mt-0.5 leading-tight">
-                    Available at {availableAtTime}
-                  </span>
+                  <span>Available at <span className="text-amber-300 font-extrabold">{availableAtTime}</span></span>
                 ) : (
-                  <span className="text-[9px] font-medium text-rose-100 mt-0.5 leading-tight">
-                    Currently Closed
-                  </span>
+                  <span>Currently Closed</span>
                 )}
-              </div>
+              </span>
             </div>
           )}
 

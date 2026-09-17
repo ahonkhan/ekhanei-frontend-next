@@ -307,22 +307,22 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
 
             <div
               ref={brandsScrollRef}
-              className="flex gap-3 overflow-x-auto no-scrollbar snap-x py-2"
+              className="grid grid-cols-5 gap-1.5 sm:flex sm:gap-3 sm:overflow-x-auto sm:no-scrollbar sm:snap-x py-2"
             >
               {brands.map((brand) => (
                 <Link
                   key={brand.id}
                   href={`/search?q=${encodeURIComponent(brand.name)}&brandId=${brand.id}`}
-                  className="snap-start flex-shrink-0 w-28 h-28 sm:w-36 sm:h-36 aspect-square rounded-2xl overflow-hidden border border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all duration-300 cursor-pointer select-none relative group"
+                  className="w-full aspect-square sm:w-36 sm:h-36 sm:flex-shrink-0 sm:snap-start rounded-xl sm:rounded-2xl overflow-hidden border border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all duration-300 cursor-pointer select-none relative group bg-white flex items-center justify-center p-1 sm:p-2"
                   title={brand.name}
                 >
                   <img
                     src={getImageUrl(brand.logo)}
                     alt={brand.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     loading="lazy"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-slate-900/80 backdrop-blur-xs text-white text-[11px] font-bold text-center py-1.5 px-1 truncate opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-x-0 bottom-0 bg-slate-900/85 backdrop-blur-xs text-white text-[9px] sm:text-[11px] font-bold text-center py-0.5 sm:py-1.5 px-0.5 truncate opacity-0 group-hover:opacity-100 transition-opacity">
                     {brand.name}
                   </div>
                 </Link>
