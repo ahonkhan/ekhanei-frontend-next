@@ -72,7 +72,27 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
   }
 
   // Availability check
-  const isUnavailable = product.isTimeRestricted && product.isAvailableNow === false;
+  const isUnavailable = product.isAvailableNow === false || product.isClosed === true;
+
+  // Extract start time for "Available at [time]"
+  const availableAtTime = (() => {
+    if (product.availableAt) return product.availableAt;
+    if (product.availableStartTime) {
+      const parts = product.availableStartTime.split(':');
+      if (parts.length >= 2) {
+        let hours = parseInt(parts[0], 10);
+        const minutes = parts[1];
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `${hours}:${minutes} ${ampm}`;
+      }
+      return product.availableStartTime;
+    }
+    if (product.formattedAvailabilityTime && product.formattedAvailabilityTime !== 'Always Available') {
+      return product.formattedAvailabilityTime.split('-')[0].trim();
+    }
+    return null;
+  })();
 
   return (
     <Link
@@ -95,15 +115,19 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
 
           {/* Not Available Overlay */}
           {isUnavailable && (
-            <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
-              <div className="bg-rose-600/95 backdrop-blur-sm text-white px-2.5 py-1.5 rounded-lg shadow-lg flex flex-col items-center gap-0.5 text-center">
-                <span className="text-[10px] font-extrabold flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
+            <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center p-2 z-10">
+              <div className="bg-rose-600/95 backdrop-blur-xs text-white px-3 py-1.5 rounded-xl shadow-lg flex flex-col items-center justify-center text-center max-w-[92%]">
+                <span className="text-[11px] font-black uppercase tracking-wider text-white flex items-center gap-1">
+                  <Clock className="w-3 h-3 flex-shrink-0" />
                   Not Available
                 </span>
-                {product.formattedAvailabilityTime && (
-                  <span className="text-[9px] font-semibold opacity-90 leading-tight">
-                    {product.formattedAvailabilityTime}
+                {availableAtTime ? (
+                  <span className="text-[10px] font-bold text-rose-100 mt-0.5 leading-tight">
+                    Available at {availableAtTime}
+                  </span>
+                ) : (
+                  <span className="text-[9px] font-medium text-rose-100 mt-0.5 leading-tight">
+                    Currently Closed
                   </span>
                 )}
               </div>

@@ -91,6 +91,10 @@ export interface Product {
   availableStartTime?: string;
   availableEndTime?: string;
   isAvailableNow?: boolean;
+  isClosed?: boolean;
+  closedReason?: string;
+  storeOpen?: boolean;
+  availableAt?: string;
   formattedAvailabilityTime?: string;
 }
 
