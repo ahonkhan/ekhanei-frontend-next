@@ -194,14 +194,6 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
               </>
             )}
           </div>
-
-          {/* Availability indicator (shown only when time-restricted and unavailable) */}
-          {isUnavailable && product.formattedAvailabilityTime && (
-            <p className="text-[10px] text-rose-600 font-bold mt-0.5 flex items-center gap-1 truncate">
-              <Clock className="w-2.5 h-2.5 flex-shrink-0" />
-              {product.formattedAvailabilityTime}
-            </p>
-          )}
         </div>
       </div>
     </Link>

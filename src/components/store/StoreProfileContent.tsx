@@ -6,6 +6,7 @@ import { Store, Product } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { useGetProductsQuery } from '@/store/services/apiService';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
+import { ProductSlider } from '@/components/common/ProductSlider';
 import { getImageUrl } from '@/utils/image';
 import { formatDeliveryTime } from '@/utils/formatDeliveryTime';
 import { isStoreOpenNow, getAvailableAtTime } from '@/utils/isStoreOpen';
@@ -740,38 +741,24 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
               <>
                 {/* 1. Top Rated Section */}
                 {topRatedProducts.length > 0 && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
-                      <h3 className="text-base sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                        <span>Top Rated</span>
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-2 touch-pan-x">
-                      {topRatedProducts.map((product) => (
-                        <div key={`tr-${product.id}`} className="w-[160px] sm:w-[210px] shrink-0">
-                          <PinkProductCard product={product} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <ProductSlider title="Top Rated">
+                    {topRatedProducts.map((product) => (
+                      <div key={`tr-${product.id}`} className="w-[160px] sm:w-[210px] shrink-0">
+                        <PinkProductCard product={product} />
+                      </div>
+                    ))}
+                  </ProductSlider>
                 )}
 
                 {/* 2. Top Sold Section */}
                 {topSoldProducts.length > 0 && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
-                      <h3 className="text-base sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                        <span>Top Sold</span>
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-2 touch-pan-x">
-                      {topSoldProducts.map((product) => (
-                        <div key={`ts-${product.id}`} className="w-[160px] sm:w-[210px] shrink-0">
-                          <PinkProductCard product={product} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <ProductSlider title="Top Sold">
+                    {topSoldProducts.map((product) => (
+                      <div key={`ts-${product.id}`} className="w-[160px] sm:w-[210px] shrink-0">
+                        <PinkProductCard product={product} />
+                      </div>
+                    ))}
+                  </ProductSlider>
                 )}
 
                 {/* 3. For You Section (Paginated 20 per page, Infinite Scroll) */}

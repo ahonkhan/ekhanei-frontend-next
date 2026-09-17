@@ -270,6 +270,29 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
   // Dynamic Approved Reviews List from API or Product
   const reviewsList = reviewsData?.reviews || product?.reviews || [];
 
+  // Availability check matching PinkProductCard logic
+  const isUnavailable = product.isAvailableNow === false || product.isClosed === true;
+
+  // Extract start time for "Available at [time]" matching PinkProductCard logic
+  const availableAtTime = (() => {
+    if (product.availableAt) return product.availableAt;
+    if (product.availableStartTime) {
+      const parts = product.availableStartTime.split(':');
+      if (parts.length >= 2) {
+        let hours = parseInt(parts[0], 10);
+        const minutes = parts[1];
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `${hours}:${minutes} ${ampm}`;
+      }
+      return product.availableStartTime;
+    }
+    if (product.formattedAvailabilityTime && product.formattedAvailabilityTime !== 'Always Available') {
+      return product.formattedAvailabilityTime.split('-')[0].trim();
+    }
+    return null;
+  })();
+
   const handleCustomerSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     setReviewSubmitError('');
@@ -898,6 +921,27 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                 ))}
               </Swiper>
 
+              {/* Not Available Overlay on Main Product Image */}
+              {isUnavailable && (
+                <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center p-2 z-20 pointer-events-none">
+                  <div className="bg-rose-600/95 backdrop-blur-xs text-white px-4 py-2.5 rounded-2xl shadow-xl flex flex-col items-center justify-center text-center max-w-[85%]">
+                    <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 flex-shrink-0" />
+                      NOT AVAILABLE
+                    </span>
+                    {availableAtTime ? (
+                      <span className="text-xs font-bold text-rose-100 mt-1 leading-tight">
+                        Available at {availableAtTime}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-medium text-rose-100 mt-1 leading-tight">
+                        Currently Closed
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Bottom Overlay Elements Container (MOBILE ONLY) */}
               <div className="sm:hidden absolute bottom-2 left-2 right-2 z-30 flex items-center justify-between gap-1 flex-nowrap pointer-events-none">
 
@@ -986,18 +1030,21 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
               <span className="text-slate-300">|</span>
               <span>Sold {product.soldCount ?? 0}</span>
               <span className="text-slate-300">|</span>
-              {product.isAvailableNow === false || product.isClosed === true ? (
-                <span className="text-rose-600 font-extrabold bg-rose-50 px-2.5 py-0.5 rounded-md border border-rose-200">
-                  {product.closedReason || (product.storeOpen === false ? 'Store Closed' : 'Not Available')}
+              {isUnavailable ? (
+                <span className="text-rose-600 font-extrabold bg-rose-50 px-2.5 py-0.5 rounded-md border border-rose-200 flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-rose-600 inline" />
+                  <span>NOT AVAILABLE</span>
                 </span>
               ) : (
                 <span className="text-emerald-700 font-bold">In Stock ({product.stockQuantity ?? 0})</span>
               )}
             </div>
-            {(product.isAvailableNow === false || product.isClosed === true) && (
+            {isUnavailable && (
               <p className="text-xs text-rose-700 font-bold pt-1 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-rose-600" />
-                <span>{product.closedReason || (product.storeOpen === false ? 'Store is currently closed' : 'Currently Unavailable')}</span>
+                <span>
+                  {availableAtTime ? `Available at ${availableAtTime}` : 'Currently Closed'}
+                </span>
               </p>
             )}
           </div>
@@ -1081,24 +1128,35 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
           </div>
 
           {/* 5. Action Buttons Row */}
-          {product.isAvailableNow === false || product.isClosed === true ? (
+          {isUnavailable ? (
             <div className="w-full space-y-2 pt-2">
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-900 text-xs font-bold flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-900 text-xs font-bold flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5 text-rose-600" />
+                </div>
                 <div>
-                  <span className="block font-black text-rose-700">{product.closedReason || (product.storeOpen === false ? 'Store Currently Closed' : 'Item Not Available')}</span>
-                  {product.formattedAvailabilityTime && product.formattedAvailabilityTime !== 'Always Available' && (
-                    <span className="text-slate-600 font-medium">Available hours: <strong>{product.formattedAvailabilityTime}</strong></span>
+                  <span className="block font-black text-rose-700 uppercase tracking-wide text-xs sm:text-sm">NOT AVAILABLE</span>
+                  {availableAtTime ? (
+                    <span className="text-rose-600 font-bold text-xs">Available at {availableAtTime}</span>
+                  ) : (
+                    <span className="text-rose-600 font-medium text-xs">Currently Closed</span>
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-2 sm:gap-3 pt-1 w-full opacity-60">
+              <div className="flex items-center gap-2 sm:gap-3 pt-1 w-full opacity-70">
                 <button
                   disabled
-                  className="flex-1 py-3.5 px-4 sm:px-6 rounded-2xl bg-slate-300 text-slate-700 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-not-allowed"
+                  className="flex-1 py-3 px-4 sm:px-6 rounded-2xl bg-rose-600 text-white font-black text-xs sm:text-sm flex flex-col items-center justify-center gap-0.5 cursor-not-allowed shadow-xs"
                 >
-                  <ShoppingCart className="w-4 h-4" />
-                  <span>{product.closedReason || (product.storeOpen === false ? 'Store Closed' : 'Not Available')}</span>
+                  <div className="flex items-center gap-1.5 uppercase tracking-wider">
+                    <Clock className="w-4 h-4" />
+                    <span>NOT AVAILABLE</span>
+                  </div>
+                  {availableAtTime && (
+                    <span className="text-[11px] font-bold text-rose-100">
+                      Available at {availableAtTime}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
