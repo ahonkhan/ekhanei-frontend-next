@@ -276,20 +276,34 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
   useEffect(() => {
     if (!hasMore || isFetchingProducts) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isFetchingProducts) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
     const currentEl = observerRef.current;
-    if (currentEl) observer.observe(currentEl);
+    if (!currentEl || !(currentEl instanceof Element)) return;
+
+    let observer: IntersectionObserver | null = null;
+    try {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting && hasMore && !isFetchingProducts) {
+            setPage((prev) => prev + 1);
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      observer.observe(currentEl);
+    } catch (e) {
+      console.warn('IntersectionObserver observe error:', e);
+    }
 
     return () => {
-      if (currentEl) observer.unobserve(currentEl);
+      if (observer) {
+        if (currentEl && currentEl instanceof Element) {
+          try {
+            observer.unobserve(currentEl);
+          } catch (_) {}
+        }
+        observer.disconnect();
+      }
     };
   }, [hasMore, isFetchingProducts]);
 
