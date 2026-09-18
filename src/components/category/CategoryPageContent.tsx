@@ -1,6 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay } from 'swiper/modules';
+import type { Swiper as SwiperClass } from 'swiper';
+import 'swiper/css';
+import 'swiper/css/navigation';
 import Link from 'next/link';
 import { useGetCategoryDetailQuery, useGetPaginatedProductsQuery } from '@/store/services/apiService';
 import { PinkProductCard } from '@/components/category/PinkProductCard';
@@ -56,7 +61,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
   const { data: paginatedResult, isLoading: isProductsLoading, isFetching } = useGetPaginatedProductsQuery(queryParams);
 
   const [heroSlideIdx, setHeroSlideIdx] = useState(0);
-  const brandsScrollRef = useRef<HTMLDivElement>(null);
+  const brandsSwiperRef = useRef<SwiperClass | null>(null);
   const subCatTabsScrollRef = useRef<HTMLDivElement>(null);
 
   const slides = catMeta?.heroSlides && catMeta.heroSlides.length > 0 ? catMeta.heroSlides : [];
@@ -95,10 +100,9 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
     }
   }, [slides]);
 
-  const scrollBrands = (offset: number) => {
-    if (brandsScrollRef.current) {
-      brandsScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-    }
+  const scrollBrands = (dir: number) => {
+    if (dir < 0) brandsSwiperRef.current?.slidePrev();
+    else brandsSwiperRef.current?.slideNext();
   };
 
   // Infinite Scroll Listener - triggers backend API for next page
@@ -305,29 +309,41 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
               </div>
             </div>
 
-            <div
-              ref={brandsScrollRef}
-              className="grid grid-cols-5 gap-1.5 sm:flex sm:gap-3 sm:overflow-x-auto sm:no-scrollbar sm:snap-x py-2"
+            <Swiper
+              onBeforeInit={(swiper) => { brandsSwiperRef.current = swiper; }}
+              modules={[Navigation, Autoplay]}
+              spaceBetween={10}
+              slidesPerView={3.5}
+              breakpoints={{
+                480: { slidesPerView: 4.5, spaceBetween: 12 },
+                640: { slidesPerView: 5.5, spaceBetween: 14 },
+                768: { slidesPerView: 6.5, spaceBetween: 14 },
+                1024: { slidesPerView: 8.5, spaceBetween: 16 },
+                1280: { slidesPerView: 10.5, spaceBetween: 16 },
+              }}
+              autoplay={{ delay: 3500, disableOnInteraction: false }}
+              className="w-full py-1.5"
             >
               {brands.map((brand) => (
-                <Link
-                  key={brand.id}
-                  href={`/search?q=${encodeURIComponent(brand.name)}&brandId=${brand.id}`}
-                  className="w-full aspect-square sm:w-36 sm:h-36 sm:flex-shrink-0 sm:snap-start rounded-xl sm:rounded-2xl overflow-hidden border border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all duration-300 cursor-pointer select-none relative group bg-white flex items-center justify-center p-1 sm:p-2"
-                  title={brand.name}
-                >
-                  <img
-                    src={getImageUrl(brand.logo)}
-                    alt={brand.name}
-                    className="w-full h-full object-contain"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 bg-slate-900/85 backdrop-blur-xs text-white text-[9px] sm:text-[11px] font-bold text-center py-0.5 sm:py-1.5 px-0.5 truncate opacity-0 group-hover:opacity-100 transition-opacity">
-                    {brand.name}
-                  </div>
-                </Link>
+                <SwiperSlide key={brand.id}>
+                  <Link
+                    href={`/search?q=${encodeURIComponent(brand.name)}&brandId=${brand.id}`}
+                    className="w-full aspect-square rounded-xl sm:rounded-2xl overflow-hidden border border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all duration-300 cursor-pointer select-none relative group bg-white flex items-center justify-center p-1.5 sm:p-2 block"
+                    title={brand.name}
+                  >
+                    <img
+                      src={getImageUrl(brand.logo)}
+                      alt={brand.name}
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-slate-900/85 backdrop-blur-xs text-white text-[9px] sm:text-[11px] font-bold text-center py-0.5 sm:py-1.5 px-0.5 truncate opacity-0 group-hover:opacity-100 transition-opacity">
+                      {brand.name}
+                    </div>
+                  </Link>
+                </SwiperSlide>
               ))}
-            </div>
+            </Swiper>
           </section>
         )}
 

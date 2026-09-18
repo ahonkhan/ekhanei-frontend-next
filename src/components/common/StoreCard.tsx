@@ -41,10 +41,13 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, isGrid = false }) =
               <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
               Closed
             </span>
-            <span className="mt-1.5 text-white/95 font-bold text-[11px] sm:text-xs bg-black/50 px-2.5 py-1 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-xs">
-              <Clock className="w-3 h-3 text-amber-400 shrink-0" />
-              <span>Available at <span className="text-amber-300 font-extrabold">{availableTime}</span></span>
-            </span>
+              <span className="mt-1.5 text-white/95 font-bold text-[11px] sm:text-xs bg-black/50 px-2.5 py-1 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-xs">
+                <span className="relative flex items-center justify-center shrink-0">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping absolute" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 relative" />
+                </span>
+                <span>Available at <span className="text-amber-300 font-extrabold">{availableTime}</span></span>
+              </span>
           </div>
         )}
 

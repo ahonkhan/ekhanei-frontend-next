@@ -418,7 +418,10 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
                 Store Closed
               </span>
               <span className="mt-2 text-white/95 font-bold text-xs sm:text-sm bg-black/50 px-3.5 py-1 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-sm">
-                <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="relative flex items-center justify-center shrink-0">
+                  <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping absolute" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 relative" />
+                </span>
                 <span>Available at <span className="text-amber-300 font-extrabold">{getAvailableAtTime(store)}</span></span>
               </span>
             </div>
