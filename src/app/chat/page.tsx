@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { 
+import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2, useRouter } from 'next/navigation';
+import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2, 
   MessageSquare, 
   Send, 
   Loader2, 
@@ -15,14 +15,14 @@ import {
   Phone
 } from 'lucide-react';
 import Pusher from 'pusher-js';
-import {
+import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2,
   useGetChatConversationQuery,
   useStartChatConversationMutation,
   useGetChatMessagesQuery,
   useSendChatMessageMutation,
 } from '@/store/services/apiService';
-import { useAppSelector } from '@/store/hooks';
-import { ChatLoginRequired } from '@/components/chat/ChatLoginRequired';
+import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2, useAppSelector } from '@/store/hooks';
+import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2, ChatLoginRequired } from '@/components/chat/ChatLoginRequired';
 
 export default function CustomerChatPage() {
   const router = useRouter();
@@ -33,6 +33,39 @@ export default function CustomerChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [viewerImages, setViewerImages] = useState<string[]>([]);
+  const [viewerInitialIndex, setViewerInitialIndex] = useState(0);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+
+  const openViewer = (images: string[], index: number) => {
+    setViewerImages(images);
+    setViewerInitialIndex(index);
+    setIsViewerOpen(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files).slice(0, 5 - selectedFiles.length);
+      setSelectedFiles((prev) => [...prev, ...filesArray]);
+      filesArray.forEach((file) => {
+        const url = URL.createObjectURL(file);
+        setPreviewUrls((prev) => [...prev, url]);
+      });
+    }
+  };
+
+  const removePreview = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviewUrls((prev) => {
+      const newUrls = [...prev];
+      URL.revokeObjectURL(newUrls[index]);
+      newUrls.splice(index, 1);
+      return newUrls;
+    });
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -135,12 +168,15 @@ export default function CustomerChatPage() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     const text = inputMessage.trim();
-    if (!text || !conversationId || isSending) return;
+    const filesToSend = [...selectedFiles];
+    if ((!text && filesToSend.length === 0) || !conversationId || isSending) return;
 
     setInputMessage('');
+    setSelectedFiles([]);
+    setPreviewUrls([]);
 
     try {
-      const result = await sendMessageApi({ conversationId, message: text }).unwrap();
+      const result = await sendMessageApi({ conversationId, message: text || undefined, attachments: filesToSend.length > 0 ? filesToSend : undefined }).unwrap();
       if (result?.data) {
         setMessages((prev) => {
           if (prev.some((m) => Number(m.id) === Number(result.data.id))) return prev;
@@ -239,7 +275,7 @@ export default function CustomerChatPage() {
           {/* Encryption / Security Banner */}
           <div className="flex justify-center my-2">
             <span className="text-[11px] bg-[#ffeebd] text-[#544214] font-medium px-3 py-1.5 rounded-xl shadow-xs text-center max-w-xs border border-[#f0dfaa]/60">
-              🔒 End-to-end support messaging with Ekhanei Care Team.
+              ðŸ”’ End-to-end support messaging with Ekhanei Care Team.
             </span>
           </div>
 
@@ -275,17 +311,61 @@ export default function CustomerChatPage() {
 
               const isCustomer = msg.sender_type === 'customer';
               const time = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+              
+              const attachments: string[] = msg.attachments || [];
+              const hasImages = attachments.length > 0;
+              const hasText = !!msg.message;
+
+              const getFullImageUrl = (path: string) => {
+                if (!path) return '';
+                if (path.startsWith('http')) return path;
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://admin.ekhanei.bd/api/v1';
+                const baseUrl = apiUrl.replace('/api/v1', '');
+                return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+              };
 
               return (
                 <div key={msg.id || idx} className={`flex ${isCustomer ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className={`max-w-[82%] sm:max-w-[70%] rounded-2xl px-3.5 py-2 text-xs sm:text-sm shadow-xs leading-relaxed ${
+                    className={`max-w-[85%] sm:max-w-[70%] ${hasImages && !hasText ? '' : 'rounded-2xl px-3.5 py-2 text-xs sm:text-sm shadow-xs leading-relaxed'} ${
                       isCustomer
-                        ? 'bg-[#d9fdd3] text-slate-900 rounded-tr-none border border-[#c4f0bd]'
-                        : 'bg-white text-slate-900 rounded-tl-none border border-slate-200/80'
+                        ? hasImages && !hasText ? '' : 'bg-[#d9fdd3] text-slate-900 rounded-tr-none border border-[#c4f0bd]'
+                        : hasImages && !hasText ? '' : 'bg-white text-slate-900 rounded-tl-none border border-slate-200/80'
                     }`}
                   >
-                    <p className="whitespace-pre-wrap break-words">{msg.message}</p>
+                    {hasImages && (
+                      <div className={`grid gap-1.5 mb-1 ${attachments.length === 1 ? 'grid-cols-1' : attachments.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                        {attachments.map((url, imgIdx) => (
+                          <button
+                            key={imgIdx}
+                            onClick={() => openViewer(attachments.map(getFullImageUrl), imgIdx)}
+                            className={`relative overflow-hidden rounded-xl group focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                              attachments.length === 1 ? 'w-48 sm:w-64 max-w-full' : 'w-full'
+                            }`}
+                            style={{ aspectRatio: attachments.length === 1 ? 'auto' : '1/1' }}
+                          >
+                            <img
+                              src={getFullImageUrl(url)}
+                              alt={`Photo ${imgIdx + 1}`}
+                              className={`w-full transition-transform duration-200 group-hover:scale-105 ${
+                                attachments.length === 1 ? 'h-auto max-h-64 object-contain bg-black/5' : 'h-full object-cover'
+                              }`}
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                              <ZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                            </div>
+                            {imgIdx === 2 && attachments.length > 3 && (
+                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-xl">
+                                <span className="text-white text-xl font-bold">+{attachments.length - 3}</span>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {hasText && <p className="whitespace-pre-wrap break-words">{msg.message}</p>}
+                    
                     <div
                       className={`flex items-center justify-end space-x-1 text-[10px] font-semibold mt-1 ${
                         isCustomer ? 'text-emerald-800' : 'text-slate-400'
@@ -318,9 +398,9 @@ export default function CustomerChatPage() {
 
         {/* WHATSAPP BOTTOM COMPOSER */}
         {isAuthenticated && (
-          <div className="p-2.5 sm:p-3 bg-[#f0f2f5] border-t border-slate-200/80 shrink-0">
+          <div className="bg-[#f0f2f5] border-t border-slate-200/80 shrink-0">
             {conversation?.status === 'closed' ? (
-              <div className="text-center py-2">
+              <div className="text-center py-4">
                 <p className="text-xs text-slate-500 mb-2 font-medium">This conversation has been closed by support.</p>
                 <button
                   onClick={async () => {
@@ -334,31 +414,92 @@ export default function CustomerChatPage() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-                <div className="flex-1 bg-white rounded-full px-4 py-2 sm:py-2.5 border border-slate-200 flex items-center gap-2 shadow-inner">
+              <form onSubmit={handleSendMessage} className="flex flex-col">
+                {previewUrls.length > 0 && (
+                  <div className="flex gap-2 px-3 pt-3 flex-wrap">
+                    {previewUrls.map((url, i) => (
+                      <div key={i} className="relative group">
+                        <img
+                          src={url}
+                          alt=""
+                          className="w-16 h-16 object-cover rounded-xl border border-slate-300 cursor-pointer"
+                          onClick={() => openViewer(previewUrls, i)}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePreview(i)}
+                          className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center transition-opacity shadow-md hover:bg-red-600"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {selectedFiles.length < 5 && (
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-16 h-16 border-2 border-dashed border-slate-400 bg-white rounded-xl flex items-center justify-center text-slate-500 hover:border-emerald-500 hover:text-emerald-600 transition-colors"
+                      >
+                        <ImagePlus className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-2 p-2.5 sm:p-3">
                   <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Type a message..."
-                    className="flex-1 bg-transparent text-xs sm:text-sm text-slate-800 focus:outline-none"
-                    disabled={isSending || isStarting}
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileChange}
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={selectedFiles.length >= 5}
+                    className="shrink-0 p-2 text-slate-500 hover:text-emerald-600 hover:bg-white rounded-full transition-colors disabled:opacity-40"
+                    title="Add photos"
+                  >
+                    <ImagePlus className="w-5 h-5" />
+                  </button>
+
+                  <div className="flex-1 bg-white rounded-3xl px-4 py-2 sm:py-2.5 border border-slate-300 flex items-center gap-2 shadow-sm">
+                    <input
+                      type="text"
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      placeholder={selectedFiles.length > 0 ? 'Add a caption... (optional)' : 'Type a message...'}
+                      className="flex-1 bg-transparent text-xs sm:text-sm text-slate-800 focus:outline-none"
+                      disabled={isSending || isStarting}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={(!inputMessage.trim() && selectedFiles.length === 0) || isSending || isStarting}
+                    className="w-10 h-10 rounded-full bg-[#075e54] hover:bg-[#064e46] disabled:bg-slate-400 text-white flex items-center justify-center shadow-md transition-all active:scale-95 shrink-0"
+                    title="Send Message"
+                  >
+                    {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  </button>
                 </div>
-                <button
-                  type="submit"
-                  disabled={!inputMessage.trim() || isSending || isStarting}
-                  className="w-10 h-10 rounded-full bg-[#075e54] hover:bg-[#064e46] disabled:bg-slate-300 text-white flex items-center justify-center shadow-md transition-all active:scale-95 shrink-0"
-                  title="Send Message"
-                >
-                  {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                </button>
               </form>
             )}
           </div>
         )}
 
       </div>
+      {isViewerOpen && (
+        <PhotoViewer
+          images={viewerImages}
+          initialIndex={viewerInitialIndex}
+          onClose={() => setIsViewerOpen(false)}
+        />
+      )}
     </div>
   );
 }
+
+
