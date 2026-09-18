@@ -116,11 +116,11 @@ export const PinkProductCard: React.FC<PinkProductCardProps> = ({ product, isSli
           {/* Unavailable Dark Overlay with Centered Badge & Available At */}
           {isUnavailable && (
             <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-2 text-center transition-all duration-300">
-              <span className="bg-rose-600 text-white font-black text-[11px] sm:text-xs px-3 py-1 rounded-full shadow-lg border border-rose-400/40 flex items-center gap-1.5 uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white animate-pulse" />
+              <span className="bg-rose-600 text-white font-black text-[9px] sm:text-[10px] px-2.5 py-0.5 rounded-full shadow-lg border border-rose-400/40 flex items-center gap-1 uppercase tracking-wider">
+                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-white animate-pulse" />
                 Not Available
               </span>
-              <span className="mt-1.5 text-white/95 font-bold text-[10px] sm:text-[11px] bg-black/50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-xs">
+              <span className="mt-1.5 text-white/95 font-bold text-xs sm:text-sm bg-black/50 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-xs">
                 <span className="relative flex items-center justify-center shrink-0">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping absolute" />
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 relative" />

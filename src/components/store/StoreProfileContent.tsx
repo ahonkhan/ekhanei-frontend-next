@@ -413,11 +413,11 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
           {/* Closed Dark Overlay with Centered Closed Badge & Available At */}
           {!isStoreOpenNow(store) && (
             <div className="absolute inset-0 bg-slate-950/65 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-4 text-center">
-              <span className="bg-rose-600 text-white font-black text-sm sm:text-base px-5 py-1.5 rounded-full shadow-xl border border-rose-400/40 flex items-center gap-2 uppercase tracking-wider">
-                <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
+              <span className="bg-rose-600 text-white font-black text-[10px] sm:text-[11px] px-3 py-0.5 rounded-full shadow-xl border border-rose-400/40 flex items-center gap-1.5 uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                 Store Closed
               </span>
-              <span className="mt-2 text-white/95 font-bold text-xs sm:text-sm bg-black/50 px-3.5 py-1 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-1.5 shadow-sm">
+              <span className="mt-2 text-white/95 font-bold text-sm sm:text-base bg-black/50 px-4 py-1.5 rounded-lg backdrop-blur-md border border-white/15 flex items-center gap-2 shadow-sm">
                 <span className="relative flex items-center justify-center shrink-0">
                   <span className="w-3 h-3 rounded-full bg-emerald-400 animate-ping absolute" />
                   <span className="w-2 h-2 rounded-full bg-emerald-400 relative" />
