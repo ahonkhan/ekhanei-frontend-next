@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2, useRouter } from 'next/navigation';
-import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2, 
+import { useRouter } from 'next/navigation';
+import { 
   MessageSquare, 
   Send, 
   Loader2, 
@@ -12,17 +12,22 @@ import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Max
   RefreshCw, 
   AlertCircle,
   ArrowLeft,
-  Phone
+  Phone,
+  ImagePlus,
+  Paperclip,
+  X,
+  ZoomIn
 } from 'lucide-react';
 import Pusher from 'pusher-js';
-import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2,
+import { 
   useGetChatConversationQuery,
   useStartChatConversationMutation,
   useGetChatMessagesQuery,
   useSendChatMessageMutation,
 } from '@/store/services/apiService';
-import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2, useAppSelector } from '@/store/hooks';
-import { ImagePlus, X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2, ChatLoginRequired } from '@/components/chat/ChatLoginRequired';
+import { useAppSelector } from '@/store/hooks';
+import { ChatLoginRequired } from '@/components/chat/ChatLoginRequired';
+import PhotoViewer from '@/components/chat/PhotoViewer';
 
 export default function CustomerChatPage() {
   const router = useRouter();

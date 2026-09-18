@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, ZoomIn, ZoomOut, Download, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 
 interface PhotoViewerProps {
@@ -150,4 +150,47 @@ export default function PhotoViewer({ images, initialIndex, onClose }: PhotoView
         <img
           key={currentImage}
           src={currentImage}
+          alt={`Photo ${currentIndex + 1}`}
+          className="max-h-full max-w-full object-contain transition-transform duration-200"
+          style={{
+            transform: `scale(${zoom}) translate(${offset.x / zoom}px, ${offset.y / zoom}px)`,
+            animation: 'fadeInImg 0.25s ease',
+          }}
+          draggable={false}
+        />
 
+        {/* Next button */}
+        {hasMultiple && (
+          <button
+            onClick={goNext}
+            className="absolute right-3 z-10 p-2.5 bg-black/40 hover:bg-black/70 text-white rounded-full transition-all backdrop-blur-sm border border-white/10"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        )}
+      </div>
+
+      {/* Thumbnail strip for multiple images */}
+      {hasMultiple && (
+        <div className="flex items-center justify-center gap-2 p-3 bg-black/60 overflow-x-auto shrink-0">
+          {images.map((img, i) => (
+            <button
+              key={i}
+              onClick={() => { setCurrentIndex(i); setZoom(1); setOffset({ x: 0, y: 0 }); }}
+              className={`w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
+                i === currentIndex ? 'border-emerald-400 scale-110' : 'border-white/20 opacity-50 hover:opacity-80'
+              }`}
+            >
+              <img src={img} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeInViewer { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInImg { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+      `}</style>
+    </div>
+  );
+}
