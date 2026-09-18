@@ -1455,45 +1455,49 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
           )}
         </div>
       ) : (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200 p-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-1.5 sm:gap-2.5">
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="flex flex-col items-center gap-0.5 px-1 sm:px-2 relative text-slate-700 hover:text-theme-primary transition shrink-0 cursor-pointer"
-          >
-            <div className="relative text-theme-primary">
-              <ShoppingCart className="w-5 h-5" />
-              {totalItemsCount > 0 && (
-                <span className="absolute -top-1.5 -right-2.5 bg-theme-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
-                  {totalItemsCount}
-                </span>
-              )}
-            </div>
-            <span className="text-[10px] font-extrabold text-slate-800">Cart</span>
-          </button>
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200 p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-5 shrink-0 px-1 sm:px-2">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="flex flex-col items-center gap-1 relative text-slate-700 hover:text-theme-primary transition cursor-pointer"
+            >
+              <div className="relative text-theme-primary">
+                <ShoppingCart className="w-6 h-6" />
+                {totalItemsCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 bg-theme-primary text-white text-[10px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-xs">
+                    {totalItemsCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] sm:text-xs font-extrabold text-slate-800">Cart</span>
+            </button>
 
-          <button
-            onClick={() => router.push('/chat')}
-            className="flex flex-col items-center gap-0.5 px-1 sm:px-2 relative text-slate-700 hover:text-theme-primary transition shrink-0 cursor-pointer"
-          >
-            <div className="relative text-theme-primary">
-              <MessageSquare className="w-5 h-5" />
-            </div>
-            <span className="text-[10px] font-extrabold text-slate-800">Chat</span>
-          </button>
+            <button
+              onClick={() => router.push('/chat')}
+              className="flex flex-col items-center gap-1 relative text-slate-700 hover:text-theme-primary transition cursor-pointer"
+            >
+              <div className="relative text-theme-primary">
+                <MessageSquare className="w-6 h-6" />
+              </div>
+              <span className="text-[10px] sm:text-xs font-extrabold text-slate-800">Chat</span>
+            </button>
+          </div>
 
-          <button
-            onClick={() => addItem({ ...product, price: activePrice })}
-            className="flex-1 bg-theme-primary hover:bg-theme-primary-hover active:scale-98 text-white font-extrabold text-[11px] sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer px-1"
-          >
-            Add to Cart
-          </button>
+          <div className="flex flex-1 items-center gap-2 sm:gap-3">
+            <button
+              onClick={() => addItem({ ...product, price: activePrice })}
+              className="flex-1 bg-theme-primary hover:bg-theme-primary-hover active:scale-98 text-white font-extrabold text-[12px] sm:text-sm py-2.5 rounded-xl shadow-md transition text-center cursor-pointer px-2"
+            >
+              Add to Cart
+            </button>
 
-          <button
-            onClick={handleBuyNow}
-            className="flex-1 bg-theme-secondary hover:bg-theme-secondary-hover active:scale-98 text-white font-black text-[11px] sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer px-1"
-          >
-            Buy Now
-          </button>
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 bg-theme-secondary hover:bg-theme-secondary-hover active:scale-98 text-white font-black text-[12px] sm:text-sm py-2.5 rounded-xl shadow-md transition text-center cursor-pointer px-2"
+            >
+              Buy Now
+            </button>
+          </div>
         </div>
       )}
 

@@ -31,12 +31,12 @@ export function ChatLoginRequired({ onLoginClick, className = '' }: ChatLoginReq
   };
 
   return (
-    <div className={`flex-1 flex flex-col items-center justify-center p-6 bg-[#fff2f5] text-center h-full min-h-[380px] w-full ${className}`}>
+    <div className={`flex-1 flex flex-col items-center justify-center p-6 bg-slate-50 text-center h-full min-h-[380px] w-full ${className}`}>
       {/* Icon Circle */}
-      <div className="w-20 h-20 rounded-full bg-[#fde2ea] flex items-center justify-center mb-5 shadow-xs shrink-0">
-        <div className="relative text-[#e6006e]">
-          <MessageSquare className="w-10 h-10 fill-[#e6006e]/10 stroke-[#e6006e] stroke-[2]" />
-          <div className="absolute -bottom-1 -right-1 bg-[#e6006e] text-white p-1 rounded-full shadow-xs">
+      <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center mb-5 shadow-sm border border-slate-100 shrink-0">
+        <div className="relative text-theme-primary">
+          <MessageSquare className="w-10 h-10 stroke-current fill-none stroke-[2]" />
+          <div className="absolute -bottom-1 -right-1 bg-theme-primary text-white p-1 rounded-full shadow-xs">
             <Lock className="w-3.5 h-3.5" />
           </div>
         </div>
@@ -56,16 +56,16 @@ export function ChatLoginRequired({ onLoginClick, className = '' }: ChatLoginReq
       <button
         type="button"
         onClick={handleLogin}
-        className="w-full max-w-xs py-3 px-4 bg-[#e6006e] hover:bg-[#c90060] active:scale-[0.98] text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md shadow-pink-500/20 transition-all flex items-center justify-center cursor-pointer"
+        className="w-full max-w-xs py-3 px-4 bg-theme-primary bg-theme-primary-hover active:scale-[0.98] text-white font-extrabold text-sm sm:text-base rounded-2xl shadow-md shadow-slate-200 transition-all flex items-center justify-center cursor-pointer"
       >
         Login to Account
       </button>
 
       {/* Divider */}
       <div className="flex items-center justify-center w-full max-w-xs my-5">
-        <div className="flex-1 h-[1px] bg-[#f7b7cb]"></div>
-        <span className="px-3 text-[11px] font-extrabold text-[#e6006e] tracking-wider">OR</span>
-        <div className="flex-1 h-[1px] bg-[#f7b7cb]"></div>
+        <div className="flex-1 h-[1px] bg-slate-200"></div>
+        <span className="px-3 text-[11px] font-extrabold text-theme-primary tracking-wider">OR</span>
+        <div className="flex-1 h-[1px] bg-slate-200"></div>
       </div>
 
       {/* WhatsApp Button */}

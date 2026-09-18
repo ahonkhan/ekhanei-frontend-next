@@ -487,7 +487,7 @@ export default function ChatWidget() {
       {/* CHAT WINDOW */}
       {isOpen && (
         <div
-          className={`fixed z-50 transition-all duration-300 ${
+          className={`fixed z-[2000] transition-all duration-300 ${
             isMinimized
               ? 'bottom-4 right-4 w-72 h-14 bg-emerald-700 text-white rounded-xl shadow-xl flex items-center justify-between px-4 cursor-pointer'
               : 'bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-[380px] h-[100dvh] sm:h-[560px] bg-white sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100'
@@ -586,9 +586,17 @@ export default function ChatWidget() {
                         const hasImages = attachments.length > 0;
                         const hasText = !!msg.message;
 
+                        const getFullImageUrl = (path: string) => {
+                          if (!path) return '';
+                          if (path.startsWith('http')) return path;
+                          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://admin.ekhanei.bd/api/v1';
+                          const baseUrl = apiUrl.replace('/api/v1', '');
+                          return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+                        };
+
                         return (
                           <div key={msg.id || idx} className={`flex ${isCustomer ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[80%] ${hasImages && !hasText ? '' : 'rounded-2xl px-3.5 py-2 shadow-sm'} ${
+                            <div className={`max-w-[85%] ${hasImages && !hasText ? '' : 'rounded-2xl px-3.5 py-2 shadow-sm'} ${
                               isCustomer
                                 ? hasImages && !hasText ? '' : 'bg-emerald-600 text-white rounded-br-none'
                                 : hasImages && !hasText ? '' : 'bg-white text-slate-800 border border-slate-200/80 rounded-bl-none'
@@ -600,14 +608,18 @@ export default function ChatWidget() {
                                   {attachments.map((url, imgIdx) => (
                                     <button
                                       key={imgIdx}
-                                      onClick={() => openViewer(attachments, imgIdx)}
-                                      className="relative overflow-hidden rounded-xl group focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                      style={{ aspectRatio: attachments.length === 1 ? '4/3' : '1/1' }}
+                                      onClick={() => openViewer(attachments.map(getFullImageUrl), imgIdx)}
+                                      className={`relative overflow-hidden rounded-xl group focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                                        attachments.length === 1 ? 'w-48 sm:w-64 max-w-full' : 'w-full'
+                                      }`}
+                                      style={{ aspectRatio: attachments.length === 1 ? 'auto' : '1/1' }}
                                     >
                                       <img
-                                        src={url}
+                                        src={getFullImageUrl(url)}
                                         alt={`Photo ${imgIdx + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                                        className={`w-full transition-transform duration-200 group-hover:scale-105 ${
+                                          attachments.length === 1 ? 'h-auto max-h-64 object-contain bg-black/5' : 'h-full object-cover'
+                                        }`}
                                       />
                                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                                         <ZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
