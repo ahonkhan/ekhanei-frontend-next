@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaFacebook, FaWhatsapp, FaTelegram } from 'react-icons/fa6';
@@ -62,6 +62,119 @@ import {
 interface ProductDetailsContentProps {
   productId: string;
 }
+
+// ============================================================
+// Fullscreen Swipe-Only Image Slider (no prev/next buttons)
+// ============================================================
+interface FullscreenSwipeSliderProps {
+  images: string[];
+  initialIndex: number;
+  onClose: () => void;
+}
+
+const FullscreenSwipeSlider: React.FC<FullscreenSwipeSliderProps> = ({
+  images,
+  initialIndex,
+  onClose,
+}) => {
+  const [currentIdx, setCurrentIdx] = useState(initialIndex);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const isDragging = useRef(false);
+
+  // Lock body scroll while open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') setCurrentIdx(i => (i - 1 + images.length) % images.length);
+      else if (e.key === 'ArrowRight') setCurrentIdx(i => (i + 1) % images.length);
+      else if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [images.length, onClose]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isDragging.current = false;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    // Only swipe horizontally if dominant axis is horizontal
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx < 0) setCurrentIdx(i => (i + 1) % images.length);
+      else setCurrentIdx(i => (i - 1 + images.length) % images.length);
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  }, [images.length]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[200] bg-black flex flex-col"
+      style={{ touchAction: 'pan-y' }}
+    >
+      {/* Top bar: counter left, close right */}
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 pt-safe-top"
+        style={{ paddingTop: 'max(env(safe-area-inset-top), 12px)' }}
+      >
+        <span className="text-white font-bold text-base tracking-wide select-none">
+          {currentIdx + 1}/{images.length}
+        </span>
+        <button
+          onClick={onClose}
+          className="w-9 h-9 rounded-full bg-[#ff2d78] flex items-center justify-center shadow-lg active:scale-90 transition"
+          aria-label="Close"
+        >
+          <X className="w-5 h-5 text-white" />
+        </button>
+      </div>
+
+      {/* Swipeable image area */}
+      <div
+        className="flex-1 flex items-center justify-center overflow-hidden select-none"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <img
+          src={images[currentIdx]}
+          alt={`Product image ${currentIdx + 1}`}
+          className="w-full h-full object-contain"
+          draggable={false}
+        />
+      </div>
+
+      {/* Bottom dot indicators */}
+      {images.length > 1 && (
+        <div
+          className="flex items-center justify-center gap-1.5 pb-8"
+          style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 24px)' }}
+        >
+          {images.map((_, i) => (
+            <span
+              key={i}
+              className={`rounded-full transition-all duration-300 ${
+                i === currentIdx
+                  ? 'w-5 h-1.5 bg-white'
+                  : 'w-1.5 h-1.5 bg-white/40'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ productId }) => {
   const router = useRouter();
@@ -855,7 +968,6 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                   <button
                     key={idx}
                     onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 640) return;
                       setSelectedImgIdx(idx);
                       setIsImageViewerOpen(true);
                       setViewerActiveIdx(idx);
@@ -880,7 +992,6 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             {/* Main Image Box */}
             <div
               onClick={() => {
-                if (typeof window !== 'undefined' && window.innerWidth < 640) return;
                 setIsImageViewerOpen(true);
                 setViewerActiveIdx(selectedImgIdx);
               }}
@@ -1314,108 +1425,13 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
         quantity={cartItem ? cartItem.quantity : 1}
       />
 
-      {/* IMAGE VIEWER LIGHTBOX MODAL */}
+      {/* FULLSCREEN SWIPE-ONLY IMAGE VIEWER */}
       {isImageViewerOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-4xl h-[560px] sm:h-[640px] bg-slate-900 text-white rounded-3xl overflow-hidden shadow-2xl border border-slate-800 flex flex-col shrink-0">
-
-            {/* Modal Header Row */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950 shrink-0 h-14">
-              <div className="flex items-center gap-3">
-                <span className="font-extrabold text-emerald-400 text-sm sm:text-base">
-                  {viewerActiveIdx + 1} / {galleryImages.length}
-                </span>
-                <span className="text-xs text-slate-400 font-semibold hidden sm:inline">
-                  Use arrow keys to navigate
-                </span>
-              </div>
-
-              {/* Action Toolbar */}
-              <div className="flex items-center gap-3 text-slate-300">
-                <button
-                  onClick={() => setZoomLevel((prev) => (prev === 1 ? 1.5 : prev === 1.5 ? 2 : 1))}
-                  className="p-1.5 rounded-full hover:bg-slate-800 hover:text-emerald-400 transition cursor-pointer"
-                  title="Zoom"
-                >
-                  <ZoomIn className="w-4.5 h-4.5" />
-                </button>
-                <button
-                  onClick={() => setRotationAngle((prev) => (prev + 90) % 360)}
-                  className="p-1.5 rounded-full hover:bg-slate-800 hover:text-emerald-400 transition cursor-pointer"
-                  title="Rotate"
-                >
-                  <RotateCw className="w-4.5 h-4.5" />
-                </button>
-                <button
-                  onClick={() => {
-                    setZoomLevel(1);
-                    setRotationAngle(0);
-                  }}
-                  className="p-1.5 rounded-full hover:bg-slate-800 hover:text-emerald-400 transition cursor-pointer"
-                  title="Reset"
-                >
-                  <Maximize2 className="w-4.5 h-4.5" />
-                </button>
-                <div className="w-px h-5 bg-slate-800" />
-                <button
-                  onClick={() => setIsImageViewerOpen(false)}
-                  className="p-1.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
-                  title="Close"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body Main Image Display Area */}
-            <div className="relative flex-1 bg-slate-950 p-4 sm:p-6 flex items-center justify-center overflow-hidden h-[360px] sm:h-[450px]">
-              <button
-                onClick={() => setViewerActiveIdx((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)}
-                className="absolute left-3 sm:left-6 p-2.5 sm:p-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white shadow-md backdrop-blur-md transition active:scale-95 z-20 cursor-pointer"
-                title="Previous Image"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-
-              <div className="w-full h-full flex items-center justify-center overflow-hidden">
-                <img
-                  src={galleryImages[viewerActiveIdx]}
-                  alt={`Product view ${viewerActiveIdx + 1}`}
-                  style={{
-                    transform: `scale(${zoomLevel}) rotate(${rotationAngle}deg)`,
-                    transition: 'transform 0.3s ease',
-                  }}
-                  className="max-h-full max-w-full object-contain rounded-none"
-                />
-              </div>
-
-              <button
-                onClick={() => setViewerActiveIdx((prev) => (prev + 1) % galleryImages.length)}
-                className="absolute right-3 sm:right-6 p-2.5 sm:p-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white shadow-md backdrop-blur-md transition active:scale-95 z-20 cursor-pointer"
-                title="Next Image"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Bottom Horizontal Thumbnails Navigation Strip */}
-            <div className="flex items-center justify-center gap-3 p-3 sm:p-4 bg-slate-950 border-t border-slate-800 overflow-x-auto no-scrollbar shrink-0">
-              {galleryImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setViewerActiveIdx(idx)}
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 transition shrink-0 cursor-pointer ${viewerActiveIdx === idx
-                      ? 'border-2 border-emerald-500 scale-105 shadow-sm'
-                      : 'border-transparent opacity-60 hover:opacity-100'
-                    }`}
-                >
-                  <img src={img} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-
-          </div>
-        </div>
+        <FullscreenSwipeSlider
+          images={galleryImages}
+          initialIndex={viewerActiveIdx}
+          onClose={() => setIsImageViewerOpen(false)}
+        />
       )}
 
       {/* MOBILE ONLY: BOTTOM FIXED STICKY ACTION BAR */}
