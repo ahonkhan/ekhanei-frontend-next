@@ -134,55 +134,55 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
       ) : slides.length > 0 ? (
         <div className="relative mb-10 sm:mb-14">
           <section className="relative w-full overflow-hidden shadow-sm border-b border-slate-200/80 aspect-[21/8] sm:aspect-[25/7] md:aspect-[28/7] bg-slate-900 group rounded-none">
-          {slides.map((slideUrl, idx) => (
-            <div
-              key={idx}
-              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${heroSlideIdx === idx ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
-                }`}
-            >
-              <img
-                src={getImageUrl(slideUrl)}
-                alt={`Category Hero Banner ${idx + 1}`}
-                className="w-full h-full object-cover"
-                loading={idx === 0 ? 'eager' : 'lazy'}
-              />
-            </div>
-          ))}
-
-          {/* Slider Controls */}
-          {slides.length > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={() => setHeroSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)}
-                className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white/80 hover:bg-white text-slate-800 flex items-center justify-center shadow-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
-                aria-label="Previous Slide"
+            {slides.map((slideUrl, idx) => (
+              <div
+                key={idx}
+                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${heroSlideIdx === idx ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+                  }`}
               >
-                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setHeroSlideIdx((prev) => (prev + 1) % slides.length)}
-                className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white/80 hover:bg-white text-slate-800 flex items-center justify-center shadow-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
-                aria-label="Next Slide"
-              >
-                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
-
-              {/* Slider Dots Pagination */}
-              <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/40 backdrop-blur-md">
-                {slides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setHeroSlideIdx(idx)}
-                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${heroSlideIdx === idx ? 'w-6 bg-emerald-400' : 'w-2 bg-white/60 hover:bg-white'
-                      }`}
-                  />
-                ))}
+                <img
+                  src={getImageUrl(slideUrl)}
+                  alt={`Category Hero Banner ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                  loading={idx === 0 ? 'eager' : 'lazy'}
+                />
               </div>
-            </>
-          )}
+            ))}
+
+            {/* Slider Controls */}
+            {slides.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setHeroSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)}
+                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white/80 hover:bg-white text-slate-800 flex items-center justify-center shadow-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                  aria-label="Previous Slide"
+                >
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHeroSlideIdx((prev) => (prev + 1) % slides.length)}
+                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white/80 hover:bg-white text-slate-800 flex items-center justify-center shadow-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                  aria-label="Next Slide"
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+
+                {/* Slider Dots Pagination */}
+                <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/40 backdrop-blur-md">
+                  {slides.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setHeroSlideIdx(idx)}
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${heroSlideIdx === idx ? 'w-6 bg-emerald-400' : 'w-2 bg-white/60 hover:bg-white'
+                        }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </section>
 
           {/* Floating White Title Box Overlapping Bottom Edge of Banner */}
@@ -332,7 +332,7 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
               onBeforeInit={(swiper) => { brandsSwiperRef.current = swiper; }}
               modules={[Navigation, Autoplay]}
               spaceBetween={10}
-              slidesPerView={3.5}
+              slidesPerView={5}
               breakpoints={{
                 480: { slidesPerView: 5, spaceBetween: 12 },
                 640: { slidesPerView: 6, spaceBetween: 14 },
@@ -378,11 +378,10 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                 <button
                   type="button"
                   onClick={() => setBottomFilterTab('all')}
-                  className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold transition-all duration-200 select-none cursor-pointer whitespace-nowrap ${
-                    bottomFilterTab === 'all'
+                  className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold transition-all duration-200 select-none cursor-pointer whitespace-nowrap ${bottomFilterTab === 'all'
                       ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 scale-[1.02]'
                       : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80 bg-slate-50/80 sm:bg-transparent'
-                  }`}
+                    }`}
                 >
                   সকল পণ্য
                 </button>
@@ -396,11 +395,10 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
                       key={sub.id || sub.slug}
                       type="button"
                       onClick={() => setBottomFilterTab(subId)}
-                      className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold transition-all duration-200 select-none cursor-pointer whitespace-nowrap ${
-                        isSelected
+                      className={`shrink-0 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold transition-all duration-200 select-none cursor-pointer whitespace-nowrap ${isSelected
                           ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-500/20 scale-[1.02]'
                           : 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50/80 bg-slate-50/80 sm:bg-transparent'
-                      }`}
+                        }`}
                     >
                       {sub.name}
                     </button>
