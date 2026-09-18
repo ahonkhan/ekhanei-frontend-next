@@ -71,7 +71,7 @@ export default function OrderSuccessContent() {
               </div>
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Est. Time</span>
-                <p className="text-xs font-bold text-slate-800">3-5 Business Days</p>
+                <p className="text-xs font-bold text-slate-800">30-40 Minutes</p>
               </div>
             </div>
           </div>
