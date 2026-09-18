@@ -59,8 +59,7 @@ export const Footer: React.FC = () => {
                       loading="lazy"
                       width="180"
                       height="60"
-                      className="max-h-14 md:max-h-16 w-auto object-contain brightness-0 invert auto-white-logo"
-                      style={{ filter: 'brightness(0) invert(1)' }}
+                      className="max-h-14 md:max-h-16 w-auto object-contain"
                       src={footerLogoUrl}
                     />
                   ) : (
