@@ -1436,23 +1436,50 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
       {/* MOBILE ONLY: BOTTOM FIXED STICKY ACTION BAR */}
       {isUnavailable ? (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-theme-primary p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.18)] flex flex-col items-center justify-center gap-1">
-          <div className="flex items-center gap-2">
-            <span className="relative flex items-center justify-center shrink-0">
-              <span className="w-3 h-3 rounded-full bg-emerald-300 animate-ping absolute" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 relative" />
-            </span>
-            <span className="text-white font-black text-sm uppercase tracking-widest">Product Not Available</span>
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200 p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-5 shrink-0 px-1 sm:px-2">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="flex flex-col items-center gap-1 relative text-slate-700 hover:text-theme-primary transition cursor-pointer"
+            >
+              <div className="relative text-theme-primary">
+                <ShoppingCart className="w-6 h-6" />
+                {totalItemsCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 bg-theme-primary text-white text-[10px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-xs">
+                    {totalItemsCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] sm:text-xs font-extrabold text-slate-800">Cart</span>
+            </button>
+
+            <button
+              onClick={() => router.push('/chat')}
+              className="flex flex-col items-center gap-1 relative text-slate-700 hover:text-theme-primary transition cursor-pointer"
+            >
+              <div className="relative text-theme-primary">
+                <MessageSquare className="w-6 h-6" />
+              </div>
+              <span className="text-[10px] sm:text-xs font-extrabold text-slate-800">Chat</span>
+            </button>
           </div>
-          {availableAtTime && (
-            <span className="text-white/90 font-bold text-xs flex items-center gap-1.5">
-              <span className="relative flex items-center justify-center shrink-0">
-                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping absolute" />
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 relative" />
-              </span>
-              Available at <span className="text-emerald-200 font-extrabold ml-1">{availableAtTime}</span>
-            </span>
-          )}
+
+          <div className="flex flex-1 items-center gap-2 sm:gap-3">
+            <div className="flex-1 bg-theme-primary text-white py-2 rounded-xl shadow-md flex flex-col items-center justify-center gap-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex items-center justify-center shrink-0">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping absolute" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-300 relative" />
+                </span>
+                <span className="font-black text-[10px] sm:text-[11px] uppercase tracking-wide">Product Not Available</span>
+              </div>
+              {availableAtTime && (
+                <span className="text-white/90 font-bold text-[9px] sm:text-[10px] flex items-center gap-1">
+                  Available at <span className="text-emerald-200 font-extrabold ml-0.5">{availableAtTime}</span>
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200 p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-3 sm:gap-4">
