@@ -1152,7 +1152,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                       <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping absolute" />
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 relative" />
                     </span>
-                    Available at <span className="text-emerald-200 font-extrabold ml-1">{availableAtTime}</span>
+                    Order at <span className="text-emerald-200 font-extrabold ml-1">{availableAtTime}</span>
                   </span>
                 ) : (
                   <span className="text-white/80 font-medium text-xs">Currently not available</span>
