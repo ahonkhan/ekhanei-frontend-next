@@ -855,6 +855,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
                   <button
                     key={idx}
                     onClick={() => {
+                      if (typeof window !== 'undefined' && window.innerWidth < 640) return;
                       setSelectedImgIdx(idx);
                       setIsImageViewerOpen(true);
                       setViewerActiveIdx(idx);
@@ -879,6 +880,7 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             {/* Main Image Box */}
             <div
               onClick={() => {
+                if (typeof window !== 'undefined' && window.innerWidth < 640) return;
                 setIsImageViewerOpen(true);
                 setViewerActiveIdx(selectedImgIdx);
               }}
