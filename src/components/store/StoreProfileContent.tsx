@@ -47,7 +47,7 @@ interface StoreProfileContentProps {
 }
 
 // Reusable Store Intro Widget Component (Matching Facebook Profile Intro Box)
-const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> = ({ store, onSeeAllPhotos }) => {
+const StoreIntroWidget: React.FC<{ store: Store }> = ({ store }) => {
   const isStoreOpen = isStoreOpenNow(store);
 
   return (
@@ -99,19 +99,7 @@ const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> 
             </div>
           </div>
 
-          {/* Phone */}
-          {store.phone && (
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 mt-0.5">
-                <Phone className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="font-bold text-slate-900">Phone Support</span>
-                <p className="text-slate-500 text-xs mt-0.5">{store.phone}</p>
-              </div>
-            </div>
-          )}
-
+          
           {/* Delivery Details */}
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
@@ -172,25 +160,6 @@ const StoreIntroWidget: React.FC<{ store: Store; onSeeAllPhotos?: () => void }> 
         )}
       </div>
 
-      {/* Mini Photo Preview Widget */}
-      {store.gallery && store.gallery.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-sm text-slate-900">Store Photos</h4>
-            <button
-              onClick={onSeeAllPhotos}
-              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition"
-            >
-              See All
-            </button>
-          </div>
-          <div className="grid grid-cols-2 gap-2 rounded-xl overflow-hidden">
-            {store.gallery.slice(0, 4).map((img, i) => (
-              <img key={i} src={getImageUrl(img)} alt="Store visual" className="w-full h-24 object-cover hover:scale-105 transition duration-300 cursor-pointer" onClick={onSeeAllPhotos} />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -317,7 +286,7 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
 
       // Category tab filter
       let matchesTab = true;
-      if (activeTab !== 'all' && activeTab !== 'about' && activeTab !== 'reviews' && activeTab !== 'photos') {
+      if (activeTab !== 'all' && activeTab !== 'about' && activeTab !== 'reviews') {
         const catKey = activeTab.toLowerCase();
         matchesTab = product.name.toLowerCase().includes(catKey) ||
           product.categoryName?.toLowerCase().includes(catKey) ||
@@ -593,19 +562,6 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
                 <span>Reviews ({reviewsList.length})</span>
               </button>
 
-              {/* Photos Tab */}
-              <button
-                onClick={() => setActiveTab('photos')}
-                className={`px-4 py-3 border-b-2 whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                  activeTab === 'photos'
-                    ? 'border-emerald-600 text-emerald-600 font-extrabold'
-                    : 'border-transparent hover:text-slate-900'
-                }`}
-              >
-                <ImageIcon className="w-4 h-4 text-blue-500" />
-                <span>Photos</span>
-              </button>
-
             </div>
           </div>
         </div>
@@ -619,8 +575,8 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
         {activeTab === 'about' && (
           <div className="max-w-4xl mx-auto space-y-6">
             
-            {/* 1. Store Intro Cards Stack (Address, Hours, Phone, Delivery, Deal, Photos) */}
-            <StoreIntroWidget store={store} onSeeAllPhotos={() => setActiveTab('photos')} />
+            {/* 1. Store Intro Cards Stack (Address, Hours, Phone, Delivery, Deal) */}
+            <StoreIntroWidget store={store} />
 
             {/* 2. Detailed Hygiene & Operating Hours Card */}
             <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-6">
@@ -731,28 +687,8 @@ export const StoreProfileContent: React.FC<StoreProfileContentProps> = ({ store,
           </div>
         )}
 
-        {/* VIEW 3: PHOTOS TAB */}
-        {activeTab === 'photos' && (
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">
-            <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-blue-500" />
-              <span>Store Photo Gallery</span>
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {(store.gallery && store.gallery.length > 0 ? store.gallery : [store.coverImage, store.logoImage]).map((img, idx) => (
-                <div key={idx} className="aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100 group cursor-pointer relative">
-                  <img src={getImageUrl(img)} alt={`Gallery ${idx}`} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-                  <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
-                    <Camera className="w-6 h-6" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* VIEW 4: PRODUCTS LIST & SECTIONS (TOP RATED, TOP SOLD, FOR YOU MATCHING IMAGE 1) */}
-        {activeTab !== 'about' && activeTab !== 'reviews' && activeTab !== 'photos' && (
+        {activeTab !== 'about' && activeTab !== 'reviews' && (
           <div className="space-y-8">
             {activeTab === 'all' && !searchQuery.trim() ? (
               <>

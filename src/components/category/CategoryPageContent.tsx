@@ -130,9 +130,10 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
     <div className="w-full pb-12 pt-0 mt-0 space-y-6 sm:space-y-10">
       {/* 1. TOP PROMO ADS / FULL WIDTH HERO SLIDER - SKELETON WHILE LOADING */}
       {isMetaLoading ? (
-        <div className="w-full aspect-[21/8] sm:aspect-[25/7] md:aspect-[28/7] bg-slate-200 animate-pulse rounded-none" />
+        <div className="w-full aspect-[21/8] sm:aspect-[25/7] md:aspect-[28/7] bg-slate-200 animate-pulse rounded-none mb-10 sm:mb-14" />
       ) : slides.length > 0 ? (
-        <section className="relative w-full overflow-hidden shadow-sm border-b border-slate-200/80 aspect-[21/8] sm:aspect-[25/7] md:aspect-[28/7] bg-slate-900 group rounded-none">
+        <div className="relative mb-10 sm:mb-14">
+          <section className="relative w-full overflow-hidden shadow-sm border-b border-slate-200/80 aspect-[21/8] sm:aspect-[25/7] md:aspect-[28/7] bg-slate-900 group rounded-none">
           {slides.map((slideUrl, idx) => (
             <div
               key={idx}
@@ -182,8 +183,26 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
               </div>
             </>
           )}
-        </section>
-      ) : null}
+          </section>
+
+          {/* Floating White Title Box Overlapping Bottom Edge of Banner */}
+          <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 z-10 px-4 sm:px-6">
+            <div className="max-w-[1680px] mx-auto">
+              <div className="bg-white/95 backdrop-blur-md px-5 py-3.5 sm:px-8 sm:py-4 rounded-lg sm:rounded-xl shadow-lg border border-slate-100/90 w-full text-left">
+                <h1 className="text-base sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none capitalize">
+                  {catMeta?.title || slug.replace('-', ' ')}
+                </h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="pt-4 sm:pt-6 px-4 sm:px-5 max-w-[1680px] mx-auto">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none capitalize">
+            {catMeta?.title || slug.replace('-', ' ')}
+          </h1>
+        </div>
+      )}
 
       <main className="max-w-[1680px] mx-auto px-2 sm:px-5 space-y-8 sm:space-y-12">
 
@@ -315,11 +334,11 @@ export const CategoryPageContent: React.FC<{ slug: string }> = ({ slug }) => {
               spaceBetween={10}
               slidesPerView={3.5}
               breakpoints={{
-                480: { slidesPerView: 4.5, spaceBetween: 12 },
-                640: { slidesPerView: 5.5, spaceBetween: 14 },
-                768: { slidesPerView: 6.5, spaceBetween: 14 },
-                1024: { slidesPerView: 8.5, spaceBetween: 16 },
-                1280: { slidesPerView: 10.5, spaceBetween: 16 },
+                480: { slidesPerView: 5, spaceBetween: 12 },
+                640: { slidesPerView: 6, spaceBetween: 14 },
+                768: { slidesPerView: 7, spaceBetween: 14 },
+                1024: { slidesPerView: 8, spaceBetween: 16 },
+                1280: { slidesPerView: 10, spaceBetween: 16 },
               }}
               autoplay={{ delay: 3500, disableOnInteraction: false }}
               className="w-full py-1.5"

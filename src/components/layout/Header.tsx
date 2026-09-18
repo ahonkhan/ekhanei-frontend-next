@@ -21,7 +21,7 @@ export const Header: React.FC = () => {
   const { selectedLocation, selectGPSLocation, openLocationDrawer } = useLocation();
   const { toggleThemeModal, currentTheme } = useTheme();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
-  const { data: siteSettings } = useGetSiteSettingsQuery();
+  const { data: siteSettings, isLoading: isSiteSettingsLoading } = useGetSiteSettingsQuery();
   const pathname = usePathname();
   const isHomePage = pathname === '/';
   const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(false);
@@ -84,14 +84,18 @@ export const Header: React.FC = () => {
               className="w-6 h-6 cursor-pointer text-white hover:opacity-80 transition"
             />
             <Link href="/">
-              <img
-                alt={siteSettings?.site_name || "Logo"}
-                width="130"
-                height="33"
-                className="w-22.5 h-5.75 md:w-32.5 md:h-8.25 object-contain brightness-0 invert auto-white-logo"
-                style={{ filter: 'brightness(0) invert(1)' }}
-                src={headerLogoUrl || "/logo.png"}
-              />
+              {isSiteSettingsLoading ? (
+                <div className="w-22.5 h-5.75 md:w-32.5 md:h-8.25 bg-white/20 animate-pulse rounded-md" />
+              ) : headerLogoUrl ? (
+                <img
+                  alt={siteSettings?.site_name || "Logo"}
+                  width="130"
+                  height="33"
+                  className="w-22.5 h-5.75 md:w-32.5 md:h-8.25 object-contain brightness-0 invert auto-white-logo"
+                  style={{ filter: 'brightness(0) invert(1)' }}
+                  src={headerLogoUrl}
+                />
+              ) : null}
             </Link>
 
             {/* Location Pill (Desktop Header) */}

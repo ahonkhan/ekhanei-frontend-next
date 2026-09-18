@@ -316,12 +316,28 @@ export const apiService = createApi({
       query: ({ conversationId, page = 1 }) => `/customer/chat/conversations/${conversationId}/messages?page=${page}`,
       providesTags: ['Chat'],
     }),
-    sendChatMessage: builder.mutation<any, { conversationId: number | string; message: string }>({
-      query: ({ conversationId, message }) => ({
-        url: `/customer/chat/conversations/${conversationId}/messages`,
-        method: 'POST',
-        body: { message },
-      }),
+    sendChatMessage: builder.mutation<any, { conversationId: number | string; message?: string; attachments?: File[] }>({
+      query: ({ conversationId, message, attachments }) => {
+        // If images are present, use FormData
+        if (attachments && attachments.length > 0) {
+          const formData = new FormData();
+          if (message) formData.append('message', message);
+          attachments.forEach((file) => formData.append('attachments[]', file));
+          return {
+            url: `/customer/chat/conversations/${conversationId}/messages`,
+            method: 'POST',
+            body: formData,
+            // Do NOT set Content-Type — browser will set multipart/form-data with boundary
+            formData: true,
+          };
+        }
+        // Text-only: plain JSON
+        return {
+          url: `/customer/chat/conversations/${conversationId}/messages`,
+          method: 'POST',
+          body: { message: message || '' },
+        };
+      },
     }),
     markChatRead: builder.mutation<any, number | string>({
       query: (conversationId) => ({

@@ -45,7 +45,7 @@ export const TrustBadges: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 3: Delivery Within 48hrs */}
+        {/* Card 3: Delivery Within 30-40min */}
         <div className="text-card-foreground flex flex-col gap-6 rounded-sm py-6 shadow-sm shadow-primary/10 flex-1 h-[66px] hover:shadow-lg transition-all duration-200 bg-white border border-slate-100">
           <div className="px-6 h-full">
             <div className="flex justify-center items-center gap-2 w-full h-full">
@@ -60,7 +60,7 @@ export const TrustBadges: React.FC = () => {
                 />
               </div>
               <span className="text-gray-800 font-medium text-[16.6px]">
-                Delivery Within <span className="text-theme-primary">48hrs</span>
+                Delivery Within <span className="text-theme-primary">30-40min</span>
               </span>
             </div>
           </div>
@@ -126,7 +126,7 @@ export const TrustBadges: React.FC = () => {
         <div className="text-card-foreground flex flex-col gap-6 shadow-sm flex-1 h-[50px] hover:shadow-lg !border-none rounded p-0.5 bg-white">
           <div className="p-1 h-full flex flex-col items-center justify-center">
             <img
-              alt="Delivery Within 48hrs"
+              alt="Delivery Within 30-40min"
               loading="lazy"
               width="25"
               height="26"
@@ -134,7 +134,7 @@ export const TrustBadges: React.FC = () => {
               src="/images/delivery.jpeg"
             />
             <span className="text-gray-800 font-medium text-[8px] leading-tight text-center">
-              Delivery Within <span className="text-theme-primary">48 hrs</span>
+              Delivery Within <span className="text-theme-primary">30-40min</span>
             </span>
           </div>
         </div>
