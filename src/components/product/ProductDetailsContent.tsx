@@ -1034,7 +1034,10 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
               <span className="text-slate-300">|</span>
               {isUnavailable ? (
                 <span className="text-rose-600 font-extrabold bg-rose-50 px-2.5 py-0.5 rounded-md border border-rose-200 flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-rose-600 inline" />
+                  <span className="relative flex items-center justify-center shrink-0">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping absolute" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 relative" />
+                  </span>
                   <span>NOT AVAILABLE</span>
                 </span>
               ) : (
@@ -1043,9 +1046,12 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
             </div>
             {isUnavailable && (
               <p className="text-xs text-rose-700 font-bold pt-1 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-rose-600" />
+                <span className="relative flex items-center justify-center shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping absolute" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 relative" />
+                </span>
                 <span>
-                  {availableAtTime ? `Available at ${availableAtTime}` : 'Currently Closed'}
+                  {availableAtTime ? `Available at ${availableAtTime}` : 'Currently not available'}
                 </span>
               </p>
             )}
@@ -1131,35 +1137,26 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
 
           {/* 5. Action Buttons Row */}
           {isUnavailable ? (
-            <div className="w-full space-y-2 pt-2">
-              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-900 text-xs font-bold flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5 text-rose-600" />
+            <div className="w-full pt-2">
+              <div className="p-4 sm:p-5 bg-theme-primary rounded-2xl text-white flex flex-col items-center justify-center gap-2 shadow-lg">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex items-center justify-center shrink-0">
+                    <span className="w-3 h-3 rounded-full bg-emerald-300 animate-ping absolute" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 relative" />
+                  </span>
+                  <span className="font-black text-sm sm:text-base uppercase tracking-widest">Product Not Available</span>
                 </div>
-                <div>
-                  <span className="block font-black text-rose-700 uppercase tracking-wide text-xs sm:text-sm">NOT AVAILABLE</span>
-                  {availableAtTime ? (
-                    <span className="text-rose-600 font-bold text-xs">Available at {availableAtTime}</span>
-                  ) : (
-                    <span className="text-rose-600 font-medium text-xs">Currently Closed</span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-3 pt-1 w-full opacity-70">
-                <button
-                  disabled
-                  className="flex-1 py-3 px-4 sm:px-6 rounded-2xl bg-rose-600 text-white font-black text-xs sm:text-sm flex flex-col items-center justify-center gap-0.5 cursor-not-allowed shadow-xs"
-                >
-                  <div className="flex items-center gap-1.5 uppercase tracking-wider">
-                    <Clock className="w-4 h-4" />
-                    <span>NOT AVAILABLE</span>
-                  </div>
-                  {availableAtTime && (
-                    <span className="text-[11px] font-bold text-rose-100">
-                      Available at {availableAtTime}
+                {availableAtTime ? (
+                  <span className="text-white/90 font-bold text-xs sm:text-sm flex items-center gap-1.5">
+                    <span className="relative flex items-center justify-center shrink-0">
+                      <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping absolute" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 relative" />
                     </span>
-                  )}
-                </button>
+                    Available at <span className="text-emerald-200 font-extrabold ml-1">{availableAtTime}</span>
+                  </span>
+                ) : (
+                  <span className="text-white/80 font-medium text-xs">Currently not available</span>
+                )}
               </div>
             </div>
           ) : (
@@ -1422,36 +1419,57 @@ export const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ pr
       )}
 
       {/* MOBILE ONLY: BOTTOM FIXED STICKY ACTION BAR */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200 p-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-2.5">
-        <button
-          onClick={() => setIsCartOpen(true)}
-          className="flex flex-col items-center gap-0.5 px-2 relative text-slate-700 hover:text-theme-primary transition shrink-0 cursor-pointer"
-        >
-          <div className="relative">
-            <ShoppingCart className="w-5 h-5" />
-            {totalItemsCount > 0 && (
-              <span className="absolute -top-1.5 -right-2.5 bg-theme-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
-                {totalItemsCount}
-              </span>
-            )}
+      {isUnavailable ? (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-theme-primary p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.18)] flex flex-col items-center justify-center gap-1">
+          <div className="flex items-center gap-2">
+            <span className="relative flex items-center justify-center shrink-0">
+              <span className="w-3 h-3 rounded-full bg-emerald-300 animate-ping absolute" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 relative" />
+            </span>
+            <span className="text-white font-black text-sm uppercase tracking-widest">Product Not Available</span>
           </div>
-          <span className="text-[10px] font-extrabold">Cart</span>
-        </button>
+          {availableAtTime && (
+            <span className="text-white/90 font-bold text-xs flex items-center gap-1.5">
+              <span className="relative flex items-center justify-center shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping absolute" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 relative" />
+              </span>
+              Available at <span className="text-emerald-200 font-extrabold ml-1">{availableAtTime}</span>
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-slate-200 p-2.5 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-2.5">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="flex flex-col items-center gap-0.5 px-2 relative text-slate-700 hover:text-theme-primary transition shrink-0 cursor-pointer"
+          >
+            <div className="relative">
+              <ShoppingCart className="w-5 h-5" />
+              {totalItemsCount > 0 && (
+                <span className="absolute -top-1.5 -right-2.5 bg-theme-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                  {totalItemsCount}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] font-extrabold">Cart</span>
+          </button>
 
-        <button
-          onClick={() => addItem({ ...product, price: activePrice })}
-          className="flex-1 bg-theme-primary hover:bg-theme-primary-hover active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
-        >
-          Add to Cart
-        </button>
+          <button
+            onClick={() => addItem({ ...product, price: activePrice })}
+            className="flex-1 bg-theme-primary hover:bg-theme-primary-hover active:scale-98 text-white font-extrabold text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
+          >
+            Add to Cart
+          </button>
 
-        <button
-          onClick={handleBuyNow}
-          className="flex-1 bg-theme-secondary hover:bg-theme-secondary-hover active:scale-98 text-white font-black text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
-        >
-          Buy Now
-        </button>
-      </div>
+          <button
+            onClick={handleBuyNow}
+            className="flex-1 bg-theme-secondary hover:bg-theme-secondary-hover active:scale-98 text-white font-black text-xs sm:text-sm py-3 rounded-2xl shadow-md transition text-center cursor-pointer"
+          >
+            Buy Now
+          </button>
+        </div>
+      )}
 
       {/* SHARE POPUP MODAL (Matching requested design) */}
       {isShareModalOpen && (
